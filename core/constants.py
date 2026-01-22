@@ -1,4 +1,3 @@
-# core/constants.py
 from dataclasses import dataclass
 
 # =========================
@@ -21,6 +20,13 @@ class _Indicators:
     FAT_META: str = "FATURAMENTO - META"
     FAT_PERC: str = "PERC META FATURAMENTO"
     FAT_DIF:  str = "DIF META FATURAMENTO"
+
+    # Novos cards (básico)
+    LEADS_CRIADOS: str = "LEADS CRIADOS"
+    TAXA_CONVERSAO: str = "TAXA DE CONVERSÃO"
+    CONTRATOS_ASSINADOS: str = "CONTRATOS ASSINADOS"
+    FATURAMENTO_ASSINADO: str = "FATURAMENTO ASSINADO"
+    FATURAMENTO_PAGO: str = "FATURAMENTO PAGO"
 
 
 INDICATORS = _Indicators()

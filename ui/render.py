@@ -1,13 +1,11 @@
-# ui/render.py
 from __future__ import annotations
 
 from pathlib import Path
+import re
 import streamlit as st
 
 
 _BASE_DIR = Path(__file__).resolve().parent.parent
-_ASSETS_DIR = _BASE_DIR / "assets"
-_TEMPLATES_DIR = _BASE_DIR / "templates"
 
 
 def _read_text(path: Path) -> str:
@@ -32,17 +30,18 @@ def inject_kiosk_css() -> None:
     st.markdown(f"<style>\n{css}\n</style>", unsafe_allow_html=True)
 
 
-def render_dashboard(cards_html: str) -> str:
+def render_dashboard(slots: dict[str, str]) -> str:
     """
-    Monta o HTML final do iframe, injetando:
-    - templates/dashboard.html (estrutura)
-    - assets/dashboard.css (variáveis e ajustes 'TV proof')
-    - cards_html (os cards em si)
+    Monta o HTML final do iframe substituindo tokens do template.
     """
     template = load_asset_text("templates/dashboard.html")
     css = load_asset_text("assets/dashboard.css")
 
-    # tokens simples para evitar brigas de { } no CSS/HTML
     html = template.replace("__DASHBOARD_CSS__", css)
-    html = html.replace("__CARDS_HTML__", cards_html)
+
+    for key, value in slots.items():
+        html = html.replace(f"__{key}__", value)
+
+    # Se sobrar algum token não preenchido, remove
+    html = re.sub(r"__[^_]+__", "", html)
     return html

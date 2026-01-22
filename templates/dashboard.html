@@ -1,4 +1,3 @@
-<!-- templates/dashboard.html -->
 <!doctype html>
 <html lang="pt-br">
   <head>
@@ -14,15 +13,43 @@ __DASHBOARD_CSS__
     </style>
   </head>
 
-  <!-- ✅ Aqui é onde “sobe” o conteúdo: items-start + padding-top -->
-  <body class="h-full w-full overflow-hidden flex justify-center items-start"
-        style="padding-top: var(--top-pad);">
+  <body class="h-full w-full overflow-hidden">
+    <!-- Wrapper com padding-top para "subir" o dashboard (TV) -->
+    <div class="w-full overflow-hidden flex justify-center items-start"
+         style="padding-top: var(--top-pad); height: 100vh;">
 
-    <div class="w-full h-full flex justify-center items-start">
-      <div class="bg-transparent rounded-[28px] w-full" style="padding: 0 var(--pad); max-width: 1600px;">
-        <!-- Mantém sempre 2 colunas (horizontal) -->
-        <div class="grid grid-cols-2" style="gap: var(--gap);">
-__CARDS_HTML__
+      <div class="w-full layout-shell" style="max-width: 1900px; padding: 0 var(--pad); height: calc(100vh - var(--top-pad));">
+        <!-- Layout responsivo:
+             Desktop/TV: grid fixo (como no print)
+             Mobile: carrossel horizontal (swipe) -->
+        <div class="layout">
+          <div class="tile tile-reunioes">
+__CARD_REUNIOES__
+          </div>
+
+          <div class="tile tile-leads">
+__CARD_LEADS__
+          </div>
+
+          <div class="tile tile-taxa-geral">
+__CARD_TAXA_GERAL__
+          </div>
+
+          <div class="tile tile-reunioes-pessoa">
+__CARD_REUNIOES_PESSOA__
+          </div>
+
+          <div class="tile tile-faturamento">
+__CARD_FATURAMENTO__
+          </div>
+
+          <div class="tile tile-taxa-pessoa">
+__CARD_TAXA_PESSOA__
+          </div>
+
+          <div class="tile tile-contratos-pessoa">
+__CARD_CONTRATOS_PESSOA__
+          </div>
         </div>
       </div>
     </div>

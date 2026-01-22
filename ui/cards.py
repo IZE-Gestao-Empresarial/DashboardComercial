@@ -1,4 +1,3 @@
-# ui/cards.py
 from ui.gauge import gauge_svg
 
 
@@ -17,7 +16,7 @@ def kpi_card_html(
     right_pill_html = right_pill.replace("\n", "<br/>")
 
     return f"""
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100" style="padding: var(--pad);">
+    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full" style="padding: var(--pad);">
       <div class="font-extrabold text-zinc-900" style="font-size: var(--fs-title); line-height: 1.1;">
         {title}
       </div>
