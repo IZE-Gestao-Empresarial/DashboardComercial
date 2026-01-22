@@ -1,0 +1,46 @@
+
+html, body {
+  height: 100%;
+  overflow: hidden !important;
+}
+
+/* Esconde menu/header/footer do Streamlit */
+#MainMenu { visibility: hidden; height: 0; }
+header[data-testid="stHeader"] { display: none; }
+[data-testid="stToolbar"] { display: none; }
+footer { display: none; }
+/* Esconde o status de "Running..." durante o reload */
+[data-testid="stStatusWidget"] { display: none !important; }
+
+/* Trava o container principal sem scroll */
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewContainer"] > .main {
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* Remove paddings e centraliza o conteúdo */
+[data-testid="stAppViewContainer"] > .main .block-container {
+  height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Centraliza o elemento do components.html */
+[data-testid="stElementContainer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Garante que o iframe fique no centro e sem borda */
+iframe {
+  border: 0 !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
