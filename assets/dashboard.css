@@ -1,26 +1,23 @@
-/* assets/dashboard.css */
 html, body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
-/* ===== Ajustes “TV proof” =====
-   - --top-pad: sobe o container dos cards
-   - clamp() reduz fonte quando o viewport fica “menor” por causa da escala do Windows/TV
-*/
+* { box-sizing: border-box; }
+
+/* ===== Ajustes “TV proof” ===== */
 :root {
-  /* sobe o bloco */
+  /* sobe o bloco no desktop/TV */
   --top-pad: clamp(10px, 2.2vh, 34px);
 
-  /* ajuste fino: encolhe tudo um pouco na TV */
-  --ui-scale: 0.92;
-
   --pad: clamp(12px, 1.0vw, 18px);
-  --box-pad: clamp(8px, 0.8vw, 12px);
   --gap: clamp(10px, 1.1vw, 14px);
 
-  /* fontes mais conservadoras (não estouram em TV com escala) */
+  --box-pad: clamp(8px, 0.8vw, 12px);
+
+  /* fontes */
   --fs-title: clamp(18px, 1.3vw, 24px);
   --fs-center: clamp(18px, 1.6vw, 28px);
   --fs-sub: clamp(11px, 0.9vw, 13px);
@@ -29,8 +26,95 @@ html, body {
   --fs-pill: clamp(12px, 1.0vw, 14px);
   --fs-badge: clamp(10px, 0.8vw, 12px);
 
+  /* placeholder (cards vazios) */
+  --fs-placeholder: clamp(20px, 1.8vw, 34px);
+
   --gauge-w: clamp(160px, 10vw, 200px);
   --gauge-min-h: clamp(120px, 11vw, 145px);
   --gauge-text-shift: 10px;
   --pill-min-h: clamp(52px, 5.5vw, 68px);
 }
+
+/* ===============
+   DESKTOP / TV
+   Grid fixo como no print
+   =============== */
+.layout {
+  height: 100%;
+  min-height: 0;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  gap: var(--gap);
+
+  grid-template-areas:
+    "reunioes leads reunioes_pessoa"
+    "reunioes taxa_geral reunioes_pessoa"
+    "faturamento taxa_pessoa contratos_pessoa"
+    "faturamento taxa_pessoa contratos_pessoa";
+}
+
+.tile {
+  height: 100%;
+  min-height: 0; /* importante para não estourar a altura */
+  width: 100%;
+}
+
+.tile-reunioes { grid-area: reunioes; }
+.tile-leads { grid-area: leads; }
+.tile-taxa-geral { grid-area: taxa_geral; }
+.tile-reunioes-pessoa { grid-area: reunioes_pessoa; }
+.tile-faturamento { grid-area: faturamento; }
+.tile-taxa-pessoa { grid-area: taxa_pessoa; }
+.tile-contratos-pessoa { grid-area: contratos_pessoa; }
+
+/* ===============
+   MOBILE
+   Carrossel horizontal (swipe)
+   Sem scroll vertical.
+   =============== */
+@media (max-width: 900px) {
+  :root {
+    --top-pad: 0px;
+  }
+
+  .layout-shell {
+    height: 100vh !important;
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap);
+
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+
+    /* evita “puxar” a página pra baixo */
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: none;
+
+    /* deixa swipe mais previsível */
+    touch-action: pan-x;
+  }
+
+  .layout::-webkit-scrollbar { display: none; }
+  .layout { scrollbar-width: none; }
+
+  .tile {
+    /* 1 card por “tela”, com bordas respirando */
+    flex: 0 0 92vw;
+    height: 100%;
+    scroll-snap-align: start;
+  }
+}
+
+
+/* Evita que conteúdo interno estoure o tile (sem criar scroll) */
+.tile > div { max-height: 100%; }

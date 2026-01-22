@@ -1,4 +1,3 @@
-# core/formatters.py
 import math
 from typing import Optional
 

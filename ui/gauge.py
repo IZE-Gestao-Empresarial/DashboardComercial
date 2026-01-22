@@ -1,4 +1,3 @@
-# ui/gauge.py
 import math
 
 
