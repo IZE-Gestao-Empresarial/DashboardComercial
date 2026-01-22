@@ -1,0 +1,36 @@
+/* assets/dashboard.css */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* ===== Ajustes “TV proof” =====
+   - --top-pad: sobe o container dos cards
+   - clamp() reduz fonte quando o viewport fica “menor” por causa da escala do Windows/TV
+*/
+:root {
+  /* sobe o bloco */
+  --top-pad: clamp(10px, 2.2vh, 34px);
+
+  /* ajuste fino: encolhe tudo um pouco na TV */
+  --ui-scale: 0.92;
+
+  --pad: clamp(12px, 1.0vw, 18px);
+  --box-pad: clamp(8px, 0.8vw, 12px);
+  --gap: clamp(10px, 1.1vw, 14px);
+
+  /* fontes mais conservadoras (não estouram em TV com escala) */
+  --fs-title: clamp(18px, 1.3vw, 24px);
+  --fs-center: clamp(18px, 1.6vw, 28px);
+  --fs-sub: clamp(11px, 0.9vw, 13px);
+  --fs-label: clamp(10px, 0.8vw, 12px);
+  --fs-kpi: clamp(14px, 1.2vw, 20px);
+  --fs-pill: clamp(12px, 1.0vw, 14px);
+  --fs-badge: clamp(10px, 0.8vw, 12px);
+
+  --gauge-w: clamp(160px, 10vw, 200px);
+  --gauge-min-h: clamp(120px, 11vw, 145px);
+  --gauge-text-shift: 10px;
+  --pill-min-h: clamp(52px, 5.5vw, 68px);
+}
