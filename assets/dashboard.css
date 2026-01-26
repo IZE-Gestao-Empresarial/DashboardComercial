@@ -9,35 +9,62 @@ html, body {
 
 /* ===== Ajustes “TV proof” ===== */
 :root {
+  /* --- Podium (contratos por pessoa) --- */
+  --podium-photo: clamp(170px, 10.5vw, 260px);
+  --podium-ring: clamp(10px, 0.7vw, 14px);
+  --podium-card-w: clamp(260px, 16vw, 420px);
+
+  --crown-w: clamp(96px, 6.2vw, 130px);
+  --crown-top: clamp(44px, 3.3vw, 66px);
+
+  --podium-head-fs: clamp(16px, 1.2vw, 22px);
+  --podium-name-fs: clamp(14px, 1.0vw, 18px);
+  --podium-row-fs: clamp(13px, 0.95vw, 17px);
+  --podium-val-fs: clamp(16px, 1.25vw, 22px);
+
   /* sobe o bloco no desktop/TV */
   --top-pad: clamp(10px, 2.2vh, 34px);
 
   --pad: clamp(12px, 1.0vw, 18px);
-  --gap: clamp(10px, 1.1vw, 14px);
 
-  --box-pad: clamp(8px, 0.8vw, 12px);
+  /* ✅ MAIOR para os 2 subcards (gap/padding) */
+  --gap: clamp(12px, 1.2vw, 20px);
+  --box-pad: clamp(12px, 1.1vw, 20px);
 
-  /* fontes */
-  --fs-title: clamp(18px, 1.3vw, 24px);
-  --fs-center: clamp(18px, 1.6vw, 28px);
-  --fs-sub: clamp(11px, 0.9vw, 13px);
-  --fs-label: clamp(10px, 0.8vw, 12px);
-  --fs-kpi: clamp(14px, 1.2vw, 20px);
+  /* ✅ MAIS DESTAQUE (porcentagem + valores) */
+  --fs-title: clamp(18px, 1.35vw, 26px);
+
+  /* porcentagem do gauge */
+  --fs-center: clamp(28px, 2.8vw, 56px);
+
+  /* subtítulo do gauge */
+  --fs-sub: clamp(12px, 1.05vw, 16px);
+
+  /* labels e valores dos subcards */
+  --fs-label: clamp(13px, 1.1vw, 20px);
+  --fs-kpi: clamp(22px, 2.2vw, 44px);
+
+  /* (não usado mais no seu KPI, mas mantido) */
   --fs-pill: clamp(12px, 1.0vw, 14px);
   --fs-badge: clamp(10px, 0.8vw, 12px);
 
   /* placeholder (cards vazios) */
   --fs-placeholder: clamp(20px, 1.8vw, 34px);
 
-  --gauge-w: clamp(160px, 10vw, 200px);
-  --gauge-min-h: clamp(120px, 11vw, 145px);
-  --gauge-text-shift: 10px;
-  --pill-min-h: clamp(52px, 5.5vw, 68px);
+  /* Gauge */
+  --gauge-w: clamp(384px, 24vw, 480px);
+  --gauge-min-h: clamp(288px, 26.4vw, 348px);
+  --gauge-text-shift: 24px;
+
+  /* ✅ MAIOR: altura mínima dos subcards cinzas */
+  --pill-min-h: clamp(80px, 7vw, 150px);
+
+  --donut-size: clamp(160px, 12vw, 230px);
 }
 
 /* ===============
    DESKTOP / TV
-   Grid fixo como no print
+   Grid fixo
    =============== */
 .layout {
   height: 100%;
@@ -57,6 +84,7 @@ html, body {
 
 .tile {
   height: 100%;
+  overflow: hidden;
   min-height: 0; /* importante para não estourar a altura */
   width: 100%;
 }
@@ -76,7 +104,26 @@ html, body {
    =============== */
 @media (max-width: 900px) {
   :root {
+    /* --- Podium (contratos por pessoa) --- */
+    --podium-photo: clamp(170px, 10.5vw, 260px);
+    --podium-ring: clamp(10px, 0.7vw, 14px);
+    --podium-card-w: clamp(260px, 16vw, 420px);
+
+    --crown-w: clamp(96px, 6.2vw, 130px);
+    --crown-top: clamp(44px, 3.3vw, 66px);
+
+    --podium-head-fs: clamp(16px, 1.2vw, 22px);
+    --podium-name-fs: clamp(14px, 1.0vw, 18px);
+    --podium-row-fs: clamp(13px, 0.95vw, 17px);
+    --podium-val-fs: clamp(16px, 1.25vw, 22px);
+
     --top-pad: 0px;
+
+    /* ✅ MAIS DESTAQUE no mobile (vw no mobile costuma deixar pequeno) */
+    --fs-center: clamp(30px, 7vw, 54px);
+    --fs-kpi: clamp(22px, 5.6vw, 40px);
+    --fs-label: clamp(13px, 3.2vw, 18px);
+    --fs-sub: clamp(12px, 3.0vw, 16px);
   }
 
   .layout-shell {
@@ -115,6 +162,382 @@ html, body {
   }
 }
 
-
 /* Evita que conteúdo interno estoure o tile (sem criar scroll) */
-.tile > div { max-height: 100%; }
+.tile > div { height: 100%; max-height: 100%; overflow: hidden; }
+
+/* ===============
+   TELAS COM "ALTURA ÚTIL" MENOR (ex.: Windows/TV com escala alta)
+   Encolhe paddings/fontes/gauges pra evitar overflow.
+   =============== */
+@media (max-height: 900px) {
+  :root {
+    --podium-photo: clamp(150px, 10vw, 220px);
+    --podium-card-w: clamp(240px, 15vw, 360px);
+    --crown-w: clamp(86px, 5.8vw, 115px);
+    --crown-top: clamp(40px, 3.0vw, 58px);
+
+    /* --- Podium (contratos por pessoa) --- */
+    --podium-photo: clamp(170px, 10.5vw, 260px);
+    --podium-ring: clamp(10px, 0.7vw, 14px);
+    --podium-card-w: clamp(260px, 16vw, 420px);
+
+    --crown-w: clamp(96px, 6.2vw, 130px);
+    --crown-top: clamp(44px, 3.3vw, 66px);
+
+    --podium-head-fs: clamp(16px, 1.2vw, 22px);
+    --podium-name-fs: clamp(14px, 1.0vw, 18px);
+    --podium-row-fs: clamp(13px, 0.95vw, 17px);
+    --podium-val-fs: clamp(16px, 1.25vw, 22px);
+
+    --top-pad: clamp(6px, 1.2vh, 16px);
+
+    --pad: clamp(10px, 0.8vw, 14px);
+
+    /* ✅ MAIOR para os 2 subcards mesmo em altura “útil” menor */
+    --gap: clamp(10px, 1.0vw, 16px);
+    --box-pad: clamp(10px, 1.0vw, 16px);
+
+    --fs-title: clamp(16px, 1.15vw, 22px);
+
+    /* ✅ MAIS DESTAQUE */
+    --fs-center: clamp(24px, 2.4vw, 48px);
+    --fs-sub: clamp(11px, 1.0vw, 14px);
+    --fs-label: clamp(12px, 1.0vw, 18px);
+    --fs-kpi: clamp(20px, 2.0vw, 38px);
+
+    --fs-pill: clamp(11px, 0.95vw, 13px);
+    --fs-badge: clamp(9px, 0.75vw, 11px);
+
+    --gauge-w: clamp(336px, 21.6vw, 432px);
+    --gauge-min-h: clamp(252px, 24vw, 312px);
+    --gauge-text-shift: 15px;
+
+    /* ✅ MAIOR: subcards cinzas */
+    --pill-min-h: clamp(70px, 6vw, 130px);
+
+    --donut-size: clamp(140px, 11vw, 210px);
+  }
+}
+
+@media (max-height: 780px) {
+  :root {
+    --podium-photo: clamp(140px, 9.5vw, 205px);
+    --podium-card-w: clamp(220px, 14vw, 330px);
+    --crown-w: clamp(80px, 5.4vw, 110px);
+    --crown-top: clamp(36px, 2.8vw, 54px);
+
+    /* --- Podium (contratos por pessoa) --- */
+    --podium-photo: clamp(170px, 10.5vw, 260px);
+    --podium-ring: clamp(10px, 0.7vw, 14px);
+    --podium-card-w: clamp(260px, 16vw, 420px);
+
+    --crown-w: clamp(96px, 6.2vw, 130px);
+    --crown-top: clamp(44px, 3.3vw, 66px);
+
+    --podium-head-fs: clamp(16px, 1.2vw, 22px);
+    --podium-name-fs: clamp(14px, 1.0vw, 18px);
+    --podium-row-fs: clamp(13px, 0.95vw, 17px);
+    --podium-val-fs: clamp(16px, 1.25vw, 22px);
+
+    --top-pad: 0px;
+
+    --pad: clamp(8px, 0.7vw, 12px);
+    --gap: clamp(6px, 0.8vw, 10px);
+    --box-pad: clamp(6px, 0.6vw, 9px);
+
+    --fs-title: clamp(15px, 1.05vw, 20px);
+
+    /* ✅ ainda maior que antes, mas sem estourar */
+    --fs-center: clamp(22px, 2.2vw, 42px);
+    --fs-sub: clamp(11px, 0.95vw, 14px);
+    --fs-label: clamp(12px, 1.0vw, 16px);
+    --fs-kpi: clamp(18px, 1.8vw, 34px);
+
+    /* Gauge (telas ainda menores) */
+    --gauge-w: clamp(312px, 20.4vw, 408px);
+    --gauge-min-h: clamp(137px, 13.4vw, 170px);
+    --gauge-text-shift: 6px;
+
+    --donut-size: clamp(130px, 10.5vw, 200px);
+  }
+}
+
+/* ===== Podium Contratos ===== */
+.podium{
+  --orangeA:#ff7a1a;
+  --orangeB:#ff4f00;
+  --orangeRing:#ff5a00;
+
+  --panelShadow: 0 18px 35px rgba(0,0,0,.18);
+  --ringShadow: 0 14px 30px rgba(0,0,0,.22);
+  --radius: 18px;
+
+  width:100%;
+  height:100%;
+  overflow:hidden;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 6px 10px;
+}
+
+.podium *{ box-sizing:border-box; }
+
+.podium .ranking{
+  width: 100%;
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  gap: clamp(14px, 2.2vw, 40px);
+}
+
+/* Card base */
+.podium .rank-card{
+  --scale: 1;
+  position:relative;
+  width: calc(520px * var(--scale));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  flex: 0 0 auto;
+}
+
+/* Avatar / foto */
+.podium .avatar-wrap{
+  position:relative;
+  margin-top: calc(40px * var(--scale));
+  z-index: 1;
+}
+
+.podium .avatar-ring{
+  width: calc(380px * var(--scale));
+  height: calc(380px * var(--scale));
+  border-radius: 999px;
+  border: calc(18px * var(--scale)) solid var(--orangeRing);
+  box-shadow: var(--ringShadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#fff;
+}
+
+.podium .avatar-placeholder{
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background:
+    radial-gradient(120px 120px at 30% 28%, rgba(255,255,255,.55), rgba(255,255,255,0) 55%),
+    linear-gradient(135deg, #d9dde7, #b9c0cf);
+}
+
+/* Coroa (Vector.png) */
+.podium .crown{
+  position:absolute;
+  top: calc(-78px * var(--scale));
+  left:50%;
+  transform:translateX(-50%);
+  z-index: 5;
+  pointer-events:none;
+}
+.podium .crown-img{
+  width: calc(190px * var(--scale));
+  height:auto;
+  display:block;
+  filter: drop-shadow(0 10px 16px rgba(0,0,0,.18));
+}
+.podium .crown-text{
+  position:absolute;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  color:#fff;
+  font-size: calc(54px * var(--scale));
+  transform: translateY(calc(6px * var(--scale)));
+  text-shadow: 0 4px 12px rgba(0,0,0,.18);
+}
+
+/* Painel*/
+.podium .info-panel{
+  width: calc(500px * var(--scale));
+  margin-top: calc(-62px * var(--scale));
+  border-radius: var(--radius);
+  box-shadow: var(--panelShadow);
+  overflow:hidden;
+  z-index: 3;
+}
+
+/* faixa laranja do título */
+.podium .panel-title{
+  padding: calc(16px * var(--scale)) calc(22px * var(--scale));
+  text-align:center;
+  color:#fff;
+  font-weight: 800;
+  font-size: calc(32px * var(--scale));
+  background: linear-gradient(135deg, var(--orangeA), var(--orangeB));
+}
+
+/* corpo branco */
+.podium .panel-body{
+  background:#fff;
+  border: 2px solid rgba(0,0,0,.06);
+  border-top: none;
+  padding: calc(16px * var(--scale)) calc(18px * var(--scale));
+}
+
+.podium .row{
+  display:grid;
+  grid-template-columns: calc(62px * var(--scale)) 1fr auto;
+  align-items:center;
+  gap: calc(12px * var(--scale));
+  padding: calc(10px * var(--scale)) calc(6px * var(--scale));
+}
+
+.podium .ico{
+  width: calc(56px * var(--scale));
+  height: calc(56px * var(--scale));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.podium .ico svg{ width:100%; height:100%; display:block; }
+
+.podium .label{
+  font-size: calc(28px * var(--scale));
+  font-weight: 800;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.podium .value{
+  font-size: calc(34px * var(--scale));
+  font-weight: 900;
+  color:#111827;
+  text-align:right;
+  white-space: nowrap;
+}
+
+.podium .divider{
+  height:1px;
+  background: rgba(17,24,39,.10);
+  margin: calc(4px * var(--scale)) calc(6px * var(--scale));
+}
+
+/* Em telas menores, reduz o gap (mantém lado a lado para não estourar altura) */
+@media (max-width: 900px){
+  .podium .ranking{ gap: 14px; }
+}
+
+/* =====================
+   Ranklist
+   ===================== */
+.ranklist-body {
+  margin-top: var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 0.9vw, 14px);
+  flex: 1;
+  min-height: 0;
+  padding-bottom: clamp(2px, 0.4vw, 6px);
+}
+
+.rl-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 0.9vw, 14px);
+  min-height: 0;
+}
+
+.rl-badge {
+  width: clamp(28px, 2.4vw, 36px);
+  height: clamp(28px, 2.4vw, 36px);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #52525B; /* zinc-600 */
+  background: #F4F4F5; /* zinc-100 */
+  border: 1px solid rgba(0,0,0,0.06);
+  flex: 0 0 auto;
+}
+
+.rl-pill {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: #F4F4F5;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: clamp(10px, 0.9vw, 14px) clamp(14px, 1.2vw, 18px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 1vw, 16px);
+}
+
+.rl-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rl-name {
+  font-weight: 800;
+  color: #111827; /* gray-900 */
+  font-size: clamp(14px, 1.05vw, 18px);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rl-value {
+  font-weight: 700;
+  color: #52525B; /* zinc-600 */
+  font-size: clamp(13px, 0.98vw, 16px);
+  line-height: 1.1;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rl-sub {
+  font-weight: 600;
+  color: #71717A; /* zinc-500 */
+  font-size: clamp(12px, 0.9vw, 14px);
+  line-height: 1.1;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rl-avatar {
+  flex: 0 0 auto;
+}
+
+/* Destaques por ranking */
+.rl-row[data-rank="1"] .rl-badge {
+  background: linear-gradient(180deg, #FF7A1A 0%, #F05914 100%);
+  color: #FFFFFF;
+  border-color: rgba(0,0,0,0);
+  box-shadow: 0 6px 18px rgba(240, 89, 20, 0.28);
+  transform: scale(1.06);
+}
+
+.rl-row[data-rank="1"] .rl-pill {
+  background: linear-gradient(90deg, rgba(240, 89, 20, 0.14) 0%, rgba(240, 89, 20, 0.04) 70%, rgba(240, 89, 20, 0.02) 100%);
+  border: 2px solid rgba(240, 89, 20, 0.34);
+  box-shadow: 0 14px 30px rgba(240, 89, 20, 0.12);
+}
+
+.rl-row[data-rank="2"] .rl-badge,
+.rl-row[data-rank="3"] .rl-badge {
+  background: #FAFAFA;
+}

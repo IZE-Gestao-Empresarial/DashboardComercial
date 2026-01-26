@@ -1,10 +1,12 @@
 import requests
 import streamlit as st
 import streamlit.components.v1 as components
+import re
+_CLEAN_INVISIBLE_RE = re.compile(r"[\u200B-\u200F\uFEFF\u00AD]")
 from streamlit_autorefresh import st_autorefresh
 
 from core.constants import CACHE_TTL_SECONDS, REFRESH_MS, INDICATORS
-from core.data import fetch_payload, payload_to_df, latest_values, get_val
+from core.data import _CLEAN_INVISIBLE_RE, fetch_payload, payload_to_df, latest_values, get_val
 from core.metrics import (
     total_for_indicator,
     people_values,
@@ -18,7 +20,7 @@ from ui.cards import kpi_card_html
 from ui.simple_kpis import simple_total_card_html
 from ui.conversions import conversion_general_card_html, conversion_people_card_html
 from ui.rings import reuniões_por_pessoa_card_html
-from ui.contracts import contratos_faturamento_por_pessoa_card_html
+from ui.contracts_podium import podium_contracts_card_html
 from ui.render import inject_kiosk_css, render_dashboard
 
 
@@ -77,10 +79,10 @@ card_reunioes = kpi_card_html(
     title="Reuniões",
     percent_float=pct_to_float_percent(reun_perc),
     subtitle="Reuniões Ocorridas",
-    left_label="Reuniões<br/>Realizadas",
+    left_label="Reuniões Realizadas",
     left_value=fmt_int(reun_real),
     left_badge="Atual",
-    mid_label="Meta de<br/>Reuniões",
+    mid_label="Meta de Reuniões",
     mid_value=fmt_int(reun_meta),
     right_pill=pill_text_from_ratio(reun_perc),
 )
@@ -89,10 +91,10 @@ card_faturamento = kpi_card_html(
     title="Faturamento",
     percent_float=pct_to_float_percent(fat_perc),
     subtitle="Faturamento alcançado",
-    left_label="Faturamento<br/>Pago",
+    left_label="Faturamento Pago",
     left_value=fmt_money(fat_real),
     left_badge="Atual",
-    mid_label="Meta de<br/>Faturamento",
+    mid_label="Meta de Faturamento",
     mid_value=fmt_money(fat_meta),
     right_pill=pill_text_from_ratio(fat_perc),
 )
@@ -100,21 +102,51 @@ card_faturamento = kpi_card_html(
 # =========================
 # 2) Leads Criados (total)
 # =========================
-leads_total = total_for_indicator(df_last, INDICATORS.LEADS_CRIADOS, prefer_responsavel="SDK")
+leads_total = total_for_indicator(df_last, INDICATORS.LEADS_CRIADOS, prefer_responsavel="SDR")
 card_leads = simple_total_card_html("Leads Criados", leads_total, subtitle="Total no período")
 
 # =========================
-# 3) Taxa de Conversão (Geral) [Responsável: SDK]
+# 3) Taxa de Conversão (Geral) [Responsável: SDR]
 # =========================
-taxa_geral_raw = get_val(df_last, INDICATORS.TAXA_CONVERSAO, "SDK")
+taxa_geral_raw = get_val(df_last, INDICATORS.TAXA_CONVERSAO, "SDR")
 taxa_geral = to_percent_value(taxa_geral_raw)
 card_taxa_geral = conversion_general_card_html("Taxa de Conversão (Geral)", taxa_geral)
 
 # =========================
-# 4) Taxa de conversão por pessoa [Responsável != SDK]
+# 4) Taxa de conversão por pessoa [Responsável != SDR]
 # =========================
-taxa_people_raw = people_values(df_last, INDICATORS.TAXA_CONVERSAO, exclude_responsaveis=["SDK"])
-taxa_people = [{"name": x["name"], "percent": to_percent_value(x["value"])} for x in taxa_people_raw]
+taxa_people_raw = people_values(df_last, INDICATORS.TAXA_CONVERSAO, exclude_responsaveis=["SDR"])
+
+def _is_team_label(name: str) -> bool:
+
+
+    n = _CLEAN_INVISIBLE_RE.sub("", (name or "")).replace("\u00A0", " ")
+    n = " ".join(n.split()).strip().upper()
+
+    if not n:
+        return True
+    team_labels = {
+        "SDR",
+        "EQUIPE",
+        "TIME",
+        "EQUIPE SDR",
+        "TIME SDR",
+        "SDR (EQUIPE)",
+    }
+    if n in team_labels:
+        return True
+    # variações comuns: "SDR - ...", "... - SDR" etc.
+    if n.startswith("SDR ") or n.startswith("SDR-"):
+        return True
+    if n.endswith(" SDR") or n.endswith("-SDR"):
+        return True
+    return False
+
+taxa_people = [
+    {"name": x["name"], "percent": to_percent_value(x["value"])}
+    for x in taxa_people_raw
+    if not _is_team_label(x.get("name", ""))
+]
 taxa_people.sort(key=lambda x: x["percent"], reverse=True)
 taxa_people = taxa_people[:5]  # básico: top 5
 card_taxa_pessoa = conversion_people_card_html("Taxa de conversão por pessoa", taxa_people)
@@ -125,7 +157,7 @@ card_taxa_pessoa = conversion_people_card_html("Taxa de conversão por pessoa", 
 reun_people_vals = people_values(
     df_last,
     INDICATORS.REUNIOES_REAL,
-    exclude_responsaveis=["SDR", "SDK", "CLOSER"],
+    exclude_responsaveis=["SDR", "SDR", "CLOSER"],
 )
 reun_shares = shares_from_values(reun_people_vals)
 reun_shares = top_n_with_others(reun_shares, n=4, others_label="OUTROS")
@@ -134,7 +166,6 @@ card_reunioes_pessoa = reuniões_por_pessoa_card_html("Reuniões por pessoa", re
 # =========================
 # 6) Contratos + Faturamento por pessoa
 #     - Indicadores: CONTRATOS ASSINADOS / FATURAMENTO ASSINADO / FATURAMENTO PAGO
-#     - Responsável != CLOSER
 # =========================
 contratos_vals = people_values(df_last, INDICATORS.CONTRATOS_ASSINADOS, exclude_responsaveis=["CLOSER"])
 fat_ass_vals = people_values(df_last, INDICATORS.FATURAMENTO_ASSINADO, exclude_responsaveis=["CLOSER"])
@@ -148,8 +179,8 @@ rows = []
 for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
     if name.strip().upper() == "CLOSER":
         continue
-    # só entra quem tem os 3
-    if name in m_contr and name in m_fa and name in m_fp:
+    # entra se tiver FATURAMENTO PAGO (ordenação do pódio)
+    if name in m_fp:
         rows.append(
             {
                 "name": name,
@@ -160,14 +191,11 @@ for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
         )
 
 rows.sort(key=lambda r: float(r.get("fat_pago") or 0.0), reverse=True)
-rows = rows[:4]  # básico: top 4
-card_contratos_pessoa = contratos_faturamento_por_pessoa_card_html(
-    "Contratos / Faturamento (por pessoa)",
-    rows,
-)
+rows = rows[:5]  # top 5 (ordem por Fat. Pago)
+card_contratos_pessoa = podium_contracts_card_html(rows)
 
 # =========================
-# Render (estrutura do print NÃO muda)
+# Render
 # =========================
 slots = {
     "CARD_REUNIOES": card_reunioes,
