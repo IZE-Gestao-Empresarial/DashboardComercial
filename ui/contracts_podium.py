@@ -23,7 +23,7 @@ def _ico_handshake() -> str:
     <svg viewBox="0 0 64 64">
       <path fill="#1F8A70" d="M8 24l14-8 10 10-10 10L8 26z"/>
       <path fill="#2ECC71" d="M56 24L42 16 32 26l10 10 14-10z"/>
-      <path fill="#F5CBA7" d="M20 36l10-10c2-2 6-2 8 0l6 6c2 2 2 6 0 8l-4 4c-2 2-6 2-8 0l-4-4-2 2c-2 2-6 2-8 0l-2-2c-2-2-2-4 0-6z"/>
+      <path fill="#F5CBA7" d="M20 36l10-10c2-2 6-2 8 0l6 6c2 2 2 6 0 8l-4 4c-2 2-6 2-8 0l-4-4-2 2c-2-2-6-2-8 0l-2-2c-2-2-2-4 0-6z"/>
       <path fill="#E8B894" d="M28 44l-6-6 3-3 6 6z"/>
     </svg>
     '''
@@ -136,7 +136,8 @@ def podium_contracts_card_html(rows: list[dict]) -> str:
         c = fmt_int(it.get("contratos"))
         fa = fmt_money(it.get("fat_assinado"))
         fa_txt = f"R$ {fa}" if fa != "-" else "-"
-        return f"Contratos: {c} • Fat. Ass.: {fa_txt}"
+        # ✅ ponto de quebra “inteligente” após o bullet
+        return f"Contratos: {c} •\u200b Fat. Ass.: {fa_txt}"
 
     return ranklist_card_html(
         title="Contratos Assinados por pessoa",
@@ -144,5 +145,5 @@ def podium_contracts_card_html(rows: list[dict]) -> str:
         value_fn=_value,
         sub_fn=_sub,
         empty_text="Sem dados",
-        avatar_size_px=50,
+        avatar_size_px=70,
     )
