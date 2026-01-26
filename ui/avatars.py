@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 import html
-import base64
-from pathlib import Path
-import mimetypes
+import re
 
-from core.people import PHOTO_FILES, PHOTO_URLS, pretty_name
+from core.people import PHOTO_URLS, pretty_name
 
 
-# cache simples para não re-ler o arquivo toda hora
-_FILE_DATAURI_CACHE: dict[str, str] = {}
+_DRIVE_ID_RE = re.compile(r"(?:id=|/d/)([a-zA-Z0-9_-]{10,})")
 
 
 def initials(name_upper: str) -> str:
@@ -21,51 +18,62 @@ def initials(name_upper: str) -> str:
     return (parts[0][0] + parts[-1][0]).upper()
 
 
-def _file_to_data_uri(rel_path: str) -> str | None:
-    if not rel_path:
-        return None
-    if rel_path in _FILE_DATAURI_CACHE:
-        return _FILE_DATAURI_CACHE[rel_path]
+def _normalize_img_url(url: str) -> str:
+    """
+    Converte links comuns do Drive para um formato que funciona bem em <img>.
+    Aceita:
+      - ...id=FILE_ID
+      - .../d/FILE_ID/...
+      - ...drive.usercontent.google.com/download?id=FILE_ID...
+    Retorna:
+      - https://drive.google.com/uc?export=view&id=FILE_ID
+    """
+    u = (url or "").strip()
+    if not u:
+        return ""
 
-    p = Path(rel_path)
-    if not p.exists():
-        return None
+    m = _DRIVE_ID_RE.search(u)
+    if m:
+        file_id = m.group(1)
+        return f"https://drive.google.com/uc?export=view&id={file_id}"
 
-    mime, _ = mimetypes.guess_type(str(p))
-    mime = mime or "image/png"
-
-    data = p.read_bytes()
-    b64 = base64.b64encode(data).decode("ascii")
-    uri = f"data:{mime};base64,{b64}"
-    _FILE_DATAURI_CACHE[rel_path] = uri
-    return uri
+    return u
 
 
 def photo_src(name_upper: str) -> str | None:
-    """Retorna src para <img>: primeiro arquivo local, depois URL."""
+    """Retorna src para <img> usando URL (Drive/CDN)."""
     key = (name_upper or "").strip().upper()
     url = PHOTO_URLS.get(key)
-    if url:
-        return url
-    return None
+    if not url:
+        return None
+    norm = _normalize_img_url(url)
+    return norm or None
 
 
 def avatar_html(name_upper: str, size_px: int = 44, ring_px: int = 2) -> str:
-    """Avatar redondo com borda laranja. Se não tiver foto, usa iniciais."""
+    """Avatar redondo com borda laranja. Se não tiver foto (ou falhar), usa iniciais."""
     key = (name_upper or "").strip().upper()
     src = photo_src(key)
     safe_title = html.escape(pretty_name(key))
 
+    ini = html.escape(initials(key))
+    font_px = max(12, int(size_px * 0.35))
+
     if src:
+        # fallback via JS inline: se a imagem falhar, mostra iniciais
+        ini_js = ini.replace("'", "\\'")
         return f'''
         <div class="rounded-full overflow-hidden flex items-center justify-center bg-zinc-100"
              style="width:{size_px}px;height:{size_px}px; box-shadow: 0 6px 16px rgba(0,0,0,0.12); border:{ring_px}px solid #F05914;"
              title="{safe_title}">
-          <img src="{html.escape(src)}" alt="{safe_title}" class="w-full h-full object-cover" />
+          <img src="{html.escape(src)}"
+               alt="{safe_title}"
+               class="w-full h-full object-cover"
+               onerror="this.remove(); this.parentElement.className='rounded-full overflow-hidden flex items-center justify-center bg-zinc-900 text-white font-extrabold'; this.parentElement.style.fontSize='{font_px}px'; this.parentElement.innerText='{ini_js}';" />
         </div>
         '''
-    ini = html.escape(initials(key))
-    font_px = max(12, int(size_px * 0.35))
+
+    # sem URL → iniciais direto
     return f'''
     <div class="rounded-full overflow-hidden flex items-center justify-center bg-zinc-900 text-white font-extrabold"
          style="width:{size_px}px;height:{size_px}px; font-size:{font_px}px; border:{ring_px}px solid #F05914; box-shadow: 0 6px 16px rgba(0,0,0,0.12);"
