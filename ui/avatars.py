@@ -44,11 +44,6 @@ def _file_to_data_uri(rel_path: str) -> str | None:
 def photo_src(name_upper: str) -> str | None:
     """Retorna src para <img>: primeiro arquivo local, depois URL."""
     key = (name_upper or "").strip().upper()
-    rel = PHOTO_FILES.get(key)
-    if rel:
-        uri = _file_to_data_uri(rel)
-        if uri:
-            return uri
     url = PHOTO_URLS.get(key)
     if url:
         return url

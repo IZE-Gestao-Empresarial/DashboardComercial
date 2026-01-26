@@ -3,7 +3,7 @@ from __future__ import annotations
 import html
 
 from core.formatters import fmt_int, fmt_money
-from core.people import PHOTO_FILES
+from core.people import PHOTO_FILES, PHOTO_URLS
 from ui.embed import file_to_data_uri
 from ui.ranklist import ranklist_card_html
 
@@ -42,10 +42,10 @@ def _ico_moneybag() -> str:
 
 def _photo_src(name_upper: str) -> str | None:
     key = (name_upper or "").strip().upper()
-    p = PHOTO_FILES.get(key)
+    p = PHOTO_URLS.get(key)
     if not p:
         return None
-    return file_to_data_uri(p)
+    return p
 
 def _rank_card_html(
     *,

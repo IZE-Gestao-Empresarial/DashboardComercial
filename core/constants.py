@@ -3,8 +3,8 @@ from dataclasses import dataclass
 # =========================
 # Config central
 # =========================
-REFRESH_MS = 30_000
-CACHE_TTL_SECONDS = 25
+REFRESH_MS = 40_000  # Tempo de refresh do dashboard em ms
+CACHE_TTL_SECONDS = 35
 
 
 @dataclass(frozen=True)
