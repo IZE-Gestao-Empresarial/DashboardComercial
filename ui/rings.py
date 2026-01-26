@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import math
-import html
 
-from ui.avatars import avatar_html
-from core.people import pretty_name
+from core.formatters import fmt_int
+from ui.ranklist import fmt_percent_br, ranklist_card_html
 
 
 def donut_svg(segments: list[dict], size: int = 210, stroke: int = 18) -> str:
-    """Donut completo com segmentos (stroke-dasharray)."""
+    """Donut completo com segmentos (stroke-dasharray).
+
+    Mantido no projeto para possíveis evoluções, mas no layout atual o card de
+    'Reuniões por pessoa' foi padronizado como ranking.
+    """
     r = (size - stroke) / 2
     c = 2 * math.pi * r
 
@@ -21,7 +24,8 @@ def donut_svg(segments: list[dict], size: int = 210, stroke: int = 18) -> str:
         length = c * (pct / 100.0)
         gap = c - length
         color = palette[i % len(palette)]
-        rings.append(f'''
+        rings.append(
+            f'''
             <circle cx="{size/2}" cy="{size/2}" r="{r}"
                     fill="transparent"
                     stroke="{color}"
@@ -29,7 +33,8 @@ def donut_svg(segments: list[dict], size: int = 210, stroke: int = 18) -> str:
                     stroke-linecap="butt"
                     stroke-dasharray="{length:.3f} {gap:.3f}"
                     stroke-dashoffset="{-start:.3f}" />
-        ''')
+        '''
+        )
         start += length
 
     bg = f'''
@@ -37,7 +42,7 @@ def donut_svg(segments: list[dict], size: int = 210, stroke: int = 18) -> str:
               fill="transparent" stroke="#E5E7EB" stroke-width="{stroke}" />
     '''
     return f'''
-    <svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" aria-hidden="true">
+    <svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" aria-hidden="true" style="width: var(--donut-size); height: var(--donut-size); max-width: 100%; max-height: 100%;">
       {bg}
       {''.join(rings)}
     </svg>
@@ -45,48 +50,16 @@ def donut_svg(segments: list[dict], size: int = 210, stroke: int = 18) -> str:
 
 
 def reuniões_por_pessoa_card_html(title: str, items: list[dict]) -> str:
-    """Card: donut + lista com avatar, nome e %."""
-    if not items:
-        return f'''
-        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center">
-          <div class="text-zinc-500 font-semibold">Sem dados de {title}</div>
-        </div>
-        '''
+    """Card: ranking por pessoa"""
 
-    donut = donut_svg(items, size=230, stroke=18)
+    def _value(it: dict) -> str:
+        try:
+            pct = float(it.get("percent") or 0.0)
+        except Exception:
+            pct = 0.0
+        return fmt_percent_br(pct)
 
-    rows = []
-    for s in items:
-        name_u = str(s.get("name") or "").strip().upper()
-        nm = html.escape(pretty_name(name_u))
-        pct = float(s.get("percent") or 0.0)
-        val = float(s.get("value") or 0.0)
+    def _sub(it: dict) -> str:
+        return f"{fmt_int(it.get('value'))} reuniões"
 
-        rows.append(f'''
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3 min-w-0">
-              {avatar_html(name_u, size_px=40)}
-              <div class="min-w-0">
-                <div class="font-semibold text-zinc-900 truncate" style="font-size: var(--fs-label);">{nm}</div>
-                <div class="text-zinc-500 tabular-nums" style="font-size: var(--fs-sub);">{int(round(val))} reuniões</div>
-              </div>
-            </div>
-            <div class="font-extrabold text-zinc-900 tabular-nums" style="font-size: var(--fs-kpi);">{pct:.1f}%</div>
-          </div>
-        ''')
-
-    return f'''
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full" style="padding: var(--pad);">
-      <div class="font-extrabold text-zinc-900" style="font-size: var(--fs-title);">{title}</div>
-
-      <div class="mt-4 flex items-center justify-between gap-6">
-        <div class="flex items-center justify-center" style="min-width: 240px;">
-          {donut}
-        </div>
-
-        <div class="flex-1 space-y-3">
-          {''.join(rows)}
-        </div>
-      </div>
-    </div>
-    '''
+    return ranklist_card_html(title=title, items=items, value_fn=_value, sub_fn=_sub)

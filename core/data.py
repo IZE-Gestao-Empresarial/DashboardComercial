@@ -5,7 +5,23 @@ from typing import Any, Dict, Optional, Tuple
 import pandas as pd
 import requests
 import streamlit as st
+import re
 
+_CLEAN_INVISIBLE_RE = re.compile(r"[\u200B-\u200F\uFEFF\u00AD]")
+
+def _norm_text(s: object) -> str:
+    """
+    Normaliza texto vindo do Sheets:
+    - remove invisíveis (zero-width, BOM, soft hyphen)
+    - troca NBSP por espaço
+    - colapsa espaços
+    - strip + UPPER
+    """
+    s = "" if s is None else str(s)
+    s = _CLEAN_INVISIBLE_RE.sub("", s)
+    s = s.replace("\u00A0", " ")  # NBSP
+    s = " ".join(s.split())       # colapsa whitespace
+    return s.strip().upper()
 
 def _safe_json(resp: requests.Response) -> Dict[str, Any]:
     try:
@@ -45,7 +61,8 @@ def payload_to_df(payload: Dict[str, Any]) -> Tuple[pd.DataFrame, Optional[str],
 
     for col in ["INDICADORES", "RESPONSÁVEL"]:
         if col in df.columns:
-            df[col] = df[col].astype(str).str.strip().str.upper()
+            df[col] = df[col].apply(_norm_text)
+
 
     if "VALOR" in df.columns:
         df["VALOR"] = pd.to_numeric(df["VALOR"], errors="coerce")

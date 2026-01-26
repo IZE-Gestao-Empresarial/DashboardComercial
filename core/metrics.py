@@ -3,14 +3,21 @@ from __future__ import annotations
 from typing import Iterable, Optional
 import math
 import pandas as pd
-
+import re
 
 def _is_nan(x) -> bool:
     return x is None or (isinstance(x, float) and math.isnan(x))
 
 
+_CLEAN_INVISIBLE_RE = re.compile(r"[\u200B-\u200F\uFEFF\u00AD]")
+
 def _norm(s: str) -> str:
-    return str(s or "").strip().upper()
+    s = str(s or "")
+    s = _CLEAN_INVISIBLE_RE.sub("", s)
+    s = s.replace("\u00A0", " ")
+    s = " ".join(s.split())
+    return s.strip().upper()
+
 
 
 def total_for_indicator(

@@ -3,8 +3,8 @@ from dataclasses import dataclass
 # =========================
 # Config central
 # =========================
-REFRESH_MS = 5_000
-CACHE_TTL_SECONDS = 4
+REFRESH_MS = 30_000
+CACHE_TTL_SECONDS = 25
 
 
 @dataclass(frozen=True)
@@ -15,8 +15,8 @@ class _Indicators:
     REUNIOES_PERC: str = "PERC META REUNIÕES OCORRIDAS"
     REUNIOES_DIF:  str = "DIF META REUNIÕES OCORRIDAS"
 
-    FAT_REAL: str = "FATURAMENTO PAGO"         # preferimos pago
-    FAT_FALLBACK_REAL: str = "FATURAMENTO"     # fallback
+    FAT_REAL: str = "FATURAMENTO PAGO"         
+    FAT_FALLBACK_REAL: str = "FATURAMENTO"
     FAT_META: str = "FATURAMENTO - META"
     FAT_PERC: str = "PERC META FATURAMENTO"
     FAT_DIF:  str = "DIF META FATURAMENTO"
