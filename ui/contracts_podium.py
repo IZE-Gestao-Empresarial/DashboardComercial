@@ -3,7 +3,7 @@ from __future__ import annotations
 import html
 
 from core.formatters import fmt_int, fmt_money
-from core.people import PHOTO_URLS
+from core.people import PHOTO_FILES
 from ui.embed import file_to_data_uri
 from ui.ranklist import ranklist_card_html
 
@@ -41,11 +41,13 @@ def _ico_moneybag() -> str:
 
 
 def _photo_src(name_upper: str) -> str | None:
+    """Data URI (base64) a partir da foto local da pessoa."""
     key = (name_upper or "").strip().upper()
-    p = PHOTO_URLS.get(key)
+    p = PHOTO_FILES.get(key)
     if not p:
         return None
     return file_to_data_uri(p)
+
 
 def _rank_card_html(
     *,
@@ -137,7 +139,7 @@ def podium_contracts_card_html(rows: list[dict]) -> str:
         return f"Contratos: {c} • Fat. Ass.: {fa_txt}"
 
     return ranklist_card_html(
-        title="Contratos Assinados / Fat. Assinado / Fat. Pago (Por Pessoa)",
+        title="Contratos Assinados por pessoa",
         items=top,
         value_fn=_value,
         sub_fn=_sub,
