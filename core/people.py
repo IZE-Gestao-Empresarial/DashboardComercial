@@ -18,9 +18,9 @@ PHOTO_FILES: dict[str, str] = {
 
 # (opcional) Se quiser usar URL ao invés de arquivo local
 PHOTO_URLS: dict[str, str] = {
-"NURY": "https://drive.google.com/u/0/uc?id=1vbnm__C3CdPY9jqukX49qhBOS5jp84Xg",
-"MARIA EDUARDA": "https://drive.google.com/u/0/uc?id=1xIGVP1wFoeZgtyofrqCu_Z2UJP9_x7TS",
-"JOÃO": "https://drive.google.com/u/0/uc?id=1pFCrf4W5UdXPeM7ooDlXroUVYzZr4NFB",
-"GUILHERME": "https://drive.google.com/u/0/uc?id=13MPjyyV-322znUbrZ9t1D4YPLsGHxCDE"
+"NURY": "https://drive.usercontent.google.com/download?id=1vbnm__C3CdPY9jqukX49qhBOS5jp84Xg&authuser=0",
+"MARIA EDUARDA": "https://drive.usercontent.google.com/download?id=1xIGVP1wFoeZgtyofrqCu_Z2UJP9_x7TS&authuser=0",
+"JOÃO": "https://drive.usercontent.google.com/download?id=1pFCrf4W5UdXPeM7ooDlXroUVYzZr4NFB&authuser=0",
+"GUILHERME": "https://drive.usercontent.google.com/download?id=13MPjyyV-322znUbrZ9t1D4YPLsGHxCDE&authuser=0"
 }
 
