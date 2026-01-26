@@ -7,6 +7,20 @@ html, body {
 
 * { box-sizing: border-box; }
 
+/* =========================================
+   FIRE TV / SILK: escala automática na TV
+   - No PC fica normal
+   - No Fire TV aumenta tipografia e componentes
+   ========================================= */
+:root{
+  --ui-scale: 1; /* PC */
+}
+
+/* Fire TV (Silk): deixa tudo mais legível */
+html[data-tv="fire"]{
+  --ui-scale: 1.55; /* ajuste fino: 1.45 ~ 1.70 */
+}
+
 /* ===== Ajustes “TV proof” ===== */
 :root {
   /* --- Podium (contratos por pessoa) --- */
@@ -32,34 +46,34 @@ html, body {
   --box-pad: clamp(12px, 1.1vw, 20px);
 
   /* ✅ MAIS DESTAQUE (porcentagem + valores) */
-  --fs-title: clamp(18px, 1.35vw, 26px);
+  --fs-title:  calc(clamp(18px, 1.35vw, 26px) * var(--ui-scale));
 
   /* porcentagem do gauge */
-  --fs-center: clamp(28px, 2.8vw, 56px);
+  --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--ui-scale));
 
   /* subtítulo do gauge */
-  --fs-sub: clamp(12px, 1.05vw, 16px);
+  --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--ui-scale));
 
   /* labels e valores dos subcards */
-  --fs-label: clamp(13px, 1.1vw, 20px);
-  --fs-kpi: clamp(22px, 2.2vw, 44px);
+  --fs-label:  calc(clamp(13px, 1.1vw, 20px) * var(--ui-scale));
+  --fs-kpi:    calc(clamp(22px, 2.2vw, 44px) * var(--ui-scale));
 
   /* (não usado mais no seu KPI, mas mantido) */
   --fs-pill: clamp(12px, 1.0vw, 14px);
   --fs-badge: clamp(10px, 0.8vw, 12px);
 
   /* placeholder (cards vazios) */
-  --fs-placeholder: clamp(20px, 1.8vw, 34px);
+  --fs-placeholder: calc(clamp(20px, 1.8vw, 34px) * var(--ui-scale));
 
-  /* Gauge */
-  --gauge-w: clamp(384px, 24vw, 480px);
-  --gauge-min-h: clamp(288px, 26.4vw, 348px);
-  --gauge-text-shift: 24px;
+  /* Gauge (aumenta junto na TV) */
+  --gauge-w:      calc(clamp(384px, 24vw, 480px) * var(--ui-scale));
+  --gauge-min-h:  calc(clamp(288px, 26.4vw, 348px) * var(--ui-scale));
+  --gauge-text-shift: calc(24px * var(--ui-scale));
 
   /* ✅ MAIOR: altura mínima dos subcards cinzas */
-  --pill-min-h: clamp(80px, 7vw, 150px);
+  --pill-min-h: calc(clamp(80px, 7vw, 150px) * var(--ui-scale));
 
-  --donut-size: clamp(160px, 12vw, 230px);
+  --donut-size: calc(clamp(160px, 12vw, 230px) * var(--ui-scale));
 }
 
 /* ===============
@@ -119,7 +133,7 @@ html, body {
 
     --top-pad: 0px;
 
-    /* ✅ MAIS DESTAQUE no mobile (vw no mobile costuma deixar pequeno) */
+    /* Mobile: escala própria (não usa ui-scale aqui) */
     --fs-center: clamp(30px, 7vw, 54px);
     --fs-kpi: clamp(22px, 5.6vw, 40px);
     --fs-label: clamp(13px, 3.2vw, 18px);
@@ -166,8 +180,8 @@ html, body {
 .tile > div { height: 100%; max-height: 100%; overflow: hidden; }
 
 /* ===============
-   TELAS COM "ALTURA ÚTIL" MENOR (ex.: Windows/TV com escala alta)
-   Encolhe paddings/fontes/gauges pra evitar overflow.
+   TELAS COM "ALTURA ÚTIL" MENOR
+   (ex.: Windows/TV com escala alta)
    =============== */
 @media (max-height: 900px) {
   :root {
@@ -190,32 +204,23 @@ html, body {
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
     --top-pad: clamp(6px, 1.2vh, 16px);
-
     --pad: clamp(10px, 0.8vw, 14px);
 
-    /* ✅ MAIOR para os 2 subcards mesmo em altura “útil” menor */
     --gap: clamp(10px, 1.0vw, 16px);
     --box-pad: clamp(10px, 1.0vw, 16px);
 
-    --fs-title: clamp(16px, 1.15vw, 22px);
+    --fs-title:  calc(clamp(16px, 1.15vw, 22px) * var(--ui-scale));
+    --fs-center: calc(clamp(24px, 2.4vw, 48px) * var(--ui-scale));
+    --fs-sub:    calc(clamp(11px, 1.0vw, 14px) * var(--ui-scale));
+    --fs-label:  calc(clamp(12px, 1.0vw, 18px) * var(--ui-scale));
+    --fs-kpi:    calc(clamp(20px, 2.0vw, 38px) * var(--ui-scale));
 
-    /* ✅ MAIS DESTAQUE */
-    --fs-center: clamp(24px, 2.4vw, 48px);
-    --fs-sub: clamp(11px, 1.0vw, 14px);
-    --fs-label: clamp(12px, 1.0vw, 18px);
-    --fs-kpi: clamp(20px, 2.0vw, 38px);
+    --gauge-w:      calc(clamp(336px, 21.6vw, 432px) * var(--ui-scale));
+    --gauge-min-h:  calc(clamp(252px, 24vw, 312px) * var(--ui-scale));
+    --gauge-text-shift: calc(15px * var(--ui-scale));
 
-    --fs-pill: clamp(11px, 0.95vw, 13px);
-    --fs-badge: clamp(9px, 0.75vw, 11px);
-
-    --gauge-w: clamp(336px, 21.6vw, 432px);
-    --gauge-min-h: clamp(252px, 24vw, 312px);
-    --gauge-text-shift: 15px;
-
-    /* ✅ MAIOR: subcards cinzas */
-    --pill-min-h: clamp(70px, 6vw, 130px);
-
-    --donut-size: clamp(140px, 11vw, 210px);
+    --pill-min-h: calc(clamp(70px, 6vw, 130px) * var(--ui-scale));
+    --donut-size: calc(clamp(140px, 11vw, 210px) * var(--ui-scale));
   }
 }
 
@@ -245,20 +250,17 @@ html, body {
     --gap: clamp(6px, 0.8vw, 10px);
     --box-pad: clamp(6px, 0.6vw, 9px);
 
-    --fs-title: clamp(15px, 1.05vw, 20px);
+    --fs-title:  calc(clamp(15px, 1.05vw, 20px) * var(--ui-scale));
+    --fs-center: calc(clamp(22px, 2.2vw, 42px) * var(--ui-scale));
+    --fs-sub:    calc(clamp(11px, 0.95vw, 14px) * var(--ui-scale));
+    --fs-label:  calc(clamp(12px, 1.0vw, 16px) * var(--ui-scale));
+    --fs-kpi:    calc(clamp(18px, 1.8vw, 34px) * var(--ui-scale));
 
-    /* ✅ ainda maior que antes, mas sem estourar */
-    --fs-center: clamp(22px, 2.2vw, 42px);
-    --fs-sub: clamp(11px, 0.95vw, 14px);
-    --fs-label: clamp(12px, 1.0vw, 16px);
-    --fs-kpi: clamp(18px, 1.8vw, 34px);
+    --gauge-w:      calc(clamp(312px, 20.4vw, 408px) * var(--ui-scale));
+    --gauge-min-h:  calc(clamp(137px, 13.4vw, 170px) * var(--ui-scale));
+    --gauge-text-shift: calc(6px * var(--ui-scale));
 
-    /* Gauge (telas ainda menores) */
-    --gauge-w: clamp(312px, 20.4vw, 408px);
-    --gauge-min-h: clamp(137px, 13.4vw, 170px);
-    --gauge-text-shift: 6px;
-
-    --donut-size: clamp(130px, 10.5vw, 200px);
+    --donut-size: calc(clamp(130px, 10.5vw, 200px) * var(--ui-scale));
   }
 }
 
