@@ -443,7 +443,8 @@ html[data-tv="fire"]{
   margin-top: var(--gap);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 0.9vw, 14px);
+  /* ↓ menor para reduzir a altura total do bloco de ranking */
+  gap: clamp(8px, 0.75vw, 12px);
   flex: 1;
   min-height: 0;
   padding-bottom: clamp(2px, 0.4vw, 6px);
@@ -452,7 +453,8 @@ html[data-tv="fire"]{
 .rl-row {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 0.9vw, 14px);
+  /* ↓ reduz o "respiro" horizontal sem mexer na foto */
+  gap: clamp(8px, 0.75vw, 12px);
   min-height: 0;
 }
 
@@ -477,13 +479,13 @@ html[data-tv="fire"]{
   border-radius: 9999px;
   border: 1px solid rgba(0,0,0,0.06);
 
-  /* ✅ mesmo padding em todos os lados */
-  padding: clamp(14px, 1.15vw, 18px);
+  /* ↓ Diminui a altura da "pílula" (sem mexer no tamanho da foto) */
+  padding: clamp(6px, 0.65vw, 12px);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(10px, 1vw, 16px);
+  gap: clamp(8px, 0.85vw, 12px);
 }
 
 
@@ -497,7 +499,7 @@ html[data-tv="fire"]{
   font-weight: 800;
   color: #111827; /* gray-900 */
   font-size: clamp(14px, 1.05vw, 18px);
-  line-height: 1.1;
+  line-height: 1.05;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -507,8 +509,8 @@ html[data-tv="fire"]{
   font-weight: 700;
   color: #52525B; /* zinc-600 */
   font-size: clamp(13px, 0.98vw, 16px);
-  line-height: 1.1;
-  margin-top: 4px;
+  line-height: 1.05;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -518,8 +520,8 @@ html[data-tv="fire"]{
   font-weight: 600;
   color: #71717A; /* zinc-500 */
   font-size: clamp(12px, 0.9vw, 14px);
-  line-height: 1.15;
-  margin-top: 3px;
+  line-height: 1.1;
+  margin-top: 2px;
 
   /* ✅ permite quebrar quando não couber */
   white-space: normal !important;
