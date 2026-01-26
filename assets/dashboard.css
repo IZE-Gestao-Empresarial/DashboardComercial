@@ -37,7 +37,8 @@ html[data-tv="fire"]{
   --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
   /* sobe o bloco no desktop/TV */
-  --top-pad: clamp(10px, 2.2vh, 34px);
+  --top-pad: clamp(8px, 1.6vh, 24px);
+
 
   --pad: clamp(12px, 1.0vw, 18px);
 
@@ -131,7 +132,7 @@ html[data-tv="fire"]{
     --podium-row-fs: clamp(13px, 0.95vw, 17px);
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-    --top-pad: 0px;
+    --top-pad: clamp(6px, 1.2vh, 12px);
 
     /* Mobile: escala própria (não usa ui-scale aqui) */
     --fs-center: clamp(30px, 7vw, 54px);
@@ -244,7 +245,7 @@ html[data-tv="fire"]{
     --podium-row-fs: clamp(13px, 0.95vw, 17px);
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-    --top-pad: 0px;
+    --top-pad: clamp(6px, 1.0vh, 14px);
 
     --pad: clamp(8px, 0.7vw, 12px);
     --gap: clamp(6px, 0.8vw, 10px);

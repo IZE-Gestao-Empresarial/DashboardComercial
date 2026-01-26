@@ -14,11 +14,12 @@ __DASHBOARD_CSS__
   </head>
 
   <body class="h-full w-full overflow-hidden">
-    <!-- Wrapper com padding-top para "subir" o dashboard (TV) -->
+    <!-- Wrapper com espaçamento UNIFORME (vertical e horizontal) entre o fundo e o layout -->
     <div class="w-full overflow-hidden flex justify-center items-start"
-         style="padding-top: var(--top-pad); height: 100vh;">
+         style="padding: var(--top-pad); height: 100vh; height: 100dvh;">
 
-      <div class="w-full layout-shell" style="max-width: 100%; padding: 0 var(--pad); height: calc(100vh - var(--top-pad));">
+      <!-- Altura útil considera o padding (top + bottom) para evitar perder o respiro e evitar overflow -->
+      <div class="w-full layout-shell" style="max-width: 100%; padding: 0; height: calc(100vh - var(--top-pad) - var(--top-pad)); height: calc(100dvh - var(--top-pad) - var(--top-pad));">
         <!-- Layout responsivo:
              Desktop/TV: grid fixo
              Mobile: carrossel horizontal (swipe) -->
