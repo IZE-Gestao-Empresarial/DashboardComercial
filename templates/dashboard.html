@@ -7,6 +7,38 @@
     <!-- Tailwind (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Detecta TV / 4K e ajusta escala via atributo no <html> (usado no CSS) -->
+    <script>
+      (function () {
+        try {
+          const ua = navigator.userAgent || "";
+          const w = Math.max(window.innerWidth || 0, screen.width || 0);
+          const h = Math.max(window.innerHeight || 0, screen.height || 0);
+
+          // Fire TV (Silk)
+          const isFire = /Silk|AFT|AmazonWebAppPlatform/i.test(ua);
+          if (isFire) {
+            document.documentElement.setAttribute("data-tv", "fire");
+            return;
+          }
+
+          // UHD / 4K (ex.: 3840x2160)
+          if (w >= 3200 && h >= 1800) {
+            document.documentElement.setAttribute("data-tv", "4k");
+            return;
+          }
+
+          // fallback: algumas TVs reportam via screen.* mesmo com zoom
+          const sw = Math.max(screen.width || 0, screen.height || 0);
+          if (sw >= 3000) {
+            document.documentElement.setAttribute("data-tv", "4k");
+          }
+        } catch (e) {
+          /* noop */
+        }
+      })();
+    </script>
+
     <!-- CSS do dashboard (vem de /assets/dashboard.css e é injetado pelo Python) -->
     <style>
 __DASHBOARD_CSS__
@@ -14,42 +46,70 @@ __DASHBOARD_CSS__
   </head>
 
   <body class="h-full w-full overflow-hidden">
-    <!-- Wrapper com espaçamento UNIFORME (vertical e horizontal) entre o fundo e o layout -->
-    <div class="w-full overflow-hidden flex justify-center items-start"
-         style="padding: var(--top-pad); height: 100vh; height: 100dvh;">
+    <!-- Viewport: controla padding externo (margens da TV/dispositivos) -->
+    <div class="dashboard-viewport">
+      <div class="layout-shell">
+        <!--
+          Layout (igual ao "estrutura.png")
+          - 3 colunas
+          - 2 cards por coluna
+          - proporções de altura por coluna (via flex)
 
-      <!-- Altura útil considera o padding (top + bottom) para evitar perder o respiro e evitar overflow -->
-      <div class="w-full layout-shell" style="max-width: 100%; padding: 0; height: calc(100vh - var(--top-pad) - var(--top-pad)); height: calc(100dvh - var(--top-pad) - var(--top-pad));">
-        <!-- Layout responsivo:
-             Desktop/TV: grid fixo
-             Mobile: carrossel horizontal (swipe) -->
-        <div class="layout">
+          Mobile: vira carrossel horizontal (swipe)
+        -->
+        <!-- Layout Desktop/TV (3 colunas x 2 linhas, igual ao estrutura.png) -->
+        <div class="layout layout-desktop">
+          <!-- Coluna esquerda -->
+          <div class="col col-left">
+            <div class="tile tile-reunioes tile-top">
+__CARD_REUNIOES__
+            </div>
+            <div class="tile tile-leads-taxa tile-bottom">
+__CARD_LEADS_TAXA__
+            </div>
+          </div>
+
+          <!-- Coluna do meio -->
+          <div class="col col-mid">
+            <div class="tile tile-ranking-sdr tile-top">
+__CARD_RANKING_SDR__
+            </div>
+            <div class="tile tile-ranking-closer tile-bottom">
+__CARD_RANKING_CLOSER__
+            </div>
+          </div>
+
+          <!-- Coluna direita -->
+          <div class="col col-right">
+            <div class="tile tile-faturamento tile-top">
+__CARD_FATURAMENTO__
+            </div>
+            <div class="tile tile-fat-ass-pago tile-bottom">
+__CARD_FAT_ASS_PAGO__
+            </div>
+          </div>
+        </div>
+
+        <!-- Layout Mobile (carrossel horizontal - 1 card por tela)
+             Ordem: segue leitura natural do dashboard. -->
+        <div class="layout layout-mobile" aria-label="Carrossel de cards">
           <div class="tile tile-reunioes">
 __CARD_REUNIOES__
           </div>
-
-          <div class="tile tile-leads">
-__CARD_LEADS__
+          <div class="tile tile-leads-taxa">
+__CARD_LEADS_TAXA__
           </div>
-
-          <div class="tile tile-taxa-geral">
-__CARD_TAXA_GERAL__
+          <div class="tile tile-ranking-sdr">
+__CARD_RANKING_SDR__
           </div>
-
-          <div class="tile tile-reunioes-pessoa">
-__CARD_REUNIOES_PESSOA__
+          <div class="tile tile-ranking-closer">
+__CARD_RANKING_CLOSER__
           </div>
-
           <div class="tile tile-faturamento">
 __CARD_FATURAMENTO__
           </div>
-
-          <div class="tile tile-taxa-pessoa">
-__CARD_TAXA_PESSOA__
-          </div>
-
-          <div class="tile tile-contratos-pessoa">
-__CARD_CONTRATOS_PESSOA__
+          <div class="tile tile-fat-ass-pago">
+__CARD_FAT_ASS_PAGO__
           </div>
         </div>
       </div>

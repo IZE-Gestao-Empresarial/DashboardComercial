@@ -23,7 +23,7 @@ def _ico_handshake() -> str:
     <svg viewBox="0 0 64 64">
       <path fill="#1F8A70" d="M8 24l14-8 10 10-10 10L8 26z"/>
       <path fill="#2ECC71" d="M56 24L42 16 32 26l10 10 14-10z"/>
-      <path fill="#F5CBA7" d="M20 36l10-10c2-2 6-2 8 0l6 6c2 2 2 6 0 8l-4 4c-2 2-6 2-8 0l-4-4-2 2c-2-2-6-2-8 0l-2-2c-2-2-2-4 0-6z"/>
+      <path fill="#F5CBA7" d="M20 36l10-10c2-2 6-2 8 0l6 6c2 2 2 6 0 8l-4 4c-2 2-6 2-8 0l-4-4-2 2c-2 2-6 2-8 0l-2-2c-2-2-2-4 0-6z"/>
       <path fill="#E8B894" d="M28 44l-6-6 3-3 6 6z"/>
     </svg>
     '''
@@ -58,6 +58,8 @@ def _rank_card_html(
     fat_pago: float | None,
     photo_src: str | None,
 ) -> str:
+    """(Opcional) Card mais visual por colocação (não usado no layout atual)."""
+
     contratos_v = fmt_int(contratos)
     fa_v = fmt_money(fat_assinado)
     fp_v = fmt_money(fat_pago)
@@ -105,7 +107,7 @@ def _rank_card_html(
     '''
 
 
-def podium_contracts_card_html(rows: list[dict]) -> str:
+def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") -> str:
     """Card de ranking por pessoa.
 
     A colocação é definida SOMENTE por FATURAMENTO PAGO (desc).
@@ -136,14 +138,13 @@ def podium_contracts_card_html(rows: list[dict]) -> str:
         c = fmt_int(it.get("contratos"))
         fa = fmt_money(it.get("fat_assinado"))
         fa_txt = f"R$ {fa}" if fa != "-" else "-"
-        # ✅ ponto de quebra “inteligente” após o bullet
-        return f"Contratos: {c} •\u200b Fat. Ass.: {fa_txt}"
+        return f"Contratos: {c} • Fat. Ass.: {fa_txt}"
 
     return ranklist_card_html(
-        title="Contratos Assinados por pessoa",
+        title=title,
         items=top,
         value_fn=_value,
         sub_fn=_sub,
         empty_text="Sem dados",
-        avatar_size_px=70,
+        avatar_size_px=50,
     )

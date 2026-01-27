@@ -19,7 +19,7 @@ def ranklist_card_html(
     value_fn: Callable[[dict], str],
     sub_fn: Optional[Callable[[dict], str]] = None,
     empty_text: Optional[str] = None,
-    avatar_size_px: int = 70,
+    avatar_size_px: int = 46,
 ) -> str:
     """Card no padrão do (ranking em pills).
 
