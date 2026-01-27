@@ -9,6 +9,11 @@ import re
 
 _CLEAN_INVISIBLE_RE = re.compile(r"[\u200B-\u200F\uFEFF\u00AD]")
 
+# ✅ aliases globais de responsáveis (já em UPPER)
+_RESPONSAVEL_ALIASES = {
+    "MARIA EDUARDA": "MARIA",
+}
+
 def _norm_text(s: object) -> str:
     """
     Normaliza texto vindo do Sheets:
@@ -16,12 +21,16 @@ def _norm_text(s: object) -> str:
     - troca NBSP por espaço
     - colapsa espaços
     - strip + UPPER
+    - aplica aliases (ex.: 'MARIA EDUARDA' -> 'MARIA')
     """
     s = "" if s is None else str(s)
     s = _CLEAN_INVISIBLE_RE.sub("", s)
     s = s.replace("\u00A0", " ")  # NBSP
     s = " ".join(s.split())       # colapsa whitespace
-    return s.strip().upper()
+    s = s.strip().upper()
+
+    # ✅ aplica alias depois de normalizar
+    return _RESPONSAVEL_ALIASES.get(s, s)
 
 def _safe_json(resp: requests.Response) -> Dict[str, Any]:
     try:
@@ -63,7 +72,6 @@ def payload_to_df(payload: Dict[str, Any]) -> Tuple[pd.DataFrame, Optional[str],
         if col in df.columns:
             df[col] = df[col].apply(_norm_text)
 
-
     if "VALOR" in df.columns:
         df["VALOR"] = pd.to_numeric(df["VALOR"], errors="coerce")
 
@@ -90,6 +98,8 @@ def get_val(df_latest: pd.DataFrame, indicador: str, responsavel: Optional[str] 
     d = df_latest[df_latest["INDICADORES"] == indicador]
     if responsavel:
         responsavel = responsavel.strip().upper()
+        # ✅ aplica alias também aqui (caso você passe "MARIA EDUARDA" em algum lugar)
+        responsavel = _RESPONSAVEL_ALIASES.get(responsavel, responsavel)
         d = d[d["RESPONSÁVEL"] == responsavel]
     if d.empty:
         return None

@@ -10,7 +10,7 @@ from core.formatters import fmt_int, fmt_money, pct_to_float_percent, pill_text_
 
 from ui.cards import kpi_card_html
 from ui.leads_conversion import leads_conversion_card_html
-from ui.ranklist import ranklist_card_html, fmt_percent_br
+from ui.ranklist import ranklist_card_html, fmt_percent_br, ranking_sdr_card_html
 from ui.contracts_podium import podium_contracts_card_html
 from ui.fat_ass_pago import faturamento_ass_pago_card_html
 from ui.render import inject_kiosk_css, render_dashboard
@@ -160,13 +160,11 @@ for it in _top_reun:
     share = (v / _total_reun * 100.0) if _total_reun > 0 else 0.0
     rank_sdr_items.append({"name": it.get("name"), "value": v, "share": share})
 
-card_ranking_sdr = ranklist_card_html(
+card_ranking_sdr = ranking_sdr_card_html(
     title="Ranking SDR",
-    items=rank_sdr_items,
-    value_fn=lambda r: f"{fmt_int(r.get('value'))} reuniões",
-    sub_fn=lambda r: f"{fmt_percent_br(r.get('share', 0.0))} do total",
-    empty_text="Sem dados",
-    avatar_size_px=50,
+    items=[{"name": r.get("name"), "reunioes": r.get("value"), "conversao": r.get("share")} for r in rank_sdr_items],
+    limit=2,
+    avatar_size_px=56,
 )
 
 

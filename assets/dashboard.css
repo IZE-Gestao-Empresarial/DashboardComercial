@@ -157,11 +157,11 @@ html[data-tv="4k"]{
 }
 
 /* Proporções por coluna (top/bottom) */
-.col-left  .tile-top{ flex: 7 1 0; }
-.col-left  .tile-bottom{ flex: 3 1 0; }
+.col-left  .tile-top{ flex: 6 1 0; }
+.col-left  .tile-bottom{ flex: 4 1 0; }
 
-.col-right .tile-top{ flex: 7 1 0; }
-.col-right .tile-bottom{ flex: 3 1 0; }
+.col-right .tile-top{ flex: 6 1 0; }
+.col-right .tile-bottom{ flex: 4 1 0; }
 
 /* Coluna do meio: 2 rankings com a MESMA altura */
 .col-mid .tile-top,
@@ -632,4 +632,357 @@ html[data-tv="4k"]{
 .rl-row[data-rank="2"] .rl-badge,
 .rl-row[data-rank="3"] .rl-badge {
   background: #FAFAFA;
+}
+
+
+/* =========================
+   RANKING (mock Group 21)
+   ========================= */
+.rk-card{ overflow:hidden; }
+.rk-title{
+  font-weight: 900;
+  color: #111827;
+  font-size: var(--fs-title);
+  line-height: 1.1;
+}
+.rk-body{
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rk-row{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+}
+
+.rk-medal{
+  width: 54px;
+  min-width: 54px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.rk-medal-img{
+  width: 44px;
+  height: 44px;
+  display:block;
+}
+.rk-medal-fallback{
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  color: #111827;
+  background: rgba(17,24,39,.06);
+}
+
+.rk-pill{
+  flex: 1 1 auto;
+  min-width: 0;
+  background: rgba(17, 24, 39, 0.04);
+  border: 1px solid rgba(17, 24, 39, 0.06);
+  border-radius: 999px;
+  padding: 14px 16px;
+  display:flex;
+  align-items:center;
+  gap: 18px;
+}
+
+.rk-name{
+  font-weight: 900;
+  color:#111827;
+  font-size: clamp(18px, 1.8vw, 34px);
+  line-height: 1;
+  min-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rk-pill-closer .rk-name{
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+.rk-name-main{
+  font-weight: 900;
+  line-height:1;
+}
+.rk-name-sub{
+  font-weight: 600;
+  color: rgba(17,24,39,.55);
+  font-size: clamp(12px, 1.0vw, 16px);
+  line-height: 1;
+}
+
+.rk-metrics{
+  display:flex;
+  gap: 26px;
+  align-items:center;
+  justify-content:flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.rk-metric{
+  display:flex;
+  flex-direction:column;
+  gap: 4px;
+  min-width: 120px;
+}
+.rk-label{
+  font-weight: 600;
+  color: rgba(17,24,39,.6);
+  font-size: clamp(12px, 1.0vw, 16px);
+  line-height: 1;
+}
+.rk-value{
+  font-weight: 900;
+  color:#111827;
+  font-size: clamp(22px, 2.2vw, 42px);
+  line-height: 1;
+}
+
+.rk-avatar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-left: auto;
+}
+
+/* Ajustes finos para telas menores */
+@media (max-width: 1100px){
+  .rk-medal{ width: 44px; min-width: 44px; }
+  .rk-medal-img{ width: 36px; height: 36px; }
+  .rk-pill{ padding: 12px 14px; gap: 14px; }
+  .rk-metric{ min-width: 96px; }
+}
+
+
+/* =========================
+   LEADS | TAXA DE CONVERSÃO (CLIENTE)
+   - CSS isolado: só mexe em classes .lc-*
+   - Não altera grade / responsividade global
+   ========================= */
+
+:root{
+  /* Tamanho do anel e do pill, escalando com TV/4K via --ui-scale */
+  --lc-ring-size: calc(clamp(210px, 22vh, 300px) * var(--ui-scale));
+  --lc-pill-min-w: calc(clamp(150px, 14vw, 220px) * var(--ui-scale));
+}
+
+/* O painel cinza deve preencher o tile */
+.lc-panel{
+  margin-top: 0;
+  height: 100%;
+  width: 100%;
+
+  border-radius: 26px;
+  background: #D8D8D8;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding: calc(18px * var(--ui-scale)) calc(22px * var(--ui-scale));
+  gap: calc(18px * var(--ui-scale));
+}
+
+/* Lado esquerdo (anel) */
+.lc-left{
+  flex: 1 1 auto;
+  min-width: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.lc-ring-wrap{
+  position: relative;
+  width: min(var(--lc-ring-size), 62%);
+  aspect-ratio: 1 / 1;
+
+  display:grid;
+  place-items:center;
+
+  /* permite tipografia responsiva ao tamanho do próprio anel */
+  container-type: inline-size;
+}
+
+.lc-ring{
+  width: 100%;
+  height: 100%;
+  display:block;
+}
+
+.lc-center{
+  position:absolute;
+  inset: 0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  pointer-events:none;
+}
+
+.lc-center-val{
+  font-weight: 900;
+  color:#111827;
+  line-height: 1;
+  white-space: nowrap;
+
+  /* fallback */
+  font-size: calc(clamp(28px, 2.6vw, 52px) * var(--ui-scale));
+  /* preferível: escala pelo tamanho do anel */
+  font-size: clamp(26px, 18cqw, 54px);
+}
+
+.lc-center-sub{
+  margin-top: calc(6px * var(--ui-scale));
+  font-weight: 700;
+  color: rgba(17,24,39,.65);
+  line-height: 1;
+  white-space: nowrap;
+
+  /* fallback */
+  font-size: calc(clamp(12px, 1.05vw, 16px) * var(--ui-scale));
+  font-size: clamp(11px, 5.2cqw, 16px);
+}
+
+/* Lado direito (pill) */
+.lc-right{
+  flex: 0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.lc-right-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.lc-pill{
+  background: #F05914;
+  color: white;
+  border-radius: 999px;
+  text-align:center;
+  box-shadow: 0 10px 22px rgba(0,0,0,.12);
+
+  min-width: var(--lc-pill-min-w);
+  padding: calc(14px * var(--ui-scale)) calc(28px * var(--ui-scale));
+}
+
+.lc-pill-val{
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  font-size: calc(clamp(28px, 2.8vw, 48px) * var(--ui-scale));
+}
+
+.lc-pill-sub{
+  margin-top: calc(10px * var(--ui-scale));
+  font-weight: 800;
+  color: rgba(17,24,39,.72);
+  white-space: nowrap;
+  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--ui-scale));
+}
+
+/* Se o tile ficar estreito (mobile), empilha sem quebrar */
+@media (max-width: 520px){
+  .lc-panel{
+    flex-direction:column;
+    justify-content:center;
+  }
+  .lc-ring-wrap{
+    width: min(var(--lc-ring-size), 80%);
+  }
+}
+
+
+/* =========================
+   FATURAMENTO ASS x PAGO (PROTÓTIPO 3)
+   ========================= */
+.fa-panel{
+  margin-top: 14px;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 26px;
+  background: #D8D8D8;
+  padding: 18px 22px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap: 12px;
+}
+.fa-bar-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap: 16px;
+}
+.fa-head-label{
+  font-weight: 700;
+  color: rgba(17,24,39,.7);
+  font-size: clamp(12px, 1.0vw, 14px);
+}
+.fa-head-val{
+  font-weight: 800;
+  color: rgba(17,24,39,.55);
+  font-size: clamp(12px, 1.0vw, 14px);
+}
+.fa-bar-bg{
+  width: 100%;
+  height: 44px;
+  background: rgba(255,255,255,.9);
+  border-radius: 999px;
+  overflow:hidden;
+  box-shadow: inset 0 0 0 1px rgba(17,24,39,.06);
+}
+.fa-bar-fill{
+  height: 100%;
+  background: #F05914;
+  border-radius: 999px;
+}
+.fa-paid-val{
+  text-align:right;
+  font-weight: 900;
+  color: #F05914;
+  font-size: clamp(14px, 1.2vw, 18px);
+}
+.fa-bar-foot{
+  margin-top: 4px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-weight: 700;
+  color: rgba(17,24,39,.75);
+  font-size: clamp(12px, 1.0vw, 14px);
+}
+.fa-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display:inline-block;
+  margin-right: 6px;
+}
+.fa-dot-pago{ background:#F05914; }
+.fa-dot-ass{ background: rgba(255,255,255,.9); box-shadow: inset 0 0 0 1px rgba(17,24,39,.12); }
+.fa-foot-left, .fa-foot-mid{ display:flex; align-items:center; }
+.fa-foot-right{ opacity: .9; }
+
+/* Responsivo */
+@media (max-width: 1100px){
+  .lc-panel, .fa-panel{ padding: 16px 18px; border-radius: 22px; }
+  .lc-pill{ min-width: 140px; padding: 12px 16px; }
+  .fa-bar-bg{ height: 38px; }
 }

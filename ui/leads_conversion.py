@@ -1,7 +1,59 @@
 from __future__ import annotations
 
+import html
+import math
+
 from core.formatters import fmt_int
 from ui.ranklist import fmt_percent_br
+
+
+def _dot_ring_svg(percent: float, *, size: int = 260, dots: int = 18) -> str:
+    """Anel de pontos (visual do cliente).
+
+    Regras visuais (referência do cliente):
+    - pontos laranja concentrados no lado esquerdo (9h)
+    - crescimento simétrico (um acima e um abaixo do ponto âncora)
+    - para percentuais baixos, mantém um mínimo visual de 3 pontos acesos
+    """
+    pct = max(0.0, min(100.0, float(percent or 0.0)))
+
+    # quantos pontos "acesos"
+    on = int(math.ceil((pct / 100.0) * dots))
+    if pct > 0 and on < 3:
+        on = 3
+    on = max(0, min(dots, on))
+
+    # índices acesos em torno do ponto âncora (i=0)
+    # ordem: 0, +1, -1, +2, -2...
+    on_idx: set[int] = set()
+    if on > 0:
+        on_idx.add(0)
+        step = 1
+        sign = 1
+        while len(on_idx) < on:
+            on_idx.add((sign * step) % dots)
+            sign *= -1
+            if sign > 0:
+                step += 1
+
+    cx = cy = size / 2
+    r = size * 0.38
+    dot_r = size * 0.033
+
+    circles = []
+    for i in range(dots):
+        # começa no lado esquerdo (9h) e segue no sentido horário
+        ang = math.pi + (math.pi * 2) * (i / dots)
+        x = cx + r * math.cos(ang)
+        y = cy + r * math.sin(ang)
+        fill = "#F05914" if i in on_idx else "#2B2B2B"
+        circles.append(
+            f"<circle cx='{x:.2f}' cy='{y:.2f}' r='{dot_r:.2f}' fill='{fill}' />"
+        )
+
+    return f"""<svg class='lc-ring' viewBox='0 0 {size} {size}' width='{size}' height='{size}' aria-hidden='true'>
+      {''.join(circles)}
+    </svg>"""
 
 
 def leads_conversion_card_html(
@@ -10,27 +62,40 @@ def leads_conversion_card_html(
     taxa_conversao: float | None,
     title: str = "Leads | Taxa de Conversão (Geral)",
 ) -> str:
-    """Card compacto com 2 KPIs (leads e taxa de conversão geral)."""
+    """Card do cliente: anel + pill (sem alterar o restante do layout)."""
 
     leads_txt = fmt_int(leads_total)
-    taxa_txt = fmt_percent_br(taxa_conversao) if taxa_conversao is not None else "-"
+    pct = float(taxa_conversao or 0.0)
 
-    return f'''
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col" style="padding: var(--pad);">
-      <div class="text-center font-extrabold" style="font-size: var(--fs-title);">{title}</div>
+    # "22,0 %"
+    if taxa_conversao is None:
+        pct_txt = "-"
+    else:
+        pct_txt = fmt_percent_br(pct).replace("%", " %")
 
-      <div class="flex-1 min-h-0 flex items-center justify-center" style="padding-top: calc(var(--gap) * 0.6);">
-        <div class="grid grid-cols-2" style="gap: var(--gap); width: 100%;">
-          <div class="rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center justify-center" style="padding: var(--box-pad); min-height: var(--pill-min-h);">
-            <div class="text-zinc-500 font-semibold" style="font-size: var(--fs-label);">Leads</div>
-            <div class="text-zinc-900 font-extrabold" style="font-size: var(--fs-kpi); line-height: 1;">{leads_txt}</div>
-          </div>
+    ring = _dot_ring_svg(pct, size=260, dots=18)
 
-          <div class="rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center justify-center" style="padding: var(--box-pad); min-height: var(--pill-min-h);">
-            <div class="text-zinc-500 font-semibold" style="font-size: var(--fs-label);">Conversão</div>
-            <div class="text-zinc-900 font-extrabold" style="font-size: var(--fs-kpi); line-height: 1;">{taxa_txt}</div>
+    # Importante: não cria wrapper global (bg-white etc).
+    # A tile do template já controla o slot; este painel é o visual cinza do cliente.
+    return f"""
+    <div class="lc-panel" role="group" aria-label="{html.escape(title)}">
+      <div class="lc-left">
+        <div class="lc-ring-wrap">
+          {ring}
+          <div class="lc-center">
+            <div class="lc-center-val">{html.escape(pct_txt)}</div>
+            <div class="lc-center-sub">Taxa de Conversão</div>
           </div>
         </div>
       </div>
+
+      <div class="lc-right">
+        <div class="lc-right-wrap">
+          <div class="lc-pill">
+            <div class="lc-pill-val">{html.escape(leads_txt)}</div>
+          </div>
+          <div class="lc-pill-sub">Leads Criados</div>
+        </div>
+      </div>
     </div>
-    '''
+    """
