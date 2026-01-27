@@ -21,6 +21,12 @@ html[data-tv="fire"]{
   --ui-scale: 1.55; /* ajuste fino: 1.45 ~ 1.70 */
 }
 
+/* TVs / navegadores em UHD (ex.: 3840x2160)
+   Aumenta legibilidade sem mexer na grade/espacamentos do layout. */
+html[data-tv="4k"]{
+  --ui-scale: 1.25;
+}
+
 /* ===== Ajustes “TV proof” ===== */
 :root {
   /* --- Podium (contratos por pessoa) --- */
@@ -37,8 +43,11 @@ html[data-tv="fire"]{
   --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
   /* sobe o bloco no desktop/TV */
-  --top-pad: clamp(8px, 1.6vh, 24px);
+  --top-pad: clamp(10px, 2.2vh, 34px);
 
+  /* padding externo (margem do layout na tela) */
+  --shell-pad-x: clamp(18px, 2.2vw, 44px);
+  --shell-pad-y: clamp(16px, 2.2vh, 40px);
 
   --pad: clamp(12px, 1.0vw, 18px);
 
@@ -77,47 +86,98 @@ html[data-tv="fire"]{
   --donut-size: calc(clamp(160px, 12vw, 230px) * var(--ui-scale));
 }
 
-/* ===============
-   DESKTOP / TV
-   Grid fixo
-   =============== */
-.layout {
-  height: 100%;
-  min-height: 0;
+/* =========================
+   Viewport (padding externo)
+   ========================= */
+.dashboard-viewport{
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  /* Safe area (iPhone notch / barras do sistema) */
+  padding:
+    calc(var(--shell-pad-y) + env(safe-area-inset-top))
+    calc(var(--shell-pad-x) + env(safe-area-inset-right))
+    calc(var(--shell-pad-y) + env(safe-area-inset-bottom))
+    calc(var(--shell-pad-x) + env(safe-area-inset-left));
+  overflow: hidden;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: repeat(4, 1fr);
-  gap: var(--gap);
-
-  grid-template-areas:
-    "reunioes leads reunioes_pessoa"
-    "reunioes taxa_geral reunioes_pessoa"
-    "faturamento taxa_pessoa contratos_pessoa"
-    "faturamento taxa_pessoa contratos_pessoa";
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
 }
 
-.tile {
+.layout-shell{
+  width: 100%;
   height: 100%;
+  max-width: 100%;
   overflow: hidden;
-  min-height: 0; /* importante para não estourar a altura */
+}
+
+/* ===============
+   DESKTOP / TV
+   Layout fixo (igual ao "estrutura.png")
+   - 3 colunas
+   - 2 cards por coluna
+   - proporções de altura por coluna via flex
+   =============== */
+.layout{
+  height: 100%;
+  min-height: 0;
   width: 100%;
 }
 
-.tile-reunioes { grid-area: reunioes; }
-.tile-leads { grid-area: leads; }
-.tile-taxa-geral { grid-area: taxa_geral; }
-.tile-reunioes-pessoa { grid-area: reunioes_pessoa; }
-.tile-faturamento { grid-area: faturamento; }
-.tile-taxa-pessoa { grid-area: taxa_pessoa; }
-.tile-contratos-pessoa { grid-area: contratos_pessoa; }
+/* Desktop/TV: grade 3 colunas */
+.layout-desktop{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--gap);
+}
+
+/* Mobile: escondido por padrão (ativado no @media) */
+.layout-mobile{
+  display: none;
+}
+
+.col{
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.tile{
+  width: 100%;
+  min-height: 0; /* importante para não estourar a altura */
+  overflow: hidden;
+
+  /* cada tile preenche o "slot" do flex */
+  flex: 1 1 0;
+}
+
+/* Proporções por coluna (top/bottom) */
+.col-left  .tile-top{ flex: 7 1 0; }
+.col-left  .tile-bottom{ flex: 3 1 0; }
+
+.col-right .tile-top{ flex: 7 1 0; }
+.col-right .tile-bottom{ flex: 3 1 0; }
+
+/* Coluna do meio: topo menor, base maior */
+.col-mid   .tile-top{ flex: 4 1 0; }
+.col-mid   .tile-bottom{ flex: 6 1 0; }
 
 /* ===============
    MOBILE
    Carrossel horizontal (swipe)
    Sem scroll vertical.
    =============== */
-@media (max-width: 900px) {
+/*
+  MOBILE
+  - breakpoints cobrindo celulares em geral
+  - também ativa em dispositivos touch (pointer coarse)
+*/
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
   :root {
     /* --- Podium (contratos por pessoa) --- */
     --podium-photo: clamp(170px, 10.5vw, 260px);
@@ -132,7 +192,11 @@ html[data-tv="fire"]{
     --podium-row-fs: clamp(13px, 0.95vw, 17px);
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-    --top-pad: clamp(6px, 1.2vh, 12px);
+    --top-pad: 0px;
+
+    /* padding externo no mobile */
+    --shell-pad-x: clamp(12px, 3.2vw, 18px);
+    --shell-pad-y: clamp(12px, 2.8vh, 18px);
 
     /* Mobile: escala própria (não usa ui-scale aqui) */
     --fs-center: clamp(30px, 7vw, 54px);
@@ -141,11 +205,16 @@ html[data-tv="fire"]{
     --fs-sub: clamp(12px, 3.0vw, 16px);
   }
 
+
   .layout-shell {
-    height: 100vh !important;
+    height: 100% !important;
   }
 
-  .layout {
+  /* Esconde o layout desktop (3 colunas) e ativa o carrossel */
+  .layout-desktop{ display:none; }
+  .layout-mobile{ display:flex; }
+
+  .layout-mobile {
     display: flex;
     flex-direction: row;
     gap: var(--gap);
@@ -166,15 +235,32 @@ html[data-tv="fire"]{
     touch-action: pan-x;
   }
 
-  .layout::-webkit-scrollbar { display: none; }
-  .layout { scrollbar-width: none; }
+  .layout-mobile::-webkit-scrollbar { display: none; }
+  .layout-mobile { scrollbar-width: none; }
 
-  .tile {
-    /* 1 card por “tela”, com bordas respirando */
-    flex: 0 0 92vw;
+  .layout-mobile .tile {
+    /* 1 card por “tela”, respeitando o padding externo */
+    flex: 0 0 calc(
+      100vw
+      - (2 * var(--shell-pad-x))
+      - env(safe-area-inset-left)
+      - env(safe-area-inset-right)
+    );
     height: 100%;
     scroll-snap-align: start;
   }
+
+  /* Ajustes extras p/ caber bem em telas curtas (celulares) */
+  :root{
+    --gauge-w: clamp(260px, 80vw, 360px);
+    --gauge-min-h: clamp(210px, 46vh, 320px);
+    --gauge-text-shift: 18px;
+    --pill-min-h: clamp(70px, 13vh, 110px);
+    --donut-size: clamp(140px, 44vw, 200px);
+    --box-pad: clamp(10px, 3.2vw, 16px);
+    --gap: clamp(10px, 3.0vw, 16px);
+  }
+
 }
 
 /* Evita que conteúdo interno estoure o tile (sem criar scroll) */
@@ -245,7 +331,7 @@ html[data-tv="fire"]{
     --podium-row-fs: clamp(13px, 0.95vw, 17px);
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-    --top-pad: clamp(6px, 1.0vh, 14px);
+    --top-pad: 0px;
 
     --pad: clamp(8px, 0.7vw, 12px);
     --gap: clamp(6px, 0.8vw, 10px);
@@ -443,8 +529,7 @@ html[data-tv="fire"]{
   margin-top: var(--gap);
   display: flex;
   flex-direction: column;
-  /* ↓ menor para reduzir a altura total do bloco de ranking */
-  gap: clamp(8px, 0.75vw, 12px);
+  gap: clamp(10px, 0.9vw, 14px);
   flex: 1;
   min-height: 0;
   padding-bottom: clamp(2px, 0.4vw, 6px);
@@ -453,8 +538,7 @@ html[data-tv="fire"]{
 .rl-row {
   display: flex;
   align-items: center;
-  /* ↓ reduz o "respiro" horizontal sem mexer na foto */
-  gap: clamp(8px, 0.75vw, 12px);
+  gap: clamp(10px, 0.9vw, 14px);
   min-height: 0;
 }
 
@@ -478,16 +562,12 @@ html[data-tv="fire"]{
   background: #F4F4F5;
   border-radius: 9999px;
   border: 1px solid rgba(0,0,0,0.06);
-
-  /* ↓ Diminui a altura da "pílula" (sem mexer no tamanho da foto) */
-  padding: clamp(6px, 0.65vw, 12px);
-
+  padding: clamp(10px, 0.9vw, 14px) clamp(14px, 1.2vw, 18px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(8px, 0.85vw, 12px);
+  gap: clamp(10px, 1vw, 16px);
 }
-
 
 .rl-text {
   min-width: 0;
@@ -499,7 +579,7 @@ html[data-tv="fire"]{
   font-weight: 800;
   color: #111827; /* gray-900 */
   font-size: clamp(14px, 1.05vw, 18px);
-  line-height: 1.05;
+  line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -509,8 +589,8 @@ html[data-tv="fire"]{
   font-weight: 700;
   color: #52525B; /* zinc-600 */
   font-size: clamp(13px, 0.98vw, 16px);
-  line-height: 1.05;
-  margin-top: 2px;
+  line-height: 1.1;
+  margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -521,21 +601,11 @@ html[data-tv="fire"]{
   color: #71717A; /* zinc-500 */
   font-size: clamp(12px, 0.9vw, 14px);
   line-height: 1.1;
-  margin-top: 2px;
-
-  /* ✅ permite quebrar quando não couber */
-  white-space: normal !important;
+  margin-top: 3px;
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: unset;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  
-  /* ✅ limita a 2 linhas (TV-safe) */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 }
-
 
 .rl-avatar {
   flex: 0 0 auto;
