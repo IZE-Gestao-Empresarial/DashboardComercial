@@ -70,7 +70,7 @@ fat_meta = get_val(df_last, INDICATORS.FAT_META, "CLOSER")
 fat_perc = get_val(df_last, INDICATORS.FAT_PERC, "CLOSER")
 
 card_reunioes = kpi_card_html(
-    title="Reuniões Meta x Realizado",
+    title="Reuniões Ocorridas",
     percent_float=pct_to_float_percent(reun_perc),
     subtitle="Reuniões ocorridas",
     left_label="Reuniões Realizadas",
