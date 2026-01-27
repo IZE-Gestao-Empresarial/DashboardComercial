@@ -163,9 +163,12 @@ html[data-tv="4k"]{
 .col-right .tile-top{ flex: 7 1 0; }
 .col-right .tile-bottom{ flex: 3 1 0; }
 
-/* Coluna do meio: topo menor, base maior */
-.col-mid   .tile-top{ flex: 4 1 0; }
-.col-mid   .tile-bottom{ flex: 6 1 0; }
+/* Coluna do meio: 2 rankings com a MESMA altura */
+.col-mid .tile-top,
+.col-mid .tile-bottom{
+  flex: 1 1 0;
+}
+
 
 /* ===============
    MOBILE
