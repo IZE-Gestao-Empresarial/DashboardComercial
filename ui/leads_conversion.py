@@ -7,54 +7,63 @@ from core.formatters import fmt_int
 from ui.ranklist import fmt_percent_br
 
 
-def _dot_ring_svg(percent: float, *, size: int = 260, dots: int = 18) -> str:
-    """Anel de pontos (visual do cliente).
-
-    Regras visuais (referência do cliente):
-    - pontos laranja concentrados no lado esquerdo (9h)
-    - crescimento simétrico (um acima e um abaixo do ponto âncora)
-    - para percentuais baixos, mantém um mínimo visual de 3 pontos acesos
+def _dot_ring_svg(percent: float, *, size: int = 360) -> str:
+    """Anel de pontos idêntico ao visual 'Taxa de Conversão (3)'.
+    
+    - Total de 15 pontos.
+    - Preenchimento sentido horário.
+    - Ponto de partida ajustado para o canto inferior esquerdo (~145 graus).
     """
     pct = max(0.0, min(100.0, float(percent or 0.0)))
+    
+    # Na imagem referência: 15 pontos no total.
+    # 7,8% acende 3 pontos. A lógica visual parece ser um "step" fixo ou teto.
+    # Vamos manter proporcional:
+    dots_total = 15
+    on = int(math.ceil((pct / 100.0) * dots_total))
+    
+    # Garante visual mínimo se houver valor positivo (como na imagem)
+    if pct > 0 and on < 1: 
+        on = 1
+    on = max(0, min(dots_total, on))
 
-    # quantos pontos "acesos"
-    on = int(math.ceil((pct / 100.0) * dots))
-    if pct > 0 and on < 3:
-        on = 3
-    on = max(0, min(dots, on))
-
-    # índices acesos em torno do ponto âncora (i=0)
-    # ordem: 0, +1, -1, +2, -2...
     on_idx: set[int] = set()
-    if on > 0:
-        on_idx.add(0)
-        step = 1
-        sign = 1
-        while len(on_idx) < on:
-            on_idx.add((sign * step) % dots)
-            sign *= -1
-            if sign > 0:
-                step += 1
+    for k in range(on):
+        on_idx.add(k)
 
     cx = cy = size / 2
-    r = size * 0.38
-    dot_r = size * 0.033
+    # Raio do anel
+    r = size * 0.42 
+    # Raio de cada ponto (ajustado visualmente)
+    dot_r = size * 0.065 
 
-    circles = []
-    for i in range(dots):
-        # começa no lado esquerdo (9h) e segue no sentido horário
-        ang = math.pi + (math.pi * 2) * (i / dots)
+    circles: list[str] = []
+    
+    # Ajuste de ângulo:
+    # 0 rad = 3h (Direita).
+    # SVG y cresce para baixo. Sentido horário = aumenta ângulo.
+    # Queremos começar em ~8h. Isso é aprox 135 a 150 graus (conversão visual).
+    # Math.pi = 180 (9h). Vamos começar um pouco antes.
+    start_angle = math.radians(150) 
+
+    step = (2 * math.pi) / dots_total
+
+    for i in range(dots_total):
+        # Calcula posição
+        ang = start_angle + (step * i)
         x = cx + r * math.cos(ang)
         y = cy + r * math.sin(ang)
-        fill = "#F05914" if i in on_idx else "#2B2B2B"
-        circles.append(
-            f"<circle cx='{x:.2f}' cy='{y:.2f}' r='{dot_r:.2f}' fill='{fill}' />"
-        )
+        
+        # Cores exatas da imagem
+        # Ativo = Laranja (#F05914)
+        # Inativo = Cinza Escuro (#3F3E3B - tom retirado da imagem/CSS)
+        fill = "#F05914" if i in on_idx else "#3F3E3B"
+        
+        circles.append(f"<circle cx='{x:.2f}' cy='{y:.2f}' r='{dot_r:.2f}' fill='{fill}' />")
 
-    return f"""<svg class='lc-ring' viewBox='0 0 {size} {size}' width='{size}' height='{size}' aria-hidden='true'>
+    return f"""<svg class='lc-ring' viewBox='0 0 {size} {size}' aria-hidden='true'>
       {''.join(circles)}
     </svg>"""
-
 
 def leads_conversion_card_html(
     *,
@@ -62,40 +71,37 @@ def leads_conversion_card_html(
     taxa_conversao: float | None,
     title: str = "Leads | Taxa de Conversão (Geral)",
 ) -> str:
-    """Card do cliente: anel + pill (sem alterar o restante do layout)."""
-
+    """Card 'Taxa de Conversão | Leads' (Design Prototipo 3)."""
+    
     leads_txt = fmt_int(leads_total)
     pct = float(taxa_conversao or 0.0)
 
-    # "22,0 %"
     if taxa_conversao is None:
         pct_txt = "-"
     else:
+        # Formato "7,8 %" (com espaço antes do %)
         pct_txt = fmt_percent_br(pct).replace("%", " %")
 
-    ring = _dot_ring_svg(pct, size=260, dots=18)
+    # Gera o anel
+    ring = _dot_ring_svg(pct, size=300)
 
-    # Importante: não cria wrapper global (bg-white etc).
-    # A tile do template já controla o slot; este painel é o visual cinza do cliente.
-    return f"""
-    <div class="lc-panel" role="group" aria-label="{html.escape(title)}">
-      <div class="lc-left">
-        <div class="lc-ring-wrap">
+    return f"""<div class='lc-card' aria-label='{html.escape(title)}'>
+      
+      <div class='lc-gauge-side'>
+        <div class='lc-ring-wrap'>
           {ring}
-          <div class="lc-center">
-            <div class="lc-center-val">{html.escape(pct_txt)}</div>
-            <div class="lc-center-sub">Taxa de Conversão</div>
+          <div class='lc-ring-text'>
+            <div class='lc-pct'>{html.escape(pct_txt)}</div>
+            <div class='lc-label'>Taxa de Conversão</div>
           </div>
         </div>
       </div>
 
-      <div class="lc-right">
-        <div class="lc-right-wrap">
-          <div class="lc-pill">
-            <div class="lc-pill-val">{html.escape(leads_txt)}</div>
-          </div>
-          <div class="lc-pill-sub">Leads Criados</div>
+      <div class='lc-data-side'>
+        <div class='lc-pill'>
+          {html.escape(leads_txt)}
         </div>
+        <div class='lc-data-label'>Leads Criados</div>
       </div>
-    </div>
-    """
+
+    </div>"""

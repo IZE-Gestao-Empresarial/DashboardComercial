@@ -13,7 +13,8 @@ html, body {
    - No Fire TV aumenta tipografia e componentes
    ========================================= */
 :root{
-  --ui-scale: 1; /* PC */
+  --ui-scale: 0.93; /* PC: componentes / espaçamentos */
+  --text-scale: 0.85; /* PC: textos */
 }
 
 /* Fire TV (Silk): deixa tudo mais legível */
@@ -43,37 +44,33 @@ html[data-tv="4k"]{
   --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
   /* sobe o bloco no desktop/TV */
-  --top-pad: clamp(10px, 2.2vh, 34px);
-
-  /* padding externo (margem do layout na tela) */
-  --shell-pad-x: clamp(18px, 2.2vw, 44px);
-  --shell-pad-y: clamp(16px, 2.2vh, 40px);
-
-  --pad: clamp(12px, 1.0vw, 18px);
-
-  /* ✅ MAIOR para os 2 subcards (gap/padding) */
-  --gap: clamp(12px, 1.2vw, 20px);
-  --box-pad: clamp(12px, 1.1vw, 20px);
-
-  /* ✅ MAIS DESTAQUE (porcentagem + valores) */
-  --fs-title:  calc(clamp(18px, 1.35vw, 26px) * var(--ui-scale));
+  --top-pad: calc(clamp(10px, 2.2vh, 34px) * var(--ui-scale));
+/* padding externo (margem do layout na tela) */
+  --shell-pad-x: calc(clamp(18px, 2.2vw, 44px) * var(--ui-scale));
+--shell-pad-y: calc(clamp(16px, 2.2vh, 40px) * var(--ui-scale));
+--pad: calc(clamp(12px, 1.0vw, 18px) * var(--ui-scale));
+/* ✅ MAIOR para os 2 subcards (gap/padding) */
+  --gap: calc(clamp(12px, 1.2vw, 20px) * var(--ui-scale));
+--box-pad: calc(clamp(12px, 1.1vw, 20px) * var(--ui-scale));
+/* ✅ MAIS DESTAQUE (porcentagem + valores) */
+  --fs-title:  calc(clamp(18px, 1.35vw, 26px) * var(--text-scale));
 
   /* porcentagem do gauge */
-  --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--ui-scale));
+  --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--text-scale));
 
   /* subtítulo do gauge */
-  --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--ui-scale));
+  --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--text-scale));
 
   /* labels e valores dos subcards */
-  --fs-label:  calc(clamp(13px, 1.1vw, 20px) * var(--ui-scale));
-  --fs-kpi:    calc(clamp(22px, 2.2vw, 44px) * var(--ui-scale));
+  --fs-label:  calc(clamp(13px, 1.1vw, 20px) * var(--text-scale));
+  --fs-kpi:    calc(clamp(22px, 2.2vw, 44px) * var(--text-scale));
 
   /* (não usado mais no seu KPI, mas mantido) */
   --fs-pill: clamp(12px, 1.0vw, 14px);
   --fs-badge: clamp(10px, 0.8vw, 12px);
 
   /* placeholder (cards vazios) */
-  --fs-placeholder: calc(clamp(20px, 1.8vw, 34px) * var(--ui-scale));
+  --fs-placeholder: calc(clamp(20px, 1.8vw, 34px) * var(--text-scale));
 
   /* Gauge (aumenta junto na TV) */
   --gauge-w:      calc(clamp(384px, 24vw, 480px) * var(--ui-scale));
@@ -197,11 +194,13 @@ html[data-tv="4k"]{
 
     --top-pad: 0px;
 
-    /* padding externo no mobile */
-    --shell-pad-x: clamp(12px, 3.2vw, 18px);
-    --shell-pad-y: clamp(12px, 2.8vh, 18px);
 
-    /* Mobile: escala própria (não usa ui-scale aqui) */
+    --ui-scale: 1;
+    --text-scale: 1;
+    /* padding externo no mobile */
+    --shell-pad-x: calc(clamp(12px, 3.2vw, 18px) * var(--ui-scale));
+--shell-pad-y: calc(clamp(12px, 2.8vh, 18px) * var(--ui-scale));
+/* Mobile: escala própria (não usa ui-scale aqui) */
     --fs-center: clamp(30px, 7vw, 54px);
     --fs-kpi: clamp(22px, 5.6vw, 40px);
     --fs-label: clamp(13px, 3.2vw, 18px);
@@ -260,9 +259,9 @@ html[data-tv="4k"]{
     --gauge-text-shift: 18px;
     --pill-min-h: clamp(70px, 13vh, 110px);
     --donut-size: clamp(140px, 44vw, 200px);
-    --box-pad: clamp(10px, 3.2vw, 16px);
-    --gap: clamp(10px, 3.0vw, 16px);
-  }
+    --box-pad: calc(clamp(10px, 3.2vw, 16px) * var(--ui-scale));
+--gap: calc(clamp(10px, 3.0vw, 16px) * var(--ui-scale));
+}
 
 }
 
@@ -293,17 +292,15 @@ html[data-tv="4k"]{
     --podium-row-fs: clamp(13px, 0.95vw, 17px);
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-    --top-pad: clamp(6px, 1.2vh, 16px);
-    --pad: clamp(10px, 0.8vw, 14px);
-
-    --gap: clamp(10px, 1.0vw, 16px);
-    --box-pad: clamp(10px, 1.0vw, 16px);
-
-    --fs-title:  calc(clamp(16px, 1.15vw, 22px) * var(--ui-scale));
-    --fs-center: calc(clamp(24px, 2.4vw, 48px) * var(--ui-scale));
-    --fs-sub:    calc(clamp(11px, 1.0vw, 14px) * var(--ui-scale));
-    --fs-label:  calc(clamp(12px, 1.0vw, 18px) * var(--ui-scale));
-    --fs-kpi:    calc(clamp(20px, 2.0vw, 38px) * var(--ui-scale));
+    --top-pad: calc(clamp(6px, 1.2vh, 16px) * var(--ui-scale));
+--pad: calc(clamp(10px, 0.8vw, 14px) * var(--ui-scale));
+--gap: calc(clamp(10px, 1.0vw, 16px) * var(--ui-scale));
+--box-pad: calc(clamp(10px, 1.0vw, 16px) * var(--ui-scale));
+--fs-title:  calc(clamp(16px, 1.15vw, 22px) * var(--text-scale));
+    --fs-center: calc(clamp(24px, 2.4vw, 48px) * var(--text-scale));
+    --fs-sub:    calc(clamp(11px, 1.0vw, 14px) * var(--text-scale));
+    --fs-label:  calc(clamp(12px, 1.0vw, 18px) * var(--text-scale));
+    --fs-kpi:    calc(clamp(20px, 2.0vw, 38px) * var(--text-scale));
 
     --gauge-w:      calc(clamp(336px, 21.6vw, 432px) * var(--ui-scale));
     --gauge-min-h:  calc(clamp(252px, 24vw, 312px) * var(--ui-scale));
@@ -336,15 +333,14 @@ html[data-tv="4k"]{
 
     --top-pad: 0px;
 
-    --pad: clamp(8px, 0.7vw, 12px);
-    --gap: clamp(6px, 0.8vw, 10px);
-    --box-pad: clamp(6px, 0.6vw, 9px);
-
-    --fs-title:  calc(clamp(15px, 1.05vw, 20px) * var(--ui-scale));
-    --fs-center: calc(clamp(22px, 2.2vw, 42px) * var(--ui-scale));
-    --fs-sub:    calc(clamp(11px, 0.95vw, 14px) * var(--ui-scale));
-    --fs-label:  calc(clamp(12px, 1.0vw, 16px) * var(--ui-scale));
-    --fs-kpi:    calc(clamp(18px, 1.8vw, 34px) * var(--ui-scale));
+    --pad: calc(clamp(8px, 0.7vw, 12px) * var(--ui-scale));
+--gap: calc(clamp(6px, 0.8vw, 10px) * var(--ui-scale));
+--box-pad: calc(clamp(6px, 0.6vw, 9px) * var(--ui-scale));
+--fs-title:  calc(clamp(15px, 1.05vw, 20px) * var(--text-scale));
+    --fs-center: calc(clamp(22px, 2.2vw, 42px) * var(--text-scale));
+    --fs-sub:    calc(clamp(11px, 0.95vw, 14px) * var(--text-scale));
+    --fs-label:  calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
+    --fs-kpi:    calc(clamp(18px, 1.8vw, 34px) * var(--text-scale));
 
     --gauge-w:      calc(clamp(312px, 20.4vw, 408px) * var(--ui-scale));
     --gauge-min-h:  calc(clamp(137px, 13.4vw, 170px) * var(--ui-scale));
@@ -532,7 +528,7 @@ html[data-tv="4k"]{
   margin-top: var(--gap);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 0.9vw, 14px);
+  gap: calc(clamp(10px, 0.9vw, 14px) * var(--ui-scale));
   flex: 1;
   min-height: 0;
   padding-bottom: clamp(2px, 0.4vw, 6px);
@@ -541,13 +537,13 @@ html[data-tv="4k"]{
 .rl-row {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 0.9vw, 14px);
+  gap: calc(clamp(10px, 0.9vw, 14px) * var(--ui-scale));
   min-height: 0;
 }
 
 .rl-badge {
-  width: clamp(28px, 2.4vw, 36px);
-  height: clamp(28px, 2.4vw, 36px);
+  width: calc(clamp(28px, 2.4vw, 36px) * var(--ui-scale));
+  height: calc(clamp(28px, 2.4vw, 36px) * var(--ui-scale));
   border-radius: 999px;
   display: flex;
   align-items: center;
@@ -565,7 +561,7 @@ html[data-tv="4k"]{
   background: #F4F4F5;
   border-radius: 9999px;
   border: 1px solid rgba(0,0,0,0.06);
-  padding: clamp(10px, 0.9vw, 14px) clamp(14px, 1.2vw, 18px);
+  padding: calc(clamp(10px, 0.9vw, 14px) * var(--ui-scale)) calc(clamp(14px, 1.2vw, 18px) * var(--ui-scale));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -581,7 +577,7 @@ html[data-tv="4k"]{
 .rl-name {
   font-weight: 800;
   color: #111827; /* gray-900 */
-  font-size: clamp(14px, 1.05vw, 18px);
+  font-size: calc(clamp(14px, 1.05vw, 18px) * var(--text-scale));
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
@@ -591,7 +587,7 @@ html[data-tv="4k"]{
 .rl-value {
   font-weight: 700;
   color: #52525B; /* zinc-600 */
-  font-size: clamp(13px, 0.98vw, 16px);
+  font-size: calc(clamp(13px, 0.98vw, 16px) * var(--text-scale));
   line-height: 1.1;
   margin-top: 4px;
   white-space: nowrap;
@@ -602,7 +598,7 @@ html[data-tv="4k"]{
 .rl-sub {
   font-weight: 600;
   color: #71717A; /* zinc-500 */
-  font-size: clamp(12px, 0.9vw, 14px);
+  font-size: calc(clamp(12px, 0.9vw, 14px) * var(--text-scale));
   line-height: 1.1;
   margin-top: 3px;
   white-space: nowrap;
@@ -646,28 +642,28 @@ html[data-tv="4k"]{
   line-height: 1.1;
 }
 .rk-body{
-  margin-top: 14px;
+  margin-top: calc(14px * var(--ui-scale));
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: calc(14px * var(--ui-scale));
 }
 
 .rk-row{
   display:flex;
   align-items:center;
-  gap: 14px;
+  gap: calc(14px * var(--ui-scale));
 }
 
 .rk-medal{
-  width: 54px;
-  min-width: 54px;
+  width: calc(54px * var(--ui-scale));
+  min-width: calc(54px * var(--ui-scale));
   display:flex;
   align-items:center;
   justify-content:center;
 }
 .rk-medal-img{
-  width: 44px;
-  height: 44px;
+  width: calc(44px * var(--ui-scale));
+  height: calc(44px * var(--ui-scale));
   display:block;
 }
 .rk-medal-fallback{
@@ -688,16 +684,16 @@ html[data-tv="4k"]{
   background: rgba(17, 24, 39, 0.04);
   border: 1px solid rgba(17, 24, 39, 0.06);
   border-radius: 999px;
-  padding: 14px 16px;
+  padding: calc(14px * var(--ui-scale)) calc(16px * var(--ui-scale));
   display:flex;
   align-items:center;
-  gap: 18px;
+  gap: calc(18px * var(--ui-scale));
 }
 
 .rk-name{
   font-weight: 900;
   color:#111827;
-  font-size: clamp(18px, 1.8vw, 34px);
+  font-size: calc(clamp(18px, 1.8vw, 34px) * var(--text-scale));
   line-height: 1;
   min-width: 140px;
   white-space: nowrap;
@@ -716,13 +712,13 @@ html[data-tv="4k"]{
 .rk-name-sub{
   font-weight: 600;
   color: rgba(17,24,39,.55);
-  font-size: clamp(12px, 1.0vw, 16px);
+  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
   line-height: 1;
 }
 
 .rk-metrics{
   display:flex;
-  gap: 26px;
+  gap: calc(26px * var(--ui-scale));
   align-items:center;
   justify-content:flex-start;
   flex: 1 1 auto;
@@ -732,18 +728,18 @@ html[data-tv="4k"]{
   display:flex;
   flex-direction:column;
   gap: 4px;
-  min-width: 120px;
+  min-width: calc(120px * var(--ui-scale));
 }
 .rk-label{
   font-weight: 600;
   color: rgba(17,24,39,.6);
-  font-size: clamp(12px, 1.0vw, 16px);
+  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
   line-height: 1;
 }
 .rk-value{
   font-weight: 900;
   color:#111827;
-  font-size: clamp(22px, 2.2vw, 42px);
+  font-size: calc(clamp(22px, 2.2vw, 42px) * var(--text-scale));
   line-height: 1;
 }
 
@@ -764,225 +760,269 @@ html[data-tv="4k"]{
 
 
 /* =========================
-   LEADS | TAXA DE CONVERSÃO (CLIENTE)
-   - CSS isolado: só mexe em classes .lc-*
-   - Não altera grade / responsividade global
+   LEADS | CONVERSÃO (PROTÓTIPO 3)
    ========================= */
 
-:root{
-  /* Tamanho do anel e do pill, escalando com TV/4K via --ui-scale */
-  --lc-ring-size: calc(clamp(210px, 22vh, 300px) * var(--ui-scale));
-  --lc-pill-min-w: calc(clamp(150px, 14vw, 220px) * var(--ui-scale));
-}
 
-/* O painel cinza deve preencher o tile */
-.lc-panel{
-  margin-top: 0;
-  height: 100%;
+
+
+
+
+
+.lc-card {
   width: 100%;
-
-  border-radius: 26px;
-  background: #D8D8D8;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding: calc(18px * var(--ui-scale)) calc(22px * var(--ui-scale));
-  gap: calc(18px * var(--ui-scale));
-}
-
-/* Lado esquerdo (anel) */
-.lc-left{
-  flex: 1 1 auto;
-  min-width: 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.lc-ring-wrap{
+  height: 100%;
+  background: #D8D8D8; 
+  border-radius: 34px;
+  overflow: hidden;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  padding: calc(10px * var(--ui-scale)) calc(20px * var(--ui-scale));
   position: relative;
-  width: min(var(--lc-ring-size), 62%);
-  aspect-ratio: 1 / 1;
-
-  display:grid;
-  place-items:center;
-
-  /* permite tipografia responsiva ao tamanho do próprio anel */
-  container-type: inline-size;
 }
 
-.lc-ring{
+/* --- LADO ESQUERDO (GAUGE) --- */
+.lc-gauge-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+}
+
+.lc-ring-wrap {
+  position: relative;
+  width: calc(clamp(160px, 14vw, 240px) * var(--ui-scale));
+  height: calc(clamp(160px, 14vw, 240px) * var(--ui-scale));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lc-ring {
   width: 100%;
   height: 100%;
-  display:block;
+  display: block;
 }
 
-.lc-center{
-  position:absolute;
+/* Texto Central do Gauge */
+.lc-ring-text {
+  position: absolute;
   inset: 0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  pointer-events:none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
+  /* Pequeno ajuste para garantir centralização óptica com fontes menores */
+  padding-top: calc(4px * var(--ui-scale)); 
 }
 
-.lc-center-val{
-  font-weight: 900;
-  color:#111827;
-  line-height: 1;
-  white-space: nowrap;
-
-  /* fallback */
-  font-size: calc(clamp(28px, 2.6vw, 52px) * var(--ui-scale));
-  /* preferível: escala pelo tamanho do anel */
-  font-size: clamp(26px, 18cqw, 54px);
-}
-
-.lc-center-sub{
-  margin-top: calc(6px * var(--ui-scale));
-  font-weight: 700;
-  color: rgba(17,24,39,.65);
-  line-height: 1;
-  white-space: nowrap;
-
-  /* fallback */
-  font-size: calc(clamp(12px, 1.05vw, 16px) * var(--ui-scale));
-  font-size: clamp(11px, 5.2cqw, 16px);
-}
-
-/* Lado direito (pill) */
-.lc-right{
-  flex: 0 0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.lc-right-wrap{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
-
-.lc-pill{
-  background: #F05914;
-  color: white;
-  border-radius: 999px;
-  text-align:center;
-  box-shadow: 0 10px 22px rgba(0,0,0,.12);
-
-  min-width: var(--lc-pill-min-w);
-  padding: calc(14px * var(--ui-scale)) calc(28px * var(--ui-scale));
-}
-
-.lc-pill-val{
-  font-weight: 900;
-  line-height: 1;
-  white-space: nowrap;
-  font-size: calc(clamp(28px, 2.8vw, 48px) * var(--ui-scale));
-}
-
-.lc-pill-sub{
-  margin-top: calc(10px * var(--ui-scale));
+.lc-pct {
   font-weight: 800;
-  color: rgba(17,24,39,.72);
+  color: #3F3E3B;
+  line-height: 1;
+  /* ✅ FONTE REDUZIDA (antes era clamp(32px...)) */
+  font-size: calc(clamp(24px, 2.6vw, 50px) * var(--text-scale));
+  margin-bottom: calc(4px * var(--ui-scale));
   white-space: nowrap;
-  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--ui-scale));
 }
 
-/* Se o tile ficar estreito (mobile), empilha sem quebrar */
-@media (max-width: 520px){
-  .lc-panel{
-    flex-direction:column;
-    justify-content:center;
+.lc-label {
+  font-weight: 600;
+  color: #3F3E3B;
+  opacity: 0.9;
+  line-height: 1.1;
+  /* ✅ FONTE REDUZIDA LEVEMENTE */
+  font-size: calc(clamp(11px, 0.95vw, 15px) * var(--text-scale));
+  max-width: 80%;
+}
+
+/* --- LADO DIREITO (LEADS) --- */
+/* --- LADO DIREITO (LEADS) --- */
+.lc-data-side {
+  flex: 0 0 auto;
+  width: 35%; /* Reduzi levemente a largura da coluna */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8px * var(--ui-scale)); /* Gap menor entre número e texto */
+  
+  /* Mantém o bloco para cima */
+  padding-bottom: calc(70px * var(--ui-scale));
+}
+
+.lc-pill {
+  background: #F05914;
+  border-radius: 999px;
+  
+  /* Padding reduzido: mais fino e menos largo */
+  padding: calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale)) calc(clamp(18px, 2.2vw, 35px) * var(--ui-scale));
+  
+  color: #FFFFFF;
+  font-weight: 800;
+  line-height: 1;
+  /* Fonte do número reduzida */
+  font-size: calc(clamp(20px, 2.2vw, 38px) * var(--text-scale));
+  
+  box-shadow: 0 4px 12px rgba(240, 89, 20, 0.25);
+  white-space: nowrap;
+}
+
+.lc-data-label {
+  font-weight: 600;
+  color: #3F3E3B;
+  /* Fonte da legenda reduzida */
+  font-size: calc(clamp(12px, 1.1vw, 18px) * var(--text-scale));
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Ajuste Mobile */
+@media (max-width: 1024px) {
+  .lc-data-side { 
+    width: auto; 
+    padding-bottom: 0; 
   }
-  .lc-ring-wrap{
-    width: min(var(--lc-ring-size), 80%);
-  }
+  .lc-pill { font-size: 24px; }
+  .lc-data-label { font-size: 14px; }
 }
 
 
-/* =========================
-   FATURAMENTO ASS x PAGO (PROTÓTIPO 3)
-   ========================= */
-.fa-panel{
-  margin-top: 14px;
+
+
+/* === FATURAMENTO ASSINADO X PAGO (sobreposto) === */
+/* === FATAP (Faturamento Assinado x Pago) — Figma match === */
+.fatap-card{
+  height: 100%;
+  width: 100%;
+  border-radius: 34px;
+  background: #D8D8D8;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.0vw, 16px);
+
+  padding: clamp(14px, 1.1vw, 20px);
+  box-shadow: inset 0 0 0 1px rgba(17,24,39,.05);
+}
+
+.fatap-stage{
   flex: 1 1 auto;
   min-height: 0;
-  border-radius: 26px;
-  background: #D8D8D8;
-  padding: 18px 22px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.fa-bar-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap: 16px;
-}
-.fa-head-label{
-  font-weight: 700;
-  color: rgba(17,24,39,.7);
-  font-size: clamp(12px, 1.0vw, 14px);
-}
-.fa-head-val{
-  font-weight: 800;
-  color: rgba(17,24,39,.55);
-  font-size: clamp(12px, 1.0vw, 14px);
-}
-.fa-bar-bg{
-  width: 100%;
-  height: 44px;
-  background: rgba(255,255,255,.9);
-  border-radius: 999px;
-  overflow:hidden;
-  box-shadow: inset 0 0 0 1px rgba(17,24,39,.06);
-}
-.fa-bar-fill{
-  height: 100%;
-  background: #F05914;
-  border-radius: 999px;
-}
-.fa-paid-val{
-  text-align:right;
-  font-weight: 900;
-  color: #F05914;
-  font-size: clamp(14px, 1.2vw, 18px);
-}
-.fa-bar-foot{
-  margin-top: 4px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  font-weight: 700;
-  color: rgba(17,24,39,.75);
-  font-size: clamp(12px, 1.0vw, 14px);
-}
-.fa-dot{
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  display:inline-block;
-  margin-right: 6px;
-}
-.fa-dot-pago{ background:#F05914; }
-.fa-dot-ass{ background: rgba(255,255,255,.9); box-shadow: inset 0 0 0 1px rgba(17,24,39,.12); }
-.fa-foot-left, .fa-foot-mid{ display:flex; align-items:center; }
-.fa-foot-right{ opacity: .9; }
 
-/* Responsivo */
-@media (max-width: 1100px){
-  .lc-panel, .fa-panel{ padding: 16px 18px; border-radius: 22px; }
-  .lc-pill{ min-width: 140px; padding: 12px 16px; }
-  .fa-bar-bg{ height: 38px; }
+.fatap-bars{
+  /* Base do desenho (sem vh pra não quebrar no zoom 100%) */
+  position: relative;
+  width: min(420px, 100%);
+  height: min(100%, clamp(170px, 14vw, 240px));
+
+  /* “respiro” no topo para o % ficar fora da barra laranja (igual Figma) */
+  --fatap-headroom: clamp(34px, 3.0vw, 48px);
+
+  /* posições (ajuste fino) */
+  --ass-x: 44%;
+  --pago-x: 62%;
 }
+
+.fatap-bar{
+  position: absolute;
+  bottom: 0;
+  width: calc(clamp(20px, 4vw, 132px) * var(--ui-scale));
+  border-radius: clamp(7px, 0.9vw, 24px);
+}
+
+/* Assinado (branco) — nunca encosta no topo */
+.fatap-bar-ass{
+  left: var(--ass-x);
+  transform: translateX(-50%);
+  height: calc(100% - var(--fatap-headroom));
+  background: rgba(255,255,255,.88);
+}
+
+/* Pago (laranja) — usa a razão via CSS var (--fatap-r: 0..100) */
+.fatap-bar-pago{
+  left: var(--pago-x);
+  transform: translateX(-85%);
+  height: calc((100% - var(--fatap-headroom)) * (var(--fatap-r, 0) / 100));
+  background: #F05914;
+}
+
+/* Pills */
+.fatap-pill{
+  position: absolute;
+  background: #1F1F1F;
+  color: #fff;
+  border-radius: 999px;
+
+  padding: calc(clamp(7px, 0.8vw, 10px) * var(--ui-scale)) calc(clamp(14px, 1.3vw, 20px) * var(--ui-scale));
+  font-weight: 500;
+  letter-spacing: .2px;
+  line-height: 1;
+  white-space: nowrap;
+
+  font-size: calc(clamp(12px, 1.05vw, 18px) * var(--text-scale));
+}
+
+.fatap-pill-ass {
+  left: var(--ass-x);
+  transform: translateX(-120%);
+  /* Ajustado para ser relativo ao topo da barra branca (headroom) */
+  top: calc(var(--fatap-headroom) + calc(15px * var(--ui-scale)));
+}
+
+.fatap-pill-pago {
+  left: var(--pago-x);
+  transform: translateX(-5%);
+  
+  /* --- CÁLCULO DINÂMICO --- */
+  /* 1. Pegamos o topo da barra: 100% - (altura da barra) */
+  /* 2. A altura da barra é: (100% - headroom) * (ratio / 100) */
+  /* 3. Somamos um offset (ex: 15px) para ela descer um pouco em relação ao topo da barra */
+  
+  top: calc(
+    100% - 
+    ((100% - var(--fatap-headroom)) * (var(--fatap-r, 0) / 100)) + 
+    calc(15px * var(--ui-scale))
+  );
+
+  /* Garante uma transição suave caso o valor mude em tempo real */
+  transition: top 0.3s ease-out;
+}
+
+/* % — fica no topo à direita, no “cinza”, fora da barra */
+.fatap-ratio{
+  position: absolute;
+  top: clamp(8px, 1.1vw, 14px);
+  right: clamp(14px, 2.0vw, 22px);
+
+  font-weight: 900;
+  color: rgba(17,24,39,.85);
+  line-height: 1;
+
+  font-size: calc(clamp(20px, 2.0vw, 34px) * var(--text-scale));
+}
+
+.fatap-title{
+  flex: 0 0 auto;
+  width: 100%;
+  text-align: center;
+  font-weight: 800;
+  color: rgba(17,24,39,.72);
+  line-height: 1.05;
+
+  padding: 0 clamp(6px, 1.0vw, 14px) clamp(4px, .7vw, 10px);
+  font-size: calc(clamp(16px, 1.55vw, 26px) * var(--text-scale));
+}
+/* === END FATAP === */
