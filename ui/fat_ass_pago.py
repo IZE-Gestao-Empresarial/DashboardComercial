@@ -6,62 +6,63 @@ from core.formatters import fmt_money
 from ui.ranklist import fmt_percent_br
 
 
+def _clean_money_txt(s: str) -> str:
+    """Remove decimais ,00/.00 quando vierem do fmt_money (para ficar igual ao protótipo)."""
+    s = (s or "").strip()
+    if s.endswith(",00") or s.endswith(".00"):
+        return s[:-3]
+    return s
+
+
 def faturamento_ass_pago_card_html(
     *,
-    title: str = "Faturamento ass x pago",
+    title: str = "Faturamento Assinado x Pago",
     total_assinado: float | int | None,
     total_pago: float | int | None,
     assinado_series: list[float] | None = None,
     pago_series: list[float] | None = None,
 ) -> str:
-    """Card no visual do PROTÓTIPO 3 (barra horizontal + legenda).
+    """Card 'Faturamento Assinado x Pago' no visual do protótipo (2 barras sobrepostas + pills).
 
-    `*_series` ficam aceitos para compatibilidade, mas o layout do protótipo usa
-    somente os totais.
+    Mantém `*_series` por compatibilidade (não usado no layout).
     """
+
+    # Normaliza o título padrão do dashboard
+    t = (title or "").strip()
+    if (not t) or (t.lower().replace("  ", " ") in {"faturamento ass x pago", "faturamento assinado x pago"}):
+        title = "Faturamento Assinado x Pago"
+
     ass = float(total_assinado or 0.0)
     pago = float(total_pago or 0.0)
 
     ratio = (pago / ass * 100.0) if ass > 0 else 0.0
     ratio = max(0.0, min(100.0, ratio))
 
-    ass_txt = fmt_money(ass)
-    pago_txt = fmt_money(pago)
+    # Valores no protótipo aparecem sem o prefixo 'R$'
+    ass_txt = _clean_money_txt(fmt_money(ass))
+    pago_txt = _clean_money_txt(fmt_money(pago))
 
-    # no protótipo: 'Pago / Assinado'
-    ratio_txt = fmt_percent_br(ratio) if ass > 0 else "0,0%"
+    # No protótipo o % é inteiro (ex.: 80%)
+    ratio_int = int(round(ratio))
+
+    # Também deixamos o % pt-BR disponível (caso queira 1 casa no futuro)
+    _ = fmt_percent_br(ratio)  # noqa: F841
 
     return f"""
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden" style="padding: var(--pad);">
-      <div class="font-extrabold text-zinc-900" style="font-size: var(--fs-title); line-height:1.1;">{html.escape(title)}</div>
+    <div class=\"fatap-card\" role=\"group\" aria-label=\"{html.escape(title)}\">
+      <div class=\"fatap-stage\">
+        <div class=\"fatap-bars\" style=\"--fatap-r:{ratio:.3f};\" role=\"img\" aria-label=\"Comparação: faturamento pago sobre faturamento assinado\">
+          <div class=\"fatap-bar fatap-bar-ass\" aria-hidden=\"true\"></div>
 
-      <div class="fa-panel">
-        <div class="fa-bar-head">
-          <div class="fa-head-col">
-            <div class="fa-head-label">Assinado</div>
-          </div>
-          <div class="fa-head-col fa-right">
-            <div class="fa-head-val">R$ {html.escape(ass_txt)}</div>
-          </div>
+          <div class=\"fatap-bar fatap-bar-pago\" aria-hidden=\"true\"></div>
+
+          <div class=\"fatap-pill fatap-pill-ass\" title=\"Faturamento Assinado\">{html.escape(ass_txt)}</div>
+          <div class=\"fatap-pill fatap-pill-pago\" title=\"Faturamento Pago\">{html.escape(pago_txt)}</div>
+
+          <div class=\"fatap-ratio\" aria-label=\"{ratio_int}%\">{ratio_int}%</div>
         </div>
-
-        <div class="fa-bar-wrap" role="img" aria-label="Progresso faturamento pago sobre assinado">
-          <div class="fa-bar-bg">
-            <div class="fa-bar-fill" style="width:{ratio:.3f}%"></div>
-          </div>
-        </div>
-
-        <div class="fa-bar-foot">
-          <div class="fa-foot-left">
-            <span class="fa-dot fa-dot-pago"></span><span>Faturamento Pago</span>
-          </div>
-          <div class="fa-foot-mid">
-            <span class="fa-dot fa-dot-ass"></span><span>Faturamento Assinado</span>
-          </div>
-          <div class="fa-foot-right">Pago / Assinado: {html.escape(ratio_txt)}</div>
-        </div>
-
-        <div class="fa-paid-val">R$ {html.escape(pago_txt)}</div>
       </div>
+
+      <div class=\"fatap-title\">{html.escape(title)}</div>
     </div>
     """

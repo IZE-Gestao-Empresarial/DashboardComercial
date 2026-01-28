@@ -96,7 +96,6 @@ card_faturamento = kpi_card_html(
 
 # =========================
 # 2) Leads + Taxa de Conversão (Geral)
-#    (observação do usuário: NÃO teremos mais o card "taxa de conversão por pessoa")
 # =========================
 leads_total = total_for_indicator(df_last, INDICATORS.LEADS_CRIADOS, prefer_responsavel="SDR")
 
