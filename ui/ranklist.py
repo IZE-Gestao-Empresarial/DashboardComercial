@@ -3,7 +3,6 @@ from __future__ import annotations
 import html
 import re
 from typing import Callable, Optional
-from pathlib import Path
 
 from core.people import pretty_name
 from ui.avatars import avatar_html
@@ -16,15 +15,7 @@ def fmt_percent_br(p: float) -> str:
 
 
 def _medal_data_uri(rank: int) -> str | None:
-    """Tenta encontrar um SVG de colocação em assets/svg e retornar como data URI.
-
-    Você pode colocar qualquer um destes nomes:
-      - rank_1.svg / rank_2.svg
-      - rank-1.svg / rank-2.svg
-      - podium_1.svg / podium_2.svg
-      - podium-1.svg / podium-2.svg
-      - first.svg / second.svg
-    """
+    """Tenta encontrar um PNG de colocação em assets/svg e retornar como data URI."""
     candidates = [
         f"assets/svg/rank_{rank}.png",
         f"assets/svg/rank-{rank}.png",
@@ -37,7 +28,6 @@ def _medal_data_uri(rank: int) -> str | None:
         candidates += ["assets/svg/second.png", "assets/svg/prata.png"]
 
     for rel in candidates:
-        # file_to_data_uri retorna None se não existir
         uri = file_to_data_uri(rel)
         if uri:
             return uri
@@ -48,62 +38,7 @@ def _medal_html(rank: int) -> str:
     uri = _medal_data_uri(rank)
     if uri:
         return f"<img class='rk-medal-img' src='{uri}' alt='{rank}º' />"
-    # fallback: número simples
     return f"<div class='rk-medal-fallback'>{rank}</div>"
-
-
-def ranklist_card_html(
-    title: str,
-    items: list[dict],
-    *,
-    value_fn: Callable[[dict], str],
-    sub_fn: Optional[Callable[[dict], str]] = None,
-    empty_text: Optional[str] = None,
-    avatar_size_px: int = 46,
-) -> str:
-    """Card no padrão do (ranking em pills) — versão genérica (legado)."""
-
-    if not items:
-        msg = empty_text or f"Sem dados de {title}"
-        return f"""
-        <div class=\"bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center\">
-          <div class=\"text-zinc-500 font-semibold\">{html.escape(msg)}</div>
-        </div>
-        """
-
-    rows_html: list[str] = []
-    for idx, it in enumerate(items, start=1):
-        name_u = str(it.get("name") or "").strip().upper()
-        name_pretty = html.escape(pretty_name(name_u))
-
-        value_text = html.escape(value_fn(it) or "")
-        sub_text = sub_fn(it) if sub_fn else None
-        sub_html = f"<div class='rl-sub'>{html.escape(sub_text)}</div>" if sub_text else ""
-
-        ring_px = 4 if idx == 1 else 2
-
-        rows_html.append(
-            f"""
-            <div class='rl-row' data-rank='{idx}'>
-              <div class='rl-badge'>{idx}</div>
-              <div class='rl-pill'>
-                <div class='rl-text'>
-                  <div class='rl-name'>{name_pretty}</div>
-                  <div class='rl-value'>{value_text}</div>
-                  {sub_html}
-                </div>
-                <div class='rl-avatar'>{avatar_html(name_u, size_px=avatar_size_px, ring_px=ring_px)}</div>
-              </div>
-            </div>
-            """
-        )
-
-    return f"""
-    <div class='ranklist-card bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden' style='padding: var(--pad);'>
-      <div class='font-extrabold text-zinc-900' style='font-size: var(--fs-title); line-height: 1.1;'>{html.escape(title)}</div>
-      <div class='ranklist-body'>{''.join(rows_html)}</div>
-    </div>
-    """
 
 
 def ranking_sdr_card_html(
@@ -114,10 +49,11 @@ def ranking_sdr_card_html(
     avatar_size_px: int = 56,
 ) -> str:
     """Ranking SDR no layout do mock (pills com 2 colunas: Reuniões + Conversão)."""
+
     if not items:
         return f"""
-        <div class=\"bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center\">
-          <div class=\"text-zinc-500 font-semibold\">Sem dados</div>
+        <div class="bg-white rounded-xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center">
+          <div class="text-zinc-500 font-semibold">Sem dados</div>
         </div>
         """
 
@@ -157,21 +93,25 @@ def ranking_sdr_card_html(
                   </div>
                   <div class='rk-metric'>
                     <div class='rk-label'>Conversão (%)</div>
-                    <div class='rk-value'>{html.escape(fmt_percent_br(conv_f))}</div>
+                    <div class='rk-value'>{int(round(conv_f))}%</div>
                   </div>
                 </div>
-
-                <div class='rk-avatar'>
-                  {avatar_html(name_u, size_px=avatar_size_px, ring_px=ring_px)}
-                </div>
+              <div class='rk-avatar'>
+                  {avatar_html(name_u, size_px=avatar_size_px, ring_px=0)}
+              </div>
               </div>
             </div>
             """
         )
 
+    # ✅ TÍTULO no MESMO padrão do KPI (sem bold extra)
     return f"""
-    <div class='rk-card bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden' style='padding: var(--pad);'>
-      <div class='rk-title'>{html.escape(title)}</div>
+      <div class='rk-card bg-[#FFFFFF] rounded-xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden'
+          style='padding: var(--rk-pad, var(--pad));'>
+<div class="rk-title-soft text-zinc-900" style="font-size: var(--fs-title); line-height: 1.1;">
+  {html.escape(title)}
+</div>
+
       <div class='rk-body'>{''.join(rows_html)}</div>
     </div>
     """
@@ -186,14 +126,14 @@ def ranking_closer_card_html(
     money_prefix: str = "R$ ",
 ) -> str:
     """Ranking Closer no layout do mock (pills com 2 colunas: Fat. Assinado + Fat. Pago)."""
+
     if not rows:
         return f"""
-        <div class=\"bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center\">
-          <div class=\"text-zinc-500 font-semibold\">Sem dados</div>
+        <div class="bg-white rounded-xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center">
+          <div class="text-zinc-500 font-semibold">Sem dados</div>
         </div>
         """
 
-    # já vem ordenado na chamada, mas garantimos por fat_pago desc se existir
     def _k(r: dict) -> float:
         try:
             return float(r.get("fat_pago") or 0.0)
@@ -202,13 +142,10 @@ def ranking_closer_card_html(
 
     ordered = sorted(rows, key=_k, reverse=True)[: max(0, int(limit) or 2)]
 
-    # formatação simples (mantém compat com seu fmt_money no controller)
     def _money(v) -> str:
         if v is None:
             return "-"
-        s = str(v)
-        # se já veio formatado, só retorna
-        return s
+        return str(v)
 
     rows_html: list[str] = []
     for idx, it in enumerate(ordered, start=1):
@@ -218,7 +155,6 @@ def ranking_closer_card_html(
         contratos = it.get("contratos")
         try:
             if isinstance(contratos, str):
-                # remove tudo que não for dígito (ex.: "1.234")
                 s = re.sub(r"\D", "", contratos)
                 contratos_int = int(s or 0)
             else:
@@ -226,12 +162,8 @@ def ranking_closer_card_html(
         except Exception:
             contratos_int = 0
 
-        fa = it.get("fat_assinado")
-        fp = it.get("fat_pago")
-
-        # Se vier número cru, mostre sem quebrar; se vier string do fmt_money, ok.
-        fa_txt = _money(fa)
-        fp_txt = _money(fp)
+        fa_txt = _money(it.get("fat_assinado"))
+        fp_txt = _money(it.get("fat_pago"))
 
         ring_px = 4 if idx == 1 else 3
 
@@ -257,17 +189,21 @@ def ranking_closer_card_html(
                   </div>
                 </div>
 
-                <div class='rk-avatar'>
-                  {avatar_html(name_u, size_px=avatar_size_px, ring_px=ring_px)}
-                </div>
+              <div class='rk-avatar'>
+                  {avatar_html(name_u, size_px=avatar_size_px, ring_px=0)}
+              </div>
               </div>
             </div>
             """
         )
 
+    # ✅ TÍTULO no MESMO padrão do KPI (sem bold extra)
     return f"""
-    <div class='rk-card bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden' style='padding: var(--pad);'>
-      <div class='rk-title'>{html.escape(title)}</div>
+  <div class='rk-card bg-[#FFFFFF] rounded-xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden'
+      style='padding: var(--rk-pad, var(--pad));'>
+      <div class="rk-title-soft text-zinc-900" style="font-size: var(--fs-title); line-height: 1.1;">
+        {html.escape(title)}
+      </div>
       <div class='rk-body'>{''.join(rows_html)}</div>
     </div>
     """

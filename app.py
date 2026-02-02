@@ -6,13 +6,13 @@ from streamlit_autorefresh import st_autorefresh
 from core.constants import CACHE_TTL_SECONDS, REFRESH_MS, INDICATORS
 from core.data import fetch_payload, payload_to_df, latest_values, get_val
 from core.metrics import total_for_indicator, people_values, to_percent_value
-from core.formatters import fmt_int, fmt_money, pct_to_float_percent, pill_text_from_ratio
+from core.formatters import fmt_int, fmt_money, pct_to_float_percent
 
 from ui.cards import kpi_card_html
 from ui.leads_conversion import leads_conversion_card_html
-from ui.ranklist import ranklist_card_html, fmt_percent_br, ranking_sdr_card_html
+from ui.ranklist import ranking_sdr_card_html
 from ui.contracts_podium import podium_contracts_card_html
-from ui.fat_ass_pago import faturamento_ass_pago_card_html
+from ui.funil_vendas import funil_vendas_card_html
 from ui.render import inject_kiosk_css, render_dashboard
 
 
@@ -63,34 +63,43 @@ reun_real = get_val(df_last, INDICATORS.REUNIOES_REAL, "SDR")
 reun_meta = get_val(df_last, INDICATORS.REUNIOES_META, "SDR")
 reun_perc = get_val(df_last, INDICATORS.REUNIOES_PERC, "SDR")
 
-fat_real = get_val(df_last, INDICATORS.FAT_REAL, "CLOSER")
-if fat_real is None:
-    fat_real = get_val(df_last, INDICATORS.FAT_FALLBACK_REAL, "CLOSER")
+# ✅ No seu payload existem "FATURAMENTO ASSINADO" e "FATURAMENTO PAGO".
+# Antes você estava usando INDICATORS.FAT_REAL (= "FATURAMENTO PAGO") no campo "Assinado".
+fat_assinado = total_for_indicator(df_last, INDICATORS.FATURAMENTO_ASSINADO, prefer_responsavel="CLOSER")
+if fat_assinado is None:
+    # fallback: se não existir o total do time, soma os closers individuais
+    fat_assinado = total_for_indicator(df_last, INDICATORS.FATURAMENTO_ASSINADO, exclude_responsaveis=["CLOSER"])
+
+fat_pago = total_for_indicator(df_last, INDICATORS.FATURAMENTO_PAGO, prefer_responsavel="CLOSER")
+if fat_pago is None:
+    # fallback: se não existir o total do time, soma os closers individuais
+    fat_pago = total_for_indicator(df_last, INDICATORS.FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
+
 fat_meta = get_val(df_last, INDICATORS.FAT_META, "CLOSER")
 fat_perc = get_val(df_last, INDICATORS.FAT_PERC, "CLOSER")
 
 card_reunioes = kpi_card_html(
     title="Reuniões Ocorridas",
     percent_float=pct_to_float_percent(reun_perc),
-    subtitle="Reuniões ocorridas",
-    left_label="Reuniões Realizadas",
+    subtitle="Progresso",
+    left_label="Número de Reuniões",
     left_value=fmt_int(reun_real),
-    left_badge="Atual",
+    left_badge="-60",          # teste badge alto
     mid_label="Meta de Reuniões",
     mid_value=fmt_int(reun_meta),
-    right_pill=pill_text_from_ratio(reun_perc),
+    right_pill="-60",          # teste badge alto no direito
 )
 
 card_faturamento = kpi_card_html(
-    title="Faturamento Meta x Realizado",
+    title="Faturamento",
     percent_float=pct_to_float_percent(fat_perc),
-    subtitle="Faturamento alcançado",
-    left_label="Faturamento Pago",
-    left_value=fmt_money(fat_real),
-    left_badge="Atual",
+    subtitle="Progresso",
+    left_label="Faturamento Assinado",
+    left_value=fmt_money(fat_assinado),
+    left_badge="+99999",         # teste grande
     mid_label="Meta de Faturamento",
     mid_value=fmt_money(fat_meta),
-    right_pill=pill_text_from_ratio(fat_perc),
+    right_pill="+99999",        # teste grande
 )
 
 
@@ -112,7 +121,6 @@ card_leads_taxa = leads_conversion_card_html(
 # =========================
 # 3) Ranking SDR (por Reuniões)
 # =========================
-
 def _is_team_label(name: str) -> bool:
     n = (name or "").replace("\u00A0", " ")
     n = " ".join(n.split()).strip().upper()
@@ -199,75 +207,21 @@ card_ranking_closer = podium_contracts_card_html(rows_closer, title="Ranking Clo
 
 
 # =========================
-# 5) Faturamento assinado x pago (CLOSER)
+# 5) Funil de vendas (NOVO)
 # =========================
+# Totais:
+# - Leads: já calculado (leads_total)
+# - Reuniões: usa o total do KPI (reun_real)
+# - Contratos: tenta pegar o total do time (CLOSER); se não existir, soma valores individuais
+contratos_total = get_val(df_last, INDICATORS.CONTRATOS_ASSINADOS, "CLOSER")
+if contratos_total is None:
+    contratos_total = sum(float(x.get("value") or 0.0) for x in contratos_vals) or 0.0
 
-def _daily_series_values(df_full, indicador: str, responsavel: str, limit: int = 24) -> dict[str, float]:
-    if df_full is None or df_full.empty:
-        return {}
-    if "DATA_ATUALIZAÇÃO" not in df_full.columns:
-        return {}
-
-    ind = (indicador or "").strip().upper()
-    resp = (responsavel or "").strip().upper()
-
-    d = df_full[(df_full["INDICADORES"] == ind) & (df_full["RESPONSÁVEL"] == resp)].copy()
-    if d.empty:
-        return {}
-
-    d = d.dropna(subset=["DATA_ATUALIZAÇÃO", "VALOR"]).sort_values("DATA_ATUALIZAÇÃO")
-
-    # consolida por dia pegando o último valor do dia
-    d["DIA"] = d["DATA_ATUALIZAÇÃO"].dt.date.astype(str)
-    d = d.groupby("DIA", as_index=False)["VALOR"].last()
-
-    # pega somente o final (mais recente)
-    tail = d.tail(limit)
-    out = {}
-    for _, row in tail.iterrows():
-        try:
-            out[str(row["DIA"])] = float(row["VALOR"] or 0.0)
-        except Exception:
-            out[str(row["DIA"])] = 0.0
-    return out
-
-
-ass_map = _daily_series_values(df, INDICATORS.FATURAMENTO_ASSINADO, "CLOSER", limit=30)
-pago_map = _daily_series_values(df, INDICATORS.FATURAMENTO_PAGO, "CLOSER", limit=30)
-
-dates = sorted(set(ass_map.keys()) | set(pago_map.keys()))
-
-area_vals: list[float] = []
-line_vals: list[float] = []
-
-if len(dates) >= 2:
-    last_a = None
-    last_p = None
-
-    for dt in dates:
-        if dt in ass_map:
-            last_a = ass_map[dt]
-        if dt in pago_map:
-            last_p = pago_map[dt]
-
-        # forward-fill simples
-        area_vals.append(float(last_a or 0.0))
-        line_vals.append(float(last_p or 0.0))
-
-    # mantém um tamanho enxuto (pra caber bem no card)
-    area_vals = area_vals[-24:]
-    line_vals = line_vals[-24:]
-
-
-total_ass = get_val(df_last, INDICATORS.FATURAMENTO_ASSINADO, "CLOSER")
-total_pago = get_val(df_last, INDICATORS.FATURAMENTO_PAGO, "CLOSER")
-
-card_fat_ass_pago = faturamento_ass_pago_card_html(
-    title="Faturamento ass x pago",
-    total_assinado=total_ass,
-    total_pago=total_pago,
-    assinado_series=area_vals,
-    pago_series=line_vals,
+card_funil_vendas = funil_vendas_card_html(
+    title="Funil de Vendas",
+    leads=leads_total,
+    reunioes=reun_real,
+    contratos=contratos_total,
 )
 
 
@@ -280,7 +234,7 @@ slots = {
     "CARD_FATURAMENTO": card_faturamento,
     "CARD_LEADS_TAXA": card_leads_taxa,
     "CARD_RANKING_CLOSER": card_ranking_closer,
-    "CARD_FAT_ASS_PAGO": card_fat_ass_pago,
+    "CARD_FUNIL_VENDAS": card_funil_vendas,
 }
 
 html = render_dashboard(slots=slots)

@@ -35,7 +35,7 @@ def _dot_ring_svg(percent: float, *, size: int = 360) -> str:
     # Raio do anel
     r = size * 0.42 
     # Raio de cada ponto (ajustado visualmente)
-    dot_r = size * 0.065 
+    dot_r = size * 0.048
 
     circles: list[str] = []
     
@@ -55,9 +55,9 @@ def _dot_ring_svg(percent: float, *, size: int = 360) -> str:
         y = cy + r * math.sin(ang)
         
         # Cores exatas da imagem
-        # Ativo = Laranja (#F05914)
-        # Inativo = Cinza Escuro (#3F3E3B - tom retirado da imagem/CSS)
-        fill = "#F05914" if i in on_idx else "#3F3E3B"
+        # Ativo = Laranja (#F4561F)
+        # Inativo = Cinza Escuro (#403D38 - tom retirado da imagem/CSS)
+        fill = "#F4561F" if i in on_idx else "#403D38"
         
         circles.append(f"<circle cx='{x:.2f}' cy='{y:.2f}' r='{dot_r:.2f}' fill='{fill}' />")
 

@@ -13,7 +13,7 @@ def gauge_svg(
     percent: float,
     segments: int = 13,
     filled: str = "#EA591A",
-    empty: str = "#D8D8D8",
+    empty: str = "#F6F6F6",
 ) -> str:
 
 
