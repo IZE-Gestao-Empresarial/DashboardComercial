@@ -16,7 +16,14 @@ def _fmt_money_br_no_symbol(v) -> str:
         s = fmt_money(v)  # esperado: "98.874,00"
         if not s or str(s).strip() == "-":
             return "0,00"
-        return str(s).strip()
+            s = str(s).strip()
+        # remove centavos quando for ",00"
+        if s.endswith(",00"):
+            s = s[:-3]
+        # deixa zero como "0"
+        if s in ("0,00", "0"):
+            return "0"
+        return s   
     except Exception:
         return "0,00"
 
@@ -29,7 +36,7 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
     """
     if not rows:
         return '''
-        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-sm border border-zinc-100 h-full w-full flex items-center justify-center">
           <div class="text-zinc-500 font-semibold">Sem dados</div>
         </div>
         '''
