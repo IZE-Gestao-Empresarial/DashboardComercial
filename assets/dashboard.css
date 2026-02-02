@@ -1,28 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 html, body {
   height: 100%;
   margin: 0;
   overflow: hidden;
   overscroll-behavior: none;
+
+  /* Fonte global */
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; font-family: inherit; }
 
 /* =========================================
-   FIRE TV / SILK: escala automática na TV
-   - No PC fica normal
-   - No Fire TV aumenta tipografia e componentes
+   Variáveis globais
    ========================================= */
 :root{
-  --ui-scale: 1; /* PC */
-}
+  /* PC: componentes / espaçamentos */
+  --ui-scale: 0.93;
+  /* PC: textos */
+  --text-scale: 0.85;
 
-/* Fire TV (Silk): deixa tudo mais legível */
-html[data-tv="fire"]{
-  --ui-scale: 1.55; /* ajuste fino: 1.45 ~ 1.70 */
-}
+  --fs-title: 25px;
+  --fs-subtitle: 25px;
 
-/* ===== Ajustes “TV proof” ===== */
-:root {
+  --outer-pad: clamp(18px, 1.6vmin, 36px);
+  --shell-pad: calc(clamp(18px, 2.2vmin, 44px) * var(--ui-scale));
+
+  /* Ajustes finos (mantidos p/ compatibilidade) */
+  --box-pad-extra: 10px;
+  --badge-y: -7px;
+
   /* --- Podium (contratos por pessoa) --- */
   --podium-photo: clamp(170px, 10.5vw, 260px);
   --podium-ring: clamp(10px, 0.7vw, 14px);
@@ -36,89 +47,149 @@ html[data-tv="fire"]{
   --podium-row-fs: clamp(13px, 0.95vw, 17px);
   --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-  /* sobe o bloco no desktop/TV */
-  --top-pad: clamp(10px, 2.2vh, 34px);
+  /* Layout / espaçamentos */
+  --top-pad: calc(clamp(10px, 2.2vh, 34px) * var(--ui-scale));
+  --pad:     calc(clamp(12px, 1.0vw, 18px) * var(--ui-scale));
+  --gap:     calc(clamp(12px, 1.2vw, 20px) * var(--ui-scale));
+  --box-pad: calc(clamp(12px, 1.1vw, 20px) * var(--ui-scale));
 
-  --pad: clamp(12px, 1.0vw, 18px);
+  /* Tipografia do gauge */
+  --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--text-scale));
+  --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--text-scale));
+  --fs-label:  calc(clamp(13px, 1.1vw, 20px) * var(--text-scale));
+  --fs-kpi:    calc(clamp(22px, 2.2vw, 44px) * var(--text-scale));
 
-  /* ✅ MAIOR para os 2 subcards (gap/padding) */
-  --gap: clamp(12px, 1.2vw, 20px);
-  --box-pad: clamp(12px, 1.1vw, 20px);
-
-  /* ✅ MAIS DESTAQUE (porcentagem + valores) */
-  --fs-title:  calc(clamp(18px, 1.35vw, 26px) * var(--ui-scale));
-
-  /* porcentagem do gauge */
-  --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--ui-scale));
-
-  /* subtítulo do gauge */
-  --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--ui-scale));
-
-  /* labels e valores dos subcards */
-  --fs-label:  calc(clamp(13px, 1.1vw, 20px) * var(--ui-scale));
-  --fs-kpi:    calc(clamp(22px, 2.2vw, 44px) * var(--ui-scale));
-
-  /* (não usado mais no seu KPI, mas mantido) */
-  --fs-pill: clamp(12px, 1.0vw, 14px);
+  /* Mantidos p/ compatibilidade (podem ser usados em outros cards) */
+  --fs-pill:  clamp(12px, 1.0vw, 14px);
   --fs-badge: clamp(10px, 0.8vw, 12px);
 
-  /* placeholder (cards vazios) */
-  --fs-placeholder: calc(clamp(20px, 1.8vw, 34px) * var(--ui-scale));
+  --fs-placeholder: calc(clamp(20px, 1.8vw, 34px) * var(--text-scale));
 
-  /* Gauge (aumenta junto na TV) */
-  --gauge-w:      calc(clamp(384px, 24vw, 480px) * var(--ui-scale));
-  --gauge-min-h:  calc(clamp(288px, 26.4vw, 348px) * var(--ui-scale));
-  --gauge-text-shift: calc(24px * var(--ui-scale));
+  /* Gauge */
+  --gauge-w:         calc(clamp(384px, 24vw, 480px) * var(--ui-scale));
+  --gauge-min-h:     calc(clamp(288px, 44vw, 348px) * var(--ui-scale));
+  --gauge-text-shift: calc(45px * var(--ui-scale));
 
-  /* ✅ MAIOR: altura mínima dos subcards cinzas */
+  /* Subcards / donuts */
   --pill-min-h: calc(clamp(80px, 7vw, 150px) * var(--ui-scale));
-
   --donut-size: calc(clamp(160px, 12vw, 230px) * var(--ui-scale));
 }
 
-/* ===============
-   DESKTOP / TV
-   Grid fixo
-   =============== */
-.layout {
-  height: 100%;
-  min-height: 0;
+/* =========================================
+   FIRE TV (Silk): escala e ajustes
+   ========================================= */
+html[data-tv="fire"]{
+  --ui-scale: 0.88;
+  --text-scale: 0.80;
+  --fs-title: 19px;
+  --fs-subtitle: 18px;
 
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: repeat(4, 1fr);
-  gap: var(--gap);
+  /* evita auto-ajuste de texto do Silk */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 
-  grid-template-areas:
-    "reunioes leads reunioes_pessoa"
-    "reunioes taxa_geral reunioes_pessoa"
-    "faturamento taxa_pessoa contratos_pessoa"
-    "faturamento taxa_pessoa contratos_pessoa";
+  --outer-pad: calc(clamp(18px, 1.6vmin, 36px) * 0.85);
+  --shell-pad: calc(clamp(18px, 2.2vmin, 44px) * var(--ui-scale) * 0.90);
+
+  /* hierarquia tipográfica do gauge */
+  --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--text-scale) * 1.12);
+  --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--text-scale) * 0.78);
+  --gauge-text-shift: calc(45px * var(--ui-scale) * 0.50);
+
+  /* Ranking (SDR/Closer) */
+  --rk-pad-y: calc(5px * var(--ui-scale));
+  --rk-pad-x: calc(10px * var(--ui-scale));
+  --rk-row-gap: calc(10px * var(--ui-scale));
+  --rk-pill-gap: calc(8px * var(--ui-scale));
+  --rk-metrics-w: calc(160px * var(--ui-scale));
+  --rk-metrics-gap: calc(10px * var(--ui-scale));
 }
 
-.tile {
-  height: 100%;
+/* TVs / navegadores em UHD (ex.: 3840x2160) */
+html[data-tv="4k"]{
+  --ui-scale: 1.10;
+  --text-scale: 1.10;
+  --fs-title: 19px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* =========================
+   Viewport (padding externo)
+   ========================= */
+.dashboard-viewport {
+  width: 100dvw;
+  height: 100dvh;
+  padding: var(--outer-pad);
+  margin: 0;
   overflow: hidden;
-  min-height: 0; /* importante para não estourar a altura */
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: #e8e8e8;
+}
+
+.layout-shell{
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.layout-desktop{
+  display: grid;
+  grid-template-columns: minmax(0, 0.704fr) minmax(0, 0.95fr) minmax(0, 0.704fr);
+  height: 100%;
+  width: 100%;
+  gap: var(--gap);
+  box-sizing: border-box;
+}
+
+/* Layout base */
+.layout{
+  height: 100%;
+  min-height: 0;
   width: 100%;
 }
 
-.tile-reunioes { grid-area: reunioes; }
-.tile-leads { grid-area: leads; }
-.tile-taxa-geral { grid-area: taxa_geral; }
-.tile-reunioes-pessoa { grid-area: reunioes_pessoa; }
-.tile-faturamento { grid-area: faturamento; }
-.tile-taxa-pessoa { grid-area: taxa_pessoa; }
-.tile-contratos-pessoa { grid-area: contratos_pessoa; }
+/* Mobile: escondido por padrão (ativado no @media) */
+.layout-mobile{ display: none; }
+
+.col{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  height: 100%;
+}
+
+.tile{
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Proporções por coluna (top/bottom) */
+.col-left  .tile-top{ flex: 6 1 0; }
+.col-left  .tile-bottom{ flex: 4 1 0; }
+
+.col-right .tile-top{ flex: 6 1 0; }
+.col-right .tile-bottom{ flex: 4 1 0; }
+
+/* Coluna do meio: 2 rankings com a MESMA altura */
+.col-mid .tile-top,
+.col-mid .tile-bottom{
+  flex: 1 1 0;
+}
 
 /* ===============
    MOBILE
-   Carrossel horizontal (swipe)
-   Sem scroll vertical.
+   Carrossel horizontal (swipe) — sem scroll vertical.
    =============== */
-@media (max-width: 900px) {
-  :root {
-    /* --- Podium (contratos por pessoa) --- */
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+  :root:not([data-tv]) {
+    /* Podium (contratos por pessoa) */
     --podium-photo: clamp(170px, 10.5vw, 260px);
     --podium-ring: clamp(10px, 0.7vw, 14px);
     --podium-card-w: clamp(260px, 16vw, 420px);
@@ -133,46 +204,65 @@ html[data-tv="fire"]{
 
     --top-pad: 0px;
 
-    /* Mobile: escala própria (não usa ui-scale aqui) */
+    --ui-scale: 1;
+    --text-scale: 1;
+
+    /* padding externo no mobile */
+    --shell-pad-x: calc(clamp(12px, 3.2vw, 18px) * var(--ui-scale));
+    --shell-pad-y: calc(clamp(12px, 2.8vh, 18px) * var(--ui-scale));
+
+    /* Mobile: escala própria */
     --fs-center: clamp(30px, 7vw, 54px);
     --fs-kpi: clamp(22px, 5.6vw, 40px);
     --fs-label: clamp(13px, 3.2vw, 18px);
     --fs-sub: clamp(12px, 3.0vw, 16px);
   }
 
-  .layout-shell {
-    height: 100vh !important;
-  }
+  html:not([data-tv]) .layout-shell { height: 100% !important; }
 
-  .layout {
-    display: flex;
+  /* Esconde o layout desktop (3 colunas) e ativa o carrossel (somente não-TV) */
+  html:not([data-tv]) .layout-desktop { display: none !important; }
+  html:not([data-tv]) .layout-mobile  { display: flex !important; }
+
+  html:not([data-tv]) .layout-mobile{
     flex-direction: row;
     gap: var(--gap);
-
     height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-
-    /* evita “puxar” a página pra baixo */
     overscroll-behavior-x: contain;
     overscroll-behavior-y: none;
-
-    /* deixa swipe mais previsível */
     touch-action: pan-x;
   }
 
-  .layout::-webkit-scrollbar { display: none; }
-  .layout { scrollbar-width: none; }
+  html:not([data-tv]) .layout-mobile::-webkit-scrollbar { display: none; }
+  html:not([data-tv]) .layout-mobile { scrollbar-width: none; }
 
-  .tile {
-    /* 1 card por “tela”, com bordas respirando */
-    flex: 0 0 92vw;
+  html:not([data-tv]) .layout-mobile .tile {
+    flex: 0 0 calc(
+      100vw
+      - (2 * var(--shell-pad-x))
+      - env(safe-area-inset-left)
+      - env(safe-area-inset-right)
+    );
     height: 100%;
     scroll-snap-align: start;
+  }
+
+  /* Ajustes extras p/ caber bem em telas curtas */
+  :root:not([data-tv]){
+    --gauge-w: clamp(260px, 80vw, 360px);
+    --gauge-min-h: clamp(210px, 46vh, 320px);
+    --gauge-text-shift: 45px;
+
+    --pill-min-h: clamp(70px, 13vh, 110px);
+    --donut-size: clamp(140px, 44vw, 200px);
+
+    --box-pad: calc(clamp(10px, 3.2vw, 16px) * var(--ui-scale));
+    --gap:     calc(clamp(10px, 3.0vw, 16px) * var(--ui-scale));
   }
 }
 
@@ -181,16 +271,10 @@ html[data-tv="fire"]{
 
 /* ===============
    TELAS COM "ALTURA ÚTIL" MENOR
-   (ex.: Windows/TV com escala alta)
    =============== */
 @media (max-height: 900px) {
   :root {
-    --podium-photo: clamp(150px, 10vw, 220px);
-    --podium-card-w: clamp(240px, 15vw, 360px);
-    --crown-w: clamp(86px, 5.8vw, 115px);
-    --crown-top: clamp(40px, 3.0vw, 58px);
-
-    /* --- Podium (contratos por pessoa) --- */
+    /* Podium */
     --podium-photo: clamp(170px, 10.5vw, 260px);
     --podium-ring: clamp(10px, 0.7vw, 14px);
     --podium-card-w: clamp(260px, 16vw, 420px);
@@ -203,35 +287,28 @@ html[data-tv="fire"]{
     --podium-row-fs: clamp(13px, 0.95vw, 17px);
     --podium-val-fs: clamp(16px, 1.25vw, 22px);
 
-    --top-pad: clamp(6px, 1.2vh, 16px);
-    --pad: clamp(10px, 0.8vw, 14px);
+    --top-pad: calc(clamp(6px, 1.2vh, 16px) * var(--ui-scale));
+    --pad:     calc(clamp(10px, 0.8vw, 14px) * var(--ui-scale));
+    --gap:     calc(clamp(10px, 1.0vw, 16px) * var(--ui-scale));
+    --box-pad: calc(clamp(10px, 1.0vw, 16px) * var(--ui-scale));
 
-    --gap: clamp(10px, 1.0vw, 16px);
-    --box-pad: clamp(10px, 1.0vw, 16px);
-
-    --fs-title:  calc(clamp(16px, 1.15vw, 22px) * var(--ui-scale));
-    --fs-center: calc(clamp(24px, 2.4vw, 48px) * var(--ui-scale));
-    --fs-sub:    calc(clamp(11px, 1.0vw, 14px) * var(--ui-scale));
-    --fs-label:  calc(clamp(12px, 1.0vw, 18px) * var(--ui-scale));
-    --fs-kpi:    calc(clamp(20px, 2.0vw, 38px) * var(--ui-scale));
+    --fs-center: calc(clamp(24px, 2.4vw, 48px) * var(--text-scale));
+    --fs-sub:    calc(clamp(11px, 1.0vw, 14px) * var(--text-scale));
+    --fs-label:  calc(clamp(12px, 1.0vw, 18px) * var(--text-scale));
+    --fs-kpi:    calc(clamp(20px, 2.0vw, 38px) * var(--text-scale));
 
     --gauge-w:      calc(clamp(336px, 21.6vw, 432px) * var(--ui-scale));
-    --gauge-min-h:  calc(clamp(252px, 24vw, 312px) * var(--ui-scale));
-    --gauge-text-shift: calc(15px * var(--ui-scale));
+    --gauge-min-h:  calc(clamp(252px, 46vh, 312px) * var(--ui-scale));
+    --gauge-text-shift: calc(45px * var(--ui-scale));
 
-    --pill-min-h: calc(clamp(70px, 6vw, 130px) * var(--ui-scale));
+    --pill-min-h: calc(clamp(70px, 6vw, 130px) * var(--ui-scale) * 0.8);
     --donut-size: calc(clamp(140px, 11vw, 210px) * var(--ui-scale));
   }
 }
 
 @media (max-height: 780px) {
   :root {
-    --podium-photo: clamp(140px, 9.5vw, 205px);
-    --podium-card-w: clamp(220px, 14vw, 330px);
-    --crown-w: clamp(80px, 5.4vw, 110px);
-    --crown-top: clamp(36px, 2.8vw, 54px);
-
-    /* --- Podium (contratos por pessoa) --- */
+    /* Podium */
     --podium-photo: clamp(170px, 10.5vw, 260px);
     --podium-ring: clamp(10px, 0.7vw, 14px);
     --podium-card-w: clamp(260px, 16vw, 420px);
@@ -246,31 +323,31 @@ html[data-tv="fire"]{
 
     --top-pad: 0px;
 
-    --pad: clamp(8px, 0.7vw, 12px);
-    --gap: clamp(6px, 0.8vw, 10px);
-    --box-pad: clamp(6px, 0.6vw, 9px);
+    --pad:     calc(clamp(8px, 0.7vw, 12px) * var(--ui-scale));
+    --gap:     calc(clamp(6px, 0.8vw, 10px) * var(--ui-scale));
+    --box-pad: calc(clamp(6px, 0.6vw, 9px) * var(--ui-scale));
 
-    --fs-title:  calc(clamp(15px, 1.05vw, 20px) * var(--ui-scale));
-    --fs-center: calc(clamp(22px, 2.2vw, 42px) * var(--ui-scale));
-    --fs-sub:    calc(clamp(11px, 0.95vw, 14px) * var(--ui-scale));
-    --fs-label:  calc(clamp(12px, 1.0vw, 16px) * var(--ui-scale));
-    --fs-kpi:    calc(clamp(18px, 1.8vw, 34px) * var(--ui-scale));
+    --fs-center: calc(clamp(22px, 2.2vw, 42px) * var(--text-scale));
+    --fs-sub:    calc(clamp(11px, 0.95vw, 14px) * var(--text-scale));
+    --fs-label:  calc(clamp(12px, 1.0vw, 16px) * var(--text-scale) * 0.8);
+    --fs-kpi:    calc(clamp(18px, 1.8vw, 34px) * var(--text-scale));
 
     --gauge-w:      calc(clamp(312px, 20.4vw, 408px) * var(--ui-scale));
-    --gauge-min-h:  calc(clamp(137px, 13.4vw, 170px) * var(--ui-scale));
-    --gauge-text-shift: calc(6px * var(--ui-scale));
+    --gauge-min-h:  calc(clamp(137px, 46vh, 170px) * var(--ui-scale));
+    --gauge-text-shift: calc(45px * var(--ui-scale));
 
     --donut-size: calc(clamp(130px, 10.5vw, 200px) * var(--ui-scale));
   }
 }
 
-/* ===== Podium Contratos ===== */
+/* =========================
+   Podium Contratos
+   ========================= */
 .podium{
   --orangeA:#ff7a1a;
   --orangeB:#ff4f00;
   --orangeRing:#ff5a00;
 
-  --panelShadow: 0 18px 35px rgba(0,0,0,.18);
   --ringShadow: 0 14px 30px rgba(0,0,0,.22);
   --radius: 18px;
 
@@ -362,12 +439,11 @@ html[data-tv="fire"]{
   text-shadow: 0 4px 12px rgba(0,0,0,.18);
 }
 
-/* Painel*/
+/* Painel */
 .podium .info-panel{
   width: calc(500px * var(--scale));
   margin-top: calc(-62px * var(--scale));
-  border-radius: var(--radius);
-  box-shadow: var(--panelShadow);
+  border-radius: 12px;
   overflow:hidden;
   z-index: 3;
 }
@@ -385,8 +461,6 @@ html[data-tv="fire"]{
 /* corpo branco */
 .podium .panel-body{
   background:#fff;
-  border: 2px solid rgba(0,0,0,.06);
-  border-top: none;
   padding: calc(16px * var(--scale)) calc(18px * var(--scale));
 }
 
@@ -430,7 +504,7 @@ html[data-tv="fire"]{
   margin: calc(4px * var(--scale)) calc(6px * var(--scale));
 }
 
-/* Em telas menores, reduz o gap (mantém lado a lado para não estourar altura) */
+/* Em telas menores, reduz o gap */
 @media (max-width: 900px){
   .podium .ranking{ gap: 14px; }
 }
@@ -442,7 +516,7 @@ html[data-tv="fire"]{
   margin-top: var(--gap);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 0.9vw, 14px);
+  gap: calc(clamp(10px, 0.9vw, 14px) * var(--ui-scale));
   flex: 1;
   min-height: 0;
   padding-bottom: clamp(2px, 0.4vw, 6px);
@@ -451,21 +525,20 @@ html[data-tv="fire"]{
 .rl-row {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 0.9vw, 14px);
+  gap: calc(clamp(10px, 0.9vw, 14px) * var(--ui-scale));
   min-height: 0;
 }
 
 .rl-badge {
-  width: clamp(28px, 2.4vw, 36px);
-  height: clamp(28px, 2.4vw, 36px);
+  width: calc(clamp(28px, 2.4vw, 36px) * var(--ui-scale));
+  height: calc(clamp(28px, 2.4vw, 36px) * var(--ui-scale));
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  color: #52525B; /* zinc-600 */
-  background: #F4F4F5; /* zinc-100 */
-  border: 1px solid rgba(0,0,0,0.06);
+  color: #52525B;
+  background: #F4F4F5;
   flex: 0 0 auto;
 }
 
@@ -474,8 +547,7 @@ html[data-tv="fire"]{
   min-width: 0;
   background: #F4F4F5;
   border-radius: 9999px;
-  border: 1px solid rgba(0,0,0,0.06);
-  padding: clamp(10px, 0.9vw, 14px) clamp(14px, 1.2vw, 18px);
+  padding: calc(clamp(10px, 0.9vw, 14px) * var(--ui-scale)) calc(clamp(14px, 1.2vw, 18px) * var(--ui-scale));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -490,8 +562,8 @@ html[data-tv="fire"]{
 
 .rl-name {
   font-weight: 800;
-  color: #111827; /* gray-900 */
-  font-size: clamp(14px, 1.05vw, 18px);
+  color: #111827;
+  font-size: calc(clamp(14px, 1.05vw, 18px) * var(--text-scale));
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
@@ -500,8 +572,8 @@ html[data-tv="fire"]{
 
 .rl-value {
   font-weight: 700;
-  color: #52525B; /* zinc-600 */
-  font-size: clamp(13px, 0.98vw, 16px);
+  color: #52525B;
+  font-size: calc(clamp(13px, 0.98vw, 16px) * var(--text-scale));
   line-height: 1.1;
   margin-top: 4px;
   white-space: nowrap;
@@ -511,8 +583,8 @@ html[data-tv="fire"]{
 
 .rl-sub {
   font-weight: 600;
-  color: #71717A; /* zinc-500 */
-  font-size: clamp(12px, 0.9vw, 14px);
+  color: #71717A;
+  font-size: calc(clamp(12px, 0.9vw, 14px) * var(--text-scale));
   line-height: 1.1;
   margin-top: 3px;
   white-space: nowrap;
@@ -520,26 +592,510 @@ html[data-tv="fire"]{
   text-overflow: ellipsis;
 }
 
-.rl-avatar {
-  flex: 0 0 auto;
-}
+.rl-avatar { flex: 0 0 auto; }
 
 /* Destaques por ranking */
 .rl-row[data-rank="1"] .rl-badge {
   background: linear-gradient(180deg, #FF7A1A 0%, #F05914 100%);
   color: #FFFFFF;
-  border-color: rgba(0,0,0,0);
-  box-shadow: 0 6px 18px rgba(240, 89, 20, 0.28);
   transform: scale(1.06);
 }
 
 .rl-row[data-rank="1"] .rl-pill {
   background: linear-gradient(90deg, rgba(240, 89, 20, 0.14) 0%, rgba(240, 89, 20, 0.04) 70%, rgba(240, 89, 20, 0.02) 100%);
-  border: 2px solid rgba(240, 89, 20, 0.34);
-  box-shadow: 0 14px 30px rgba(240, 89, 20, 0.12);
 }
 
 .rl-row[data-rank="2"] .rl-badge,
 .rl-row[data-rank="3"] .rl-badge {
   background: #FAFAFA;
+}
+
+/* =========================
+   RANKING (mock Group 21)
+   ========================= */
+.rk-card{ 
+  overflow:hidden; 
+  border-radius: 12px !important;
+}
+.rk-title{
+  font-weight: 900;
+  color: #111827;
+  font-size: var(--fs-title);
+  line-height: 1.1;
+  font-style: normal;
+}
+.rk-body{
+  margin-top: calc(14px * var(--ui-scale));
+  display: flex;
+  flex-direction: column;
+  gap: calc(14px * var(--ui-scale));
+}
+
+.rk-row{
+  display:flex;
+  align-items:center;
+  gap: calc(14px * var(--ui-scale));
+}
+
+.rk-medal{
+  width: calc(54px * var(--ui-scale));
+  min-width: calc(54px * var(--ui-scale));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.rk-medal-img{
+  width: calc(44px * var(--ui-scale));
+  height: calc(44px * var(--ui-scale));
+  display:block;
+}
+.rk-medal-fallback{
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  color: #111827;
+  background: rgba(17,24,39,.06);
+}
+
+.rk-pill{
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: calc(100% - clamp(24px, 2.2vw, 60px));
+  background: rgba(17, 24, 39, 0.04);
+  border-radius: 999px;
+  padding: calc(14px * var(--ui-scale)) calc(16px * var(--ui-scale));
+  display:flex;
+  align-items:center;
+  gap: calc(2px * var(--ui-scale));
+}
+
+.rk-name{
+  font-weight: 900;
+  color:#111827;
+  font-size: calc(clamp(18px, 1.8vw, 34px) * var(--text-scale));
+  line-height: 1;
+  min-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rk-pill-closer .rk-name{
+  display:flex;
+  flex-direction:column;
+  gap: 1px;
+}
+.rk-name-main{
+  font-weight: 900;
+  line-height:1;
+}
+.rk-name-sub{
+  font-weight: 600;
+  color: rgba(17,24,39,.55);
+  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
+  line-height: 1;
+}
+
+.rk-metrics{
+  display:flex;
+  gap: calc(26px * var(--ui-scale));
+  align-items:center;
+  justify-content:flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.rk-metric{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+  min-width: calc(120px * var(--ui-scale));
+}
+.rk-label{
+  font-weight: 600;
+  color: rgba(17,24,39,.6);
+  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
+  line-height: 1;
+}
+.rk-value{
+  font-weight: 900;
+  color:#111827;
+  font-size: calc(clamp(13px, 1.9vw, 42px) * var(--text-scale));
+  line-height: 1;
+}
+
+.rk-avatar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-left: auto;
+}
+
+/* Ajustes finos para telas menores */
+@media (max-width: 1100px){
+  html:not([data-tv="fire"]) .rk-medal{ width: 44px; min-width: 44px; }
+  html:not([data-tv="fire"]) .rk-medal-img{ width: 36px; height: 36px; }
+  html:not([data-tv="fire"]) .rk-pill{ gap: calc(6px * var(--ui-scale));}
+  html:not([data-tv="fire"]) .rk-metric{ min-width: 96px; }
+}
+
+/* =========================
+   LEADS | CONVERSÃO (PROTÓTIPO 3)
+   ========================= */
+.lc-card {
+  width: 100%;
+  height: 100%;
+  background: #D5D5D5; 
+  border-radius: 12px;
+  overflow: hidden;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  padding: calc(10px * var(--ui-scale)) calc(20px * var(--ui-scale));
+  position: relative;
+}
+
+/* LADO ESQUERDO (GAUGE) */
+.lc-gauge-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  position: relative;
+}
+
+.lc-ring-wrap {
+  position: relative;
+  width: calc(clamp(160px, 14vw, 240px) * var(--ui-scale));
+  height: calc(clamp(160px, 14vw, 240px) * var(--ui-scale));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lc-ring {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Texto Central do Gauge */
+.lc-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
+  padding-top: calc(4px * var(--ui-scale)); 
+}
+
+.lc-pct {
+  font-weight: 600;
+  color: #3F3E3B;
+  line-height: 1;
+  font-size: calc(clamp(24px, 2.6vw, 50px) * var(--text-scale));
+  margin-bottom: calc(4px * var(--ui-scale));
+  white-space: nowrap;
+}
+
+.lc-label {
+  font-weight: 600;
+  color: #3F3E3B;
+  opacity: 0.9;
+  line-height: 1.1;
+  font-size: calc(clamp(11px, 0.95vw, 15px) * var(--text-scale));
+  max-width: 80%;
+}
+
+/* LADO DIREITO (LEADS) */
+.lc-data-side {
+  flex: 0 0 auto;
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8px * var(--ui-scale));
+  padding-bottom: calc(100px * var(--ui-scale));
+}
+
+.lc-pill {
+  background: #F05914;
+  border-radius: 999px;
+  padding:
+    calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.6)
+    calc(clamp(18px, 2.2vw, 35px) * var(--ui-scale) * 0.8);
+  box-shadow: none !important;
+  
+  color: #FFFFFF;
+  font-weight: 600;
+  line-height: 1;
+  font-size: calc(clamp(20px, 2.2vw, 38px) * var(--text-scale));
+  white-space: nowrap;
+}
+
+.lc-data-label {
+  font-weight: 600;
+  color: #3F3E3B;
+  font-size: calc(clamp(12px, 0.9vw, 18px) * var(--text-scale));
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Ajuste Mobile */
+@media (max-width: 1024px) {
+  .lc-data-side { width: auto; padding-bottom: 0; }
+  .lc-pill { font-size: 24px; }
+  .lc-data-label { font-size: 14px; }
+}
+
+/* ============================================================
+   FIRE TV: força layout desktop e evita modo mobile
+   ============================================================ */
+html[data-tv="fire"] .layout-mobile{ display: none !important; }
+
+html[data-tv="fire"] .layout-desktop{
+  display: flex !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+
+  gap: var(--gap) !important;
+  padding: var(--shell-pad) !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+}
+
+html[data-tv="fire"] .col{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  gap: var(--gap) !important;
+}
+
+html[data-tv="fire"] .tile{
+  min-height: 0 !important;
+  width: 100% !important;
+}
+
+html[data-tv="fire"] body{
+  margin: 0 !important;
+  overflow: hidden !important;
+  height: 100vh !important;
+  width: 100vw !important;
+}
+
+/* Colunas (layout final) */
+html[data-tv="fire"] .col-left{  flex: 0.704 1 0 !important; min-width: 0 !important; }
+html[data-tv="fire"] .col-mid{   flex: 0.95  1 0 !important; min-width: 0 !important; }
+html[data-tv="fire"] .col-right{ flex: 0.704 1 0 !important; min-width: 0 !important; }
+
+/* Ajustes do card de Leads na TV */
+html[data-tv="fire"] .lc-data-side {
+  padding-bottom: calc(145px * var(--ui-scale));
+  gap: calc(8px * var(--ui-scale) * 0.6);
+}
+html[data-tv="fire"] .lc-pill{
+  padding:
+    calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.48)
+    calc(clamp(18px, 2.2vw, 35px) * var(--ui-scale) * 0.64);
+  font-size: calc(clamp(20px, 2.2vw, 38px) * var(--text-scale) * 0.8);
+}
+html[data-tv="fire"] .lc-data-label {
+  font-size: calc(clamp(12px, 0.9vw, 18px) * var(--text-scale) * 0.8);
+}
+
+/* ============================================================
+   PATCH: SEM BORDA/SOMBRA EM CARDS (Tailwind + CSS)
+   ============================================================ */
+.dashboard-viewport .shadow,
+.dashboard-viewport .shadow-sm,
+.dashboard-viewport .shadow-md,
+.dashboard-viewport .shadow-lg,
+.dashboard-viewport .shadow-xl,
+.dashboard-viewport .shadow-2xl {
+  box-shadow: none !important;
+}
+
+.dashboard-viewport .border,
+.dashboard-viewport .border-2,
+.dashboard-viewport .border-4,
+.dashboard-viewport .border-8 {
+  border-width: 0 !important;
+}
+
+/* Pills/badges (sem borda) */
+.rk-pill,
+.rl-pill,
+.rl-badge,
+.podium .panel-body {
+  border: 0 !important;
+}
+
+.dashboard-viewport .rounded-2xl[style*="box-shadow"],
+.dashboard-viewport .rounded-full[style*="box-shadow"] {
+  box-shadow: none !important;
+}
+
+.dashboard-viewport .rounded-2xl[style*="border: 2px"] {
+  border: 0 !important;
+}
+
+html[data-tv="fire"] .dashboard-viewport{
+  padding: 0 !important; /* evita padding duplo */
+}
+
+.kpi-title{
+  padding-left: calc(8px * var(--ui-scale));
+  margin-top: calc(4px * var(--ui-scale));
+}
+.rk-title-soft{
+  font-weight: 400;
+  padding-left: calc(8px * var(--ui-scale));
+  margin-top: calc(4px * var(--ui-scale));
+}
+
+/* ============================================================
+   FIRE TV (960x540) — Ranking (SDR/Closer)
+   ============================================================ */
+html[data-tv="fire"] .rk-body{
+  margin-top: calc(10px * var(--ui-scale));
+  gap: var(--rk-row-gap);
+}
+
+html[data-tv="fire"] .rk-row{
+  gap: var(--rk-row-gap);
+}
+
+html[data-tv="fire"] .rk-medal{
+  width: calc(46px * var(--ui-scale));
+  min-width: calc(46px * var(--ui-scale));
+}
+html[data-tv="fire"] .rk-medal-img{
+  width: calc(38px * var(--ui-scale));
+  height: calc(38px * var(--ui-scale));
+}
+
+html[data-tv="fire"] .rk-pill{
+  display: flex !important;
+  align-items: center !important;
+  padding: var(--rk-pad-y) var(--rk-pad-x) !important;
+  gap: var(--rk-pill-gap) !important;
+  min-height: 0 !important;
+}
+
+html[data-tv="fire"] .rk-avatar{
+  margin-left: calc(6px * var(--ui-scale));
+}
+
+html[data-tv="fire"] .rk-name{
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  font-size: calc(18px * var(--text-scale)) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+html[data-tv="fire"] .rk-name-sub{
+  font-size: calc(12px * var(--text-scale)) !important;
+  line-height: 1.05 !important;
+}
+
+html[data-tv="fire"] .rk-metrics{
+  display: flex !important;
+  flex: 0 0 var(--rk-metrics-w) !important;
+  margin-left: auto !important;
+  justify-content: space-between !important;
+  gap: var(--rk-metrics-gap) !important;
+  min-width: 0 !important;
+  padding-left: 0 !important;
+  flex-wrap: nowrap !important;
+}
+
+html[data-tv="fire"] .rk-metric{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+}
+
+html[data-tv="fire"] .rk-label{
+  font-size: calc(11px * var(--text-scale)) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+html[data-tv="fire"] .rk-value{
+  font-size: calc(18px * var(--text-scale)) !important;
+  line-height: 1.0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 2º lugar com pill mais “fina” */
+html[data-tv="fire"] .rk-row[data-rank="2"] .rk-pill{
+  padding-top:  calc(var(--rk-pad-y) * 0.70) !important;
+  padding-bottom: calc(var(--rk-pad-y) * 0.70) !important;
+  gap: calc(var(--rk-pill-gap) * 0.90) !important;
+}
+html[data-tv="fire"] .rk-row[data-rank="2"] .rk-avatar{
+  margin-left: calc(4px * var(--ui-scale)) !important;
+}
+
+/* =========================
+   FUNIL DE VENDAS — (Taxa de conversão)
+   ========================= */
+.fv-card{
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+  background: #D5D5D5;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.fv-stage{
+  flex: 1 1 auto;
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mantém a proporção do protótipo (2048x1094) */
+.fv-figure{
+  width: 92%;
+  max-width: none;
+  max-height: 100%;
+  aspect-ratio: 2048 / 1094;
+  display: block;
+}
+
+.fv-svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+html[data-tv="fire"] .fv-figure{
+  width: 96%;
+  transform: scale(1.08);
+  transform-origin: center;
 }

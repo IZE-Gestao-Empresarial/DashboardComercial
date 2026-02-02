@@ -7,51 +7,252 @@
     <!-- Tailwind (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Detecta TV / 4K e ajusta escala via atributo no <html> (usado no CSS) -->
+    <script>
+      (function () {
+        try {
+          const ua = navigator.userAgent || "";
+          const html = document.documentElement;
+
+          // 1. Detecta Amazon Fire TV
+          const isFire = true;
+
+          // 2. Detecta TVs em geral (muitas mandam "SmartTV", "Tizen", "WebOS" no UA)
+          const isTV = /SmartTV|Tizen|WebOS|NetCast|Opera TV|Viera|Bravia/i.test(ua);
+
+          if (isFire) {
+            html.setAttribute("data-tv", "fire");
+          } else if (isTV || window.innerWidth > 2000) {
+            html.setAttribute("data-tv", "4k");
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Auto-scale no desktop (evita precisar usar zoom do navegador) -->
+    <script>
+      (function () {
+        function setDashScale() {
+          try {
+            const html = document.documentElement;
+
+            // Em TVs já existe ajuste próprio (data-tv="fire"/"4k")
+            if (html.hasAttribute("data-tv")) {
+              html.style.setProperty("--dash-scale", "1");
+              return;
+            }
+
+            // No mobile usamos o layout-carrossel, sem escala
+            const isMobile = window.matchMedia(
+              "(max-width: 1024px), (hover: none) and (pointer: coarse)"
+            ).matches;
+            if (isMobile) {
+              html.style.setProperty("--dash-scale", "1");
+              return;
+            }
+
+            const baseW =
+              parseFloat(getComputedStyle(html).getPropertyValue("--dash-design-w")) || 2560;
+            const baseH =
+              parseFloat(getComputedStyle(html).getPropertyValue("--dash-design-h")) || 1440;
+
+            const vp = document.querySelector(".dashboard-viewport");
+            if (!vp) return;
+
+            const cs = getComputedStyle(vp);
+            const padL = parseFloat(cs.paddingLeft) || 0;
+            const padR = parseFloat(cs.paddingRight) || 0;
+            const padT = parseFloat(cs.paddingTop) || 0;
+            const padB = parseFloat(cs.paddingBottom) || 0;
+
+            const rect = vp.getBoundingClientRect();
+            const availW = Math.max(0, rect.width - padL - padR);
+            const availH = Math.max(0, rect.height - padT - padB);
+
+            // Escala somente para "caber" (não aumenta acima de 1)
+            const s = Math.min(1, availW / baseW, availH / baseH);
+            html.style.setProperty("--dash-scale", (Math.round(s * 10000) / 10000).toString());
+          } catch (e) {
+            /* noop */
+          }
+        }
+
+        window.addEventListener("resize", setDashScale, { passive: true });
+        window.addEventListener("DOMContentLoaded", setDashScale);
+        setDashScale();
+      })();
+    </script>
+
     <!-- CSS do dashboard (vem de /assets/dashboard.css e é injetado pelo Python) -->
     <style>
-__DASHBOARD_CSS__
+      __DASHBOARD_CSS__
+
+      /* Debug HUD (rodapé) */
+      #debug-hud {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        z-index: 999999;
+
+        padding: 8px 10px;
+        border-radius: 10px;
+
+        font: 600 12px/1.25 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        letter-spacing: 0.2px;
+
+        color: rgba(255, 255, 255, 0.92);
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(6px);
+
+        pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     </style>
   </head>
 
   <body class="h-full w-full overflow-hidden">
-    <!-- Wrapper com padding-top para "subir" o dashboard (TV) -->
-    <div class="w-full overflow-hidden flex justify-center items-start"
-         style="padding-top: var(--top-pad); height: 100vh;">
+    <!-- Viewport: controla padding externo (margens da TV/dispositivos) -->
+    <div class="dashboard-viewport">
+      <div class="layout-shell">
+        <div class="layout layout-desktop">
+          <!-- Coluna esquerda -->
+          <div class="col col-left">
+            <div class="tile tile-reunioes tile-top">
+__CARD_REUNIOES__
+            </div>
+            <div class="tile tile-leads-taxa tile-bottom">
+__CARD_LEADS_TAXA__
+            </div>
+          </div>
 
-      <div class="w-full layout-shell" style="max-width: 100%; padding: 0 var(--pad); height: calc(100vh - var(--top-pad));">
-        <!-- Layout responsivo:
-             Desktop/TV: grid fixo
-             Mobile: carrossel horizontal (swipe) -->
-        <div class="layout">
+          <!-- Coluna do meio -->
+          <div class="col col-mid">
+            <div class="tile tile-ranking-sdr tile-top">
+__CARD_RANKING_SDR__
+            </div>
+            <div class="tile tile-ranking-closer tile-bottom">
+__CARD_RANKING_CLOSER__
+            </div>
+          </div>
+
+          <!-- Coluna direita -->
+          <div class="col col-right">
+            <div class="tile tile-faturamento tile-top">
+__CARD_FATURAMENTO__
+            </div>
+            <div class="tile tile-funil-vendas tile-bottom">
+__CARD_FUNIL_VENDAS__
+            </div>
+          </div>
+        </div>
+
+        <!-- Layout Mobile (carrossel horizontal - 1 card por tela) -->
+        <div class="layout layout-mobile" aria-label="Carrossel de cards">
           <div class="tile tile-reunioes">
 __CARD_REUNIOES__
           </div>
-
-          <div class="tile tile-leads">
-__CARD_LEADS__
+          <div class="tile tile-leads-taxa">
+__CARD_LEADS_TAXA__
           </div>
-
-          <div class="tile tile-taxa-geral">
-__CARD_TAXA_GERAL__
+          <div class="tile tile-ranking-sdr">
+__CARD_RANKING_SDR__
           </div>
-
-          <div class="tile tile-reunioes-pessoa">
-__CARD_REUNIOES_PESSOA__
+          <div class="tile tile-ranking-closer">
+__CARD_RANKING_CLOSER__
           </div>
-
           <div class="tile tile-faturamento">
 __CARD_FATURAMENTO__
           </div>
-
-          <div class="tile tile-taxa-pessoa">
-__CARD_TAXA_PESSOA__
-          </div>
-
-          <div class="tile tile-contratos-pessoa">
-__CARD_CONTRATOS_PESSOA__
+          <div class="tile tile-funil-vendas">
+__CARD_FUNIL_VENDAS__
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Debug HUD -->
+    <!-- <div id="debug-hud" aria-hidden="true"></div> -->
+    <script>
+      // true = mostra, false = esconde
+      window.DEBUG_HUD_ENABLED = false;
+    </script>
+
+    <script>
+      (function () {
+        if (!window.DEBUG_HUD_ENABLED) return;
+
+        const hud = document.getElementById("debug-hud");
+
+        function px(n) {
+          return Math.round(n);
+        }
+
+        function updateHud() {
+          try {
+            const html = document.documentElement;
+            const vp = document.querySelector(".dashboard-viewport");
+            const desk = document.querySelector(".layout.layout-desktop");
+
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+
+            let vpW = 0, vpH = 0, availW = 0, availH = 0;
+            let padL = 0, padR = 0, padT = 0, padB = 0;
+
+            if (vp) {
+              const rect = vp.getBoundingClientRect();
+              vpW = rect.width;
+              vpH = rect.height;
+
+              const cs = getComputedStyle(vp);
+              padL = parseFloat(cs.paddingLeft) || 0;
+              padR = parseFloat(cs.paddingRight) || 0;
+              padT = parseFloat(cs.paddingTop) || 0;
+              padB = parseFloat(cs.paddingBottom) || 0;
+
+              availW = Math.max(0, vpW - padL - padR);
+              availH = Math.max(0, vpH - padT - padB);
+            }
+
+            let deskW = 0, deskH = 0;
+            if (desk) {
+              const r2 = desk.getBoundingClientRect();
+              deskW = r2.width;
+              deskH = r2.height;
+            }
+
+            const tv = html.getAttribute("data-tv") || "—";
+            const dashScale = getComputedStyle(html).getPropertyValue("--dash-scale").trim() || "—";
+
+            hud.textContent =
+              `Tela: ${px(w)}×${px(h)}  |  viewport: ${px(vpW)}×${px(vpH)}  |  útil(vp): ${px(availW)}×${px(availH)}  |  layout-desktop: ${px(deskW)}×${px(deskH)}  |  pad(vp): L${px(padL)} R${px(padR)} T${px(padT)} B${px(padB)}  |  tv: ${tv}  |  scale: ${dashScale}`;
+          } catch (e) {}
+        }
+
+        let rafId = null;
+        function scheduleHudUpdate() {
+          if (rafId) return;
+          rafId = requestAnimationFrame(() => {
+            rafId = null;
+            updateHud();
+          });
+        }
+
+        window.addEventListener("resize", scheduleHudUpdate, { passive: true });
+        window.addEventListener("orientationchange", scheduleHudUpdate, { passive: true });
+        window.addEventListener("DOMContentLoaded", scheduleHudUpdate);
+
+        const mo = new MutationObserver(scheduleHudUpdate);
+        mo.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-tv"],
+        });
+
+        scheduleHudUpdate();
+      })();
+    </script>
   </body>
 </html>

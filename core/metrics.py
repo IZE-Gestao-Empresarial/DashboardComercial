@@ -11,12 +11,20 @@ def _is_nan(x) -> bool:
 
 _CLEAN_INVISIBLE_RE = re.compile(r"[\u200B-\u200F\uFEFF\u00AD]")
 
+# ✅ aliases globais de responsáveis (já em UPPER)
+_RESPONSAVEL_ALIASES = {
+    "MARIA EDUARDA": "MARIA",
+}
+
 def _norm(s: str) -> str:
     s = str(s or "")
     s = _CLEAN_INVISIBLE_RE.sub("", s)
     s = s.replace("\u00A0", " ")
     s = " ".join(s.split())
-    return s.strip().upper()
+    s = s.strip().upper()
+
+    # ✅ aplica alias depois de normalizar
+    return _RESPONSAVEL_ALIASES.get(s, s)
 
 
 

@@ -27,7 +27,7 @@ PHOTO_FILES: dict[str, str] = {
 # o que faz o <img> falhar. Por isso o default do app usa PHOTO_FILES.
 PHOTO_URLS: dict[str, str] = {
     "NURY": "https://aslibuujaazfedmrpytj.supabase.co/storage/v1/object/public/email_storage/nury.png",
-    "MARIA EDUARDA": "https://aslibuujaazfedmrpytj.supabase.co/storage/v1/object/public/email_storage/maria.png",
+    "MARIA": "https://aslibuujaazfedmrpytj.supabase.co/storage/v1/object/public/email_storage/maria.png",
     "JOÃO": "https://aslibuujaazfedmrpytj.supabase.co/storage/v1/object/public/email_storage/joao.png",
     "JOAO": "https://aslibuujaazfedmrpytj.supabase.co/storage/v1/object/public/email_storage/joao.png",
     "GUILHERME": "https://aslibuujaazfedmrpytj.supabase.co/storage/v1/object/public/email_storage/guilherme.png",
