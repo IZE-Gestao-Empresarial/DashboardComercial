@@ -15,8 +15,6 @@ def gauge_svg(
     filled: str = "#EA591A",
     empty: str = "#F6F6F6",
 ) -> str:
-
-
     percent = max(0.0, min(100.0, float(percent or 0.0)))
     segments = max(1, int(segments))
     filled_count = int(round((percent / 100.0) * segments))
@@ -33,7 +31,7 @@ def gauge_svg(
     scale = seg_len / base_h
     r_inner = 75.0  # raio interno onde começa o segmento
 
-    # Arco (ângulos em graus) – mais aberto nas pontas, igual ao Frame 7
+    # Arco (ângulos em graus)
     arc_start = 185.0
     arc_end = 355.0
     step = (arc_end - arc_start) / float(segments)
@@ -58,7 +56,19 @@ def gauge_svg(
         )
 
     return f"""
-    <svg viewBox="0 0 {vb_w} {vb_h}" style="width: min(var(--gauge-w), 100%); height: auto; max-width: 100%; display: block; margin: 0 auto;" aria-hidden="true">
+    <svg
+      viewBox="0 0 {vb_w} {vb_h}"
+      style="
+        width: min(var(--gauge-w), 100%);
+        height: auto;
+        max-width: 100%;
+        display: block;
+        margin: 0 auto;
+        transform: scale(var(--gauge-scale, 1));
+        transform-origin: center;
+      "
+      aria-hidden="true"
+    >
       {''.join(segs)}
     </svg>
     """

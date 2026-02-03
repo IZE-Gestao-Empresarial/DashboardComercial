@@ -79,11 +79,10 @@ def avatar_html(name_upper: str, size_px: int = 44, ring_px: int = 2) -> str:
     ring_css = f"calc({ring_px}px * var(--ui-scale, 1))"
     font_css = f"calc({font_px}px * var(--ui-scale, 1))"
 
-    # ✅ “TV-friendly”: prioriza rosto e evita artefatos feios em downscale
     img_style = (
         "width:100%;height:100%;object-fit:cover;"
-        "object-position:50% 18%;"  # sobe um pouco (rosto)
-        "transform:translateZ(0);"  # ajuda compositor
+        "object-position:50% 18%;" 
+        "transform:translateZ(0);"
     )
 
     if src:

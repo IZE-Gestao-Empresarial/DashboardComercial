@@ -2,6 +2,7 @@ import requests
 import streamlit as st
 import streamlit.components.v1 as components
 from streamlit_autorefresh import st_autorefresh
+import re
 
 from core.constants import CACHE_TTL_SECONDS, REFRESH_MS, INDICATORS
 from core.data import fetch_payload, payload_to_df, latest_values, get_val
@@ -84,7 +85,7 @@ card_reunioes = kpi_card_html(
     subtitle="Progresso",
     left_label="Número de Reuniões",
     left_value=fmt_int(reun_real),
-    left_badge="-60",          # teste badge alto
+    left_badge="50",          # teste badge alto
     mid_label="Meta de Reuniões",
     mid_value=fmt_int(reun_meta),
     right_pill="-60",          # teste badge alto no direito
@@ -96,10 +97,10 @@ card_faturamento = kpi_card_html(
     subtitle="Progresso",
     left_label="Faturamento Assinado",
     left_value=fmt_money(fat_assinado),
-    left_badge="+99999",         # teste grande
+    left_badge="+99",         # teste grande
     mid_label="Meta de Faturamento",
     mid_value=fmt_money(fat_meta),
-    right_pill="+99999",        # teste grande
+    right_pill="-99",        # teste grande
 )
 
 
@@ -178,6 +179,43 @@ card_ranking_sdr = ranking_sdr_card_html(
 # =========================
 # 4) Ranking Closer (por Faturamento Pago)
 # =========================
+def _to_float_moneyish(v) -> float:
+    """Converte números/strings (incluindo '98.874,00', 'R$ 98.874,00', etc.) para float."""
+    if v is None:
+        return 0.0
+    if isinstance(v, (int, float)):
+        try:
+            return float(v)
+        except Exception:
+            return 0.0
+
+    s = str(v).strip()
+    if not s or s == "-":
+        return 0.0
+
+    # pega o primeiro bloco numérico relevante
+    m = re.search(r"-?[\d\.,]+", s.replace("R$", "").strip())
+    if not m:
+        return 0.0
+
+    num = m.group(0)
+
+    # heurística BR: se tiver '.' e ',' => '.' milhar, ',' decimal
+    if "." in num and "," in num:
+        num = num.replace(".", "").replace(",", ".")
+    elif "," in num and "." not in num:
+        num = num.replace(",", ".")
+    else:
+        # se tiver vários '.', tende a ser milhar
+        if num.count(".") > 1:
+            num = num.replace(".", "")
+
+    try:
+        return float(num)
+    except Exception:
+        return 0.0
+
+
 contratos_vals = people_values(df_last, INDICATORS.CONTRATOS_ASSINADOS, exclude_responsaveis=["CLOSER"])
 fat_ass_vals = people_values(df_last, INDICATORS.FATURAMENTO_ASSINADO, exclude_responsaveis=["CLOSER"])
 fat_pago_vals = people_values(df_last, INDICATORS.FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
@@ -186,21 +224,33 @@ m_contr = {x["name"]: x["value"] for x in contratos_vals}
 m_fa = {x["name"]: x["value"] for x in fat_ass_vals}
 m_fp = {x["name"]: x["value"] for x in fat_pago_vals}
 
-rows_closer = []
+# nomes que entram no ranking (tem Fat. Pago)
+names_in_rank = []
 for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
     if (name or "").strip().upper() == "CLOSER":
         continue
-    if name in m_fp:  # só entra se tiver Fat. Pago (usado como ordenação)
-        rows_closer.append(
-            {
-                "name": name,
-                "contratos": m_contr.get(name),
-                "fat_assinado": m_fa.get(name),
-                "fat_pago": m_fp.get(name),
-            }
-        )
+    if name in m_fp:
+        names_in_rank.append(name)
 
-rows_closer.sort(key=lambda r: float(r.get("fat_pago") or 0.0), reverse=True)
+# ✅ % baseada no faturamento assinado (participação do closer no total assinado do ranking)
+_total_fa = sum(_to_float_moneyish(m_fa.get(n)) for n in names_in_rank) or 0.0
+
+rows_closer = []
+for name in names_in_rank:
+    fa_num = _to_float_moneyish(m_fa.get(name))
+    pct_fa_share = (fa_num / _total_fa * 100.0) if _total_fa > 0 else 0.0
+
+    rows_closer.append(
+        {
+            "name": name,
+            "contratos": m_contr.get(name),
+            "fat_assinado": m_fa.get(name),
+            "fat_pago": m_fp.get(name),
+            "pct": pct_fa_share,  # <- vai aparecer abaixo de "X contratos"
+        }
+    )
+
+rows_closer.sort(key=lambda r: float(_to_float_moneyish(r.get("fat_pago")) or 0.0), reverse=True)
 rows_closer = rows_closer[:5]
 
 card_ranking_closer = podium_contracts_card_html(rows_closer, title="Ranking Closer")

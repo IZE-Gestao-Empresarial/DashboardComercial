@@ -50,7 +50,7 @@ html, body {
   /* Layout / espaçamentos */
   --top-pad: calc(clamp(10px, 2.2vh, 34px) * var(--ui-scale));
   --pad:     calc(clamp(12px, 1.0vw, 18px) * var(--ui-scale));
-  --gap:     calc(clamp(12px, 1.2vw, 20px) * var(--ui-scale));
+  --gap: calc(clamp(16px, 1.4vw, 22px) * var(--ui-scale));
   --box-pad: calc(clamp(12px, 1.1vw, 20px) * var(--ui-scale));
 
   /* Tipografia do gauge */
@@ -62,11 +62,10 @@ html, body {
   /* Mantidos p/ compatibilidade (podem ser usados em outros cards) */
   --fs-pill:  clamp(12px, 1.0vw, 14px);
   --fs-badge: clamp(10px, 0.8vw, 12px);
-
   --fs-placeholder: calc(clamp(20px, 1.8vw, 34px) * var(--text-scale));
 
   /* Gauge */
-  --gauge-w:         calc(clamp(384px, 24vw, 480px) * var(--ui-scale));
+  --gauge-w: calc(clamp(360px, 22vw, 440px) * var(--ui-scale)); /* era 384/24vw/480 */
   --gauge-min-h:     calc(clamp(288px, 44vw, 348px) * var(--ui-scale));
   --gauge-text-shift: calc(45px * var(--ui-scale));
 
@@ -81,28 +80,70 @@ html, body {
 html[data-tv="fire"]{
   --ui-scale: 0.88;
   --text-scale: 0.80;
+
   --fs-title: 19px;
   --fs-subtitle: 18px;
+
+  --lr-top-flex: 6.9;
+  --lr-bottom-flex: 3.1;
 
   /* evita auto-ajuste de texto do Silk */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 
+  --gap: calc(clamp(21px, 1.6vw, 25px) * var(--ui-scale));
   --outer-pad: calc(clamp(18px, 1.6vmin, 36px) * 0.85);
-  --shell-pad: calc(clamp(18px, 2.2vmin, 44px) * var(--ui-scale) * 0.90);
+  --shell-pad: calc(clamp(18px, 2.2vmin, 44px) * var(--ui-scale) * 1.59);
 
   /* hierarquia tipográfica do gauge */
   --fs-center: calc(clamp(28px, 2.8vw, 56px) * var(--text-scale) * 1.12);
   --fs-sub:    calc(clamp(12px, 1.05vw, 16px) * var(--text-scale) * 0.78);
-  --gauge-text-shift: calc(45px * var(--ui-scale) * 0.50);
+  --gauge-text-shift: calc(45px * var(--ui-scale) * 0.70);
 
-  /* Ranking (SDR/Closer) */
-  --rk-pad-y: calc(5px * var(--ui-scale));
-  --rk-pad-x: calc(10px * var(--ui-scale));
+  /* bom pra dar respiro em cards KPI */
+  --kpi-gauge-scale: 0.92;
+
+  /* ============================================================
+     Ranking (SDR/Closer) — variáveis (Fire TV)
+     - traz métricas e avatar mais pra dentro
+     - fundo recorta mais perto do avatar (sem “buraco” grande)
+     ============================================================ */
+  --rk-pad-y: calc(6px * var(--ui-scale));
+  --rk-pad-x: calc(12px * var(--ui-scale));
   --rk-row-gap: calc(10px * var(--ui-scale));
-  --rk-pill-gap: calc(8px * var(--ui-scale));
-  --rk-metrics-w: calc(160px * var(--ui-scale));
+  --rk-pill-gap: calc(10px * var(--ui-scale));
+
+  /* ✅ coluna fixa das métricas (um pouco menor p/ caber melhor) */
+  --rk-metrics-w: calc(145px * var(--ui-scale));
   --rk-metrics-gap: calc(10px * var(--ui-scale));
+  --rk-metric-vgap: calc(3px * var(--ui-scale));
+
+  /* tipografia */
+  --rk-name-fs:  calc(17px * var(--text-scale));
+  --rk-label-fs: calc(10px * var(--text-scale));
+  --rk-value-fs: calc(16px * var(--text-scale));
+  --rk-sub-fs:   calc(11px * var(--text-scale));
+  --rk-pct-fs:   calc(11px * var(--text-scale));
+
+  /* espaçamentos */
+  --rk-body-gap: calc(18px * var(--ui-scale));
+  --rk-rank1-drop: calc(6px * var(--ui-scale));
+  --rk-name-pl: calc(6px * var(--ui-scale));
+
+  /* medalha / avatar */
+  --rk-medal-w: calc(44px * var(--ui-scale));
+  --rk-medal-img: calc(36px * var(--ui-scale));
+
+  --rk-avatar-box: calc(54px * var(--ui-scale));
+  --rk-avatar-scale: 0.92;
+
+  /* ✅ recorte do FUNDO: bem mais próximo do avatar */
+  --rk-pill-bg-gap: calc(3px * var(--ui-scale));
+  --rk-pill-bg-right: calc(var(--rk-avatar-box) + var(--rk-pill-bg-gap));
+
+  /* ✅ 2º lugar: recorte menor (mais sutil) */
+  --rk-rank2-rightcut: calc(14px * var(--ui-scale));
+
 }
 
 /* TVs / navegadores em UHD (ex.: 3840x2160) */
@@ -171,11 +212,11 @@ html[data-tv="4k"]{
 }
 
 /* Proporções por coluna (top/bottom) */
-.col-left  .tile-top{ flex: 6 1 0; }
-.col-left  .tile-bottom{ flex: 4 1 0; }
+.col-left  .tile-top{ flex: var(--lr-top-flex) 1 0; }
+.col-left  .tile-bottom{ flex: var(--lr-bottom-flex) 1 0; }
 
-.col-right .tile-top{ flex: 6 1 0; }
-.col-right .tile-bottom{ flex: 4 1 0; }
+.col-right .tile-top{ flex: var(--lr-top-flex) 1 0; }
+.col-right .tile-bottom{ flex: var(--lr-bottom-flex) 1 0; }
 
 /* Coluna do meio: 2 rankings com a MESMA altura */
 .col-mid .tile-top,
@@ -611,137 +652,6 @@ html[data-tv="4k"]{
 }
 
 /* =========================
-   RANKING (mock Group 21)
-   ========================= */
-.rk-card{ 
-  overflow:hidden; 
-  border-radius: 12px !important;
-}
-.rk-title{
-  font-weight: 900;
-  color: #111827;
-  font-size: var(--fs-title);
-  line-height: 1.1;
-  font-style: normal;
-}
-.rk-body{
-  margin-top: calc(14px * var(--ui-scale));
-  display: flex;
-  flex-direction: column;
-  gap: calc(14px * var(--ui-scale));
-}
-
-.rk-row{
-  display:flex;
-  align-items:center;
-  gap: calc(14px * var(--ui-scale));
-}
-
-.rk-medal{
-  width: calc(54px * var(--ui-scale));
-  min-width: calc(54px * var(--ui-scale));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.rk-medal-img{
-  width: calc(44px * var(--ui-scale));
-  height: calc(44px * var(--ui-scale));
-  display:block;
-}
-.rk-medal-fallback{
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight: 900;
-  color: #111827;
-  background: rgba(17,24,39,.06);
-}
-
-.rk-pill{
-  flex: 1 1 auto;
-  min-width: 0;
-  max-width: calc(100% - clamp(24px, 2.2vw, 60px));
-  background: rgba(17, 24, 39, 0.04);
-  border-radius: 999px;
-  padding: calc(14px * var(--ui-scale)) calc(16px * var(--ui-scale));
-  display:flex;
-  align-items:center;
-  gap: calc(2px * var(--ui-scale));
-}
-
-.rk-name{
-  font-weight: 900;
-  color:#111827;
-  font-size: calc(clamp(18px, 1.8vw, 34px) * var(--text-scale));
-  line-height: 1;
-  min-width: 140px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.rk-pill-closer .rk-name{
-  display:flex;
-  flex-direction:column;
-  gap: 1px;
-}
-.rk-name-main{
-  font-weight: 900;
-  line-height:1;
-}
-.rk-name-sub{
-  font-weight: 600;
-  color: rgba(17,24,39,.55);
-  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
-  line-height: 1;
-}
-
-.rk-metrics{
-  display:flex;
-  gap: calc(26px * var(--ui-scale));
-  align-items:center;
-  justify-content:flex-start;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.rk-metric{
-  display:flex;
-  flex-direction:column;
-  gap: 10px;
-  min-width: calc(120px * var(--ui-scale));
-}
-.rk-label{
-  font-weight: 600;
-  color: rgba(17,24,39,.6);
-  font-size: calc(clamp(12px, 1.0vw, 16px) * var(--text-scale));
-  line-height: 1;
-}
-.rk-value{
-  font-weight: 900;
-  color:#111827;
-  font-size: calc(clamp(13px, 1.9vw, 42px) * var(--text-scale));
-  line-height: 1;
-}
-
-.rk-avatar{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-left: auto;
-}
-
-/* Ajustes finos para telas menores */
-@media (max-width: 1100px){
-  html:not([data-tv="fire"]) .rk-medal{ width: 44px; min-width: 44px; }
-  html:not([data-tv="fire"]) .rk-medal-img{ width: 36px; height: 36px; }
-  html:not([data-tv="fire"]) .rk-pill{ gap: calc(6px * var(--ui-scale));}
-  html:not([data-tv="fire"]) .rk-metric{ min-width: 96px; }
-}
-
-/* =========================
    LEADS | CONVERSÃO (PROTÓTIPO 3)
    ========================= */
 .lc-card {
@@ -901,14 +811,28 @@ html[data-tv="fire"] .col-right{ flex: 0.704 1 0 !important; min-width: 0 !impor
 
 /* Ajustes do card de Leads na TV */
 html[data-tv="fire"] .lc-data-side {
-  padding-bottom: calc(145px * var(--ui-scale));
+  padding-bottom: calc(95px * var(--ui-scale)); /* ↓ desce o pill + label */
   gap: calc(8px * var(--ui-scale) * 0.6);
 }
 html[data-tv="fire"] .lc-pill{
-  padding:
-    calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.48)
-    calc(clamp(18px, 2.2vw, 35px) * var(--ui-scale) * 0.64);
+  /* tipografia */
   font-size: calc(clamp(20px, 2.2vw, 38px) * var(--text-scale) * 0.8);
+  line-height: 1;
+
+  /* espaçamentos (sem sobrescrever padding depois) */
+  padding-top:    calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.48);
+  padding-bottom: calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.48);
+  padding-left:   calc(25px * var(--ui-scale));
+  padding-right:  calc(25px * var(--ui-scale));
+
+  /* melhor que height fixo (não corta se a fonte variar) */
+  min-height: calc(25px * var(--ui-scale));
+
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
 }
 html[data-tv="fire"] .lc-data-label {
   font-size: calc(clamp(12px, 0.9vw, 18px) * var(--text-scale) * 0.8);
@@ -933,8 +857,7 @@ html[data-tv="fire"] .lc-data-label {
   border-width: 0 !important;
 }
 
-/* Pills/badges (sem borda) */
-.rk-pill,
+
 .rl-pill,
 .rl-badge,
 .podium .panel-body {
@@ -958,102 +881,10 @@ html[data-tv="fire"] .dashboard-viewport{
   padding-left: calc(8px * var(--ui-scale));
   margin-top: calc(4px * var(--ui-scale));
 }
-.rk-title-soft{
-  font-weight: 400;
-  padding-left: calc(8px * var(--ui-scale));
-  margin-top: calc(4px * var(--ui-scale));
+.kpi-box{
+  border-radius: 8.6px !important;
 }
 
-/* ============================================================
-   FIRE TV (960x540) — Ranking (SDR/Closer)
-   ============================================================ */
-html[data-tv="fire"] .rk-body{
-  margin-top: calc(10px * var(--ui-scale));
-  gap: var(--rk-row-gap);
-}
-
-html[data-tv="fire"] .rk-row{
-  gap: var(--rk-row-gap);
-}
-
-html[data-tv="fire"] .rk-medal{
-  width: calc(46px * var(--ui-scale));
-  min-width: calc(46px * var(--ui-scale));
-}
-html[data-tv="fire"] .rk-medal-img{
-  width: calc(38px * var(--ui-scale));
-  height: calc(38px * var(--ui-scale));
-}
-
-html[data-tv="fire"] .rk-pill{
-  display: flex !important;
-  align-items: center !important;
-  padding: var(--rk-pad-y) var(--rk-pad-x) !important;
-  gap: var(--rk-pill-gap) !important;
-  min-height: 0 !important;
-}
-
-html[data-tv="fire"] .rk-avatar{
-  margin-left: calc(6px * var(--ui-scale));
-}
-
-html[data-tv="fire"] .rk-name{
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  font-size: calc(18px * var(--text-scale)) !important;
-  line-height: 1.05 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-html[data-tv="fire"] .rk-name-sub{
-  font-size: calc(12px * var(--text-scale)) !important;
-  line-height: 1.05 !important;
-}
-
-html[data-tv="fire"] .rk-metrics{
-  display: flex !important;
-  flex: 0 0 var(--rk-metrics-w) !important;
-  margin-left: auto !important;
-  justify-content: space-between !important;
-  gap: var(--rk-metrics-gap) !important;
-  min-width: 0 !important;
-  padding-left: 0 !important;
-  flex-wrap: nowrap !important;
-}
-
-html[data-tv="fire"] .rk-metric{
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-}
-
-html[data-tv="fire"] .rk-label{
-  font-size: calc(11px * var(--text-scale)) !important;
-  line-height: 1.05 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-html[data-tv="fire"] .rk-value{
-  font-size: calc(18px * var(--text-scale)) !important;
-  line-height: 1.0 !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-/* 2º lugar com pill mais “fina” */
-html[data-tv="fire"] .rk-row[data-rank="2"] .rk-pill{
-  padding-top:  calc(var(--rk-pad-y) * 0.70) !important;
-  padding-bottom: calc(var(--rk-pad-y) * 0.70) !important;
-  gap: calc(var(--rk-pill-gap) * 0.90) !important;
-}
-html[data-tv="fire"] .rk-row[data-rank="2"] .rk-avatar{
-  margin-left: calc(4px * var(--ui-scale)) !important;
-}
 
 /* =========================
    FUNIL DE VENDAS — (Taxa de conversão)
@@ -1099,3 +930,4 @@ html[data-tv="fire"] .fv-figure{
   transform: scale(1.08);
   transform-origin: center;
 }
+
