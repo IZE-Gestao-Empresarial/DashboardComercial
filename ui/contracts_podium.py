@@ -7,23 +7,27 @@ from ui.ranklist import ranking_closer_card_html
 def _fmt_money_br_no_symbol(v) -> str:
     """
     Retorna valor no padrão BR sem 'R$':
-    - 98874 -> "98.874,00"
+    - 98874 -> "98.874"
     - None/NaN -> "0,00"
     """
-    # fmt_money no seu projeto geralmente retorna "98.874,00" (sem R$)
-    # Mas como pode retornar "-" dependendo da implementação, aqui garantimos fallback.
     try:
-        s = fmt_money(v)  # esperado: "98.874,00"
-        if not s or str(s).strip() == "-":
+        s = fmt_money(v)  # ex: "R$ 98.874,00"
+        s = str(s or "").strip()
+
+        if not s or s == "-":
             return "0,00"
-            s = str(s).strip()
-        # remove centavos quando for ",00"
+
+        # remove símbolo se vier
+        s = s.replace("R$", "").strip()
+
+        # se termina com ,00, remove para ficar compacto (igual seu layout)
         if s.endswith(",00"):
             s = s[:-3]
-        # deixa zero como "0"
+
         if s in ("0,00", "0"):
             return "0"
-        return s   
+
+        return s
     except Exception:
         return "0,00"
 
@@ -32,7 +36,9 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
     """Ranking Closer (layout do mock).
 
     A colocação é definida SOMENTE por FATURAMENTO PAGO (desc).
-    Espera `rows` com chaves: name, contratos, fat_assinado, fat_pago.
+    Espera `rows` com chaves:
+      - name, contratos, fat_assinado, fat_pago
+      - (opcional) pct -> percentual a exibir abaixo de "contratos"
     """
     if not rows:
         return '''
@@ -49,7 +55,6 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
 
     ordered = sorted(rows, key=_k, reverse=True)
 
-    # Formata os campos para exibição no card
     formatted = []
     for r in ordered:
         name = r.get("name")
@@ -57,9 +62,9 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
             {
                 "name": name,
                 "contratos": fmt_int(r.get("contratos")),
-                # ✅ agora fica "98.874,00"
                 "fat_assinado": _fmt_money_br_no_symbol(r.get("fat_assinado")),
                 "fat_pago": _fmt_money_br_no_symbol(r.get("fat_pago")),
+                "pct": r.get("pct"),  # <- mantém a % calculada no app.py
             }
         )
 

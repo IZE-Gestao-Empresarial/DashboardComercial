@@ -8,7 +8,6 @@ from ui.avatars import photo_src
 
 
 def _metric_row(icon: str, label: str, value_html: str) -> str:
-    # linha com divisor
     return f'''
       <div class="flex items-center justify-between py-2" style="gap: 12px;">
         <div class="flex items-center gap-3 min-w-0">
@@ -88,7 +87,6 @@ def contratos_faturamento_por_pessoa_card_html(title: str, rows: list[dict]) -> 
         </div>
         '''
 
-    # pega só os 2 primeiros (1º e 2º)
     rows2 = rows[:2]
     cards = []
     for i, r in enumerate(rows2, start=1):

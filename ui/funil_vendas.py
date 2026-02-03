@@ -65,11 +65,9 @@ def funil_vendas_card_html(
     reunioes_txt = _fmt_int_br(r)
     contratos_txt = _fmt_int_br(c)
 
-    # igual ao print: 1ª pill com 1 casa; 2ª com 2 casas
     p1_txt = _pct_br(p1, 1)
     p2_txt = _pct_br(p2, 2)
 
-    # Paths/posições extraídos do protótipo (viewBox 2048x1094)
     PATH_TOP = (
         "M 1482.0 363.5 L 564.0 363.5 L 551.0 359.5 L 535.0 348.5 "
         "L 521.5 328.0 L 480.5 195.0 L 478.5 167.0 L 486.5 147.0 "
@@ -115,7 +113,7 @@ def funil_vendas_card_html(
           .fv-lbl2 {{ font-size: 58px; font-weight: 500; fill: rgba(0,0,0,0.86); }}
           .fv-num3 {{ font-size: 92px; font-weight: 800; fill: #fff; letter-spacing: -0.5px; }}
           .fv-lbl3 {{ font-size: 58px; font-weight: 500; fill: rgba(255,255,255,0.95); }}
-          .fv-pct  {{ font-size: 60px; font-weight: 500; fill: #fff; }}
+          .fv-pct  {{ font-size: 60px; font-weight: 300; fill: #fff; }}
           .fv-title{{ font-size: 58px; font-weight: 500; fill: {TOP}; }}
         </style>
 

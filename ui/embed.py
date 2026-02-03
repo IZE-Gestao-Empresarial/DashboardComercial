@@ -4,7 +4,6 @@ import base64
 import mimetypes
 from pathlib import Path
 
-# raiz do projeto (ui/..)
 BASE_DIR = Path(__file__).resolve().parents[1]
 
 

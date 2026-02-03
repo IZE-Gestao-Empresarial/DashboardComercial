@@ -120,7 +120,6 @@ def kpi_card_html(
         </div>
         """
 
-
     # ------------------------------------------------------------------
     # Pré-processamento
     # ------------------------------------------------------------------
@@ -136,17 +135,30 @@ def kpi_card_html(
     # ------------------------------------------------------------------
 
     return f"""
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col"
+    <div class="kpi-card bg-white rounded-3xl shadow-sm border border-zinc-100 h-full w-full flex flex-col"
          style="padding: var(--pad); border-radius: 12px;">
 
       <div class="kpi-title text-zinc-900"
-      style="font-size: var(--fs-title); line-height: 1.1;">
-      {title}
-    </div>
+           style="font-size: var(--fs-title); line-height: 1.1;">
+        {title}
+      </div>
 
+      <div class="kpi-gauge relative mt-2 flex-1 flex justify-center items-center"
+           style="
+             /* ✅ escala segura (evita valores absurdos tipo 0.45) */
+             --kpi-gauge-scale-safe: clamp(0.78, var(--kpi-gauge-scale, 0.92), 1);
+             --gauge-scale: var(--kpi-gauge-scale-safe);
 
-      <div class="relative mt-2 flex-1 flex justify-center items-center"
-           style="min-height: var(--gauge-min-h);">
+             /* ✅ o bloco também encolhe junto (pra não empurrar os subcards) */
+             min-height: calc(var(--gauge-min-h) * var(--kpi-gauge-scale-safe));
+
+             /* ✅ respiro lateral/topo: evita encostar na borda do card */
+             padding-top: calc(6px * var(--ui-scale));
+             padding-left: calc(10px * var(--ui-scale));
+             padding-right: calc(10px * var(--ui-scale));
+             box-sizing: border-box;
+           ">
+
         {svg}
 
         <div class="absolute inset-0 flex flex-col items-center justify-center text-center"
@@ -165,15 +177,13 @@ def kpi_card_html(
 
       <div class="mt-2 grid grid-cols-2" style="gap: var(--gap);">
 
-          <!-- BOX ESQUERDO -->
-          <div class="bg-[#F6F6F6] rounded-2xl flex flex-col"
-          style="padding: calc(var(--box-pad) + var(--box-pad-extra)); min-height: var(--pill-min-h);">
+        <!-- BOX ESQUERDO -->
+        <div class="kpi-box bg-[#F6F6F6] rounded-2xl flex flex-col"
+             style="padding: calc(var(--box-pad) + var(--box-pad-extra)); min-height: var(--pill-min-h);">
 
           <div class="flex items-center justify-between gap-2">
-            <div
-              class="text-zinc-600 leading-snug text-left"
-              style="font-size: calc(var(--fs-label) - 1px);"
-            >
+            <div class="text-zinc-600 leading-snug text-left"
+                 style="font-size: calc(var(--fs-label) - 1px);">
               {left_label_html}
             </div>
 
@@ -187,17 +197,14 @@ def kpi_card_html(
         </div>
 
         <!-- BOX DIREITO -->
-        <div class="bg-[#F6F6F6] rounded-2xl flex flex-col"
-        style="padding: calc(var(--box-pad) + var(--box-pad-extra)); min-height: var(--pill-min-h);">
+        <div class="kpi-box bg-[#F6F6F6] rounded-2xl flex flex-col"
+             style="padding: calc(var(--box-pad) + var(--box-pad-extra)); min-height: var(--pill-min-h);">
 
           <div class="flex items-center justify-between gap-2">
-          <div
-            class="text-zinc-600 leading-snug text-left"
-            style="font-size: calc(var(--fs-label) - 1px);"
-          >
-            {mid_label_html}
-          </div>
-
+            <div class="text-zinc-600 leading-snug text-left"
+                 style="font-size: calc(var(--fs-label) - 1px);">
+              {mid_label_html}
+            </div>
 
             {right_badge_html}
           </div>

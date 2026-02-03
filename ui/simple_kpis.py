@@ -7,7 +7,6 @@ def simple_total_card_html(title: str, value: float | None, subtitle: str | None
     """Card simples no MESMO padrão de disposição da conversão geral."""
     v = fmt_int(value)
 
-    # Se não vier subtitle, usa o próprio title (mesmo padrão do card de conversão geral)
     sub = (subtitle or title).strip()
 
     return f"""
