@@ -63,6 +63,8 @@ df_last = latest_values(df)
 reun_real = get_val(df_last, INDICATORS.REUNIOES_REAL, "SDR")
 reun_meta = get_val(df_last, INDICATORS.REUNIOES_META, "SDR")
 reun_perc = get_val(df_last, INDICATORS.REUNIOES_PERC, "SDR")
+reun_crescimento = get_val(df_last, INDICATORS.REUNIOES_CRESC, "SDR")
+reun_dif = (reun_real - reun_meta) if (reun_real is not None and reun_meta is not None) else None
 
 # ✅ No seu payload existem "FATURAMENTO ASSINADO" e "FATURAMENTO PAGO".
 # Antes você estava usando INDICATORS.FAT_REAL (= "FATURAMENTO PAGO") no campo "Assinado".
@@ -78,17 +80,18 @@ if fat_pago is None:
 
 fat_meta = get_val(df_last, INDICATORS.FAT_META, "CLOSER")
 fat_perc = get_val(df_last, INDICATORS.FAT_PERC, "CLOSER")
-
+fat_cresc = get_val(df_last, INDICATORS.FAT_CRESC, "CLOSER")
+fat_dif = (fat_assinado - fat_meta) if (fat_assinado is not None and fat_meta is not None) else None
 card_reunioes = kpi_card_html(
     title="Reuniões Ocorridas",
     percent_float=pct_to_float_percent(reun_perc),
     subtitle="Progresso",
     left_label="Número de Reuniões",
     left_value=fmt_int(reun_real),
-    left_badge="50",          # teste badge alto
+    left_badge=pct_to_float_percent(reun_crescimento),          # teste badge alto
     mid_label="Meta de Reuniões",
     mid_value=fmt_int(reun_meta),
-    right_pill="-60",          # teste badge alto no direito
+    right_pill=fmt_int(reun_dif) if reun_dif is not None else "0",          # teste badge alto no direito
 )
 
 card_faturamento = kpi_card_html(
@@ -96,11 +99,11 @@ card_faturamento = kpi_card_html(
     percent_float=pct_to_float_percent(fat_perc),
     subtitle="Progresso",
     left_label="Faturamento Assinado",
-    left_value=fmt_money(fat_assinado),
-    left_badge="+99",         # teste grande
+    left_value=fat_assinado,
+    left_badge=pct_to_float_percent(fat_cresc),         # teste grande
     mid_label="Meta de Faturamento",
-    mid_value=fmt_money(fat_meta),
-    right_pill="-99",        # teste grande
+    mid_value=fat_meta,
+    right_pill=fmt_int(fat_dif),
 )
 
 
