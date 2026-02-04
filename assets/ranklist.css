@@ -6,6 +6,7 @@
    ✓ SDR e Closer com MESMO tamanho (145px para métricas)
    ✓ Nome Closer em 11px (Guilherme não corta)
    ✓ Métricas SDR centralizadas (mesma posição do Closer)
+   ✓ Títulos alinhados com cards KPI (padding-left + margin-top)
    ============================================================ */
 
 .rk-scope{
@@ -52,11 +53,10 @@
   border-radius: var(--rk-card-radius) !important;
 }
 
-.rk-scope .rk-title{
-  font-weight: 900;
-  color:#111827;
-  font-size: var(--fs-title);
-  line-height: 1.1;
+.rk-scope .rk-title,
+.rk-scope .rk-title-soft{
+  padding-left: calc(8px * var(--ui-scale));
+  margin-top: calc(4px * var(--ui-scale));
 }
 
 .rk-scope .rk-body{
@@ -284,11 +284,10 @@ html[data-tv="fire"] .rk-scope .rk-card{
   height: 100%;
 }
 
-html[data-tv="fire"] .rk-scope .rk-title{
-  font-size: 15px;
-  margin-bottom: 0;
-  flex-shrink: 0;
-  font-weight: 900;
+html[data-tv="fire"] .rk-scope .rk-title,
+html[data-tv="fire"] .rk-scope .rk-title-soft{
+  padding-left: calc(8px * var(--ui-scale));
+  margin-top: calc(4px * var(--ui-scale));
 }
 
 html[data-tv="fire"] .rk-scope .rk-body{
@@ -503,8 +502,8 @@ html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-value{
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-avatar{
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   min-width: 38px;
   transform: scale(1.15);
 }
