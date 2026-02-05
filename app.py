@@ -268,12 +268,20 @@ card_ranking_closer = podium_contracts_card_html(rows_closer, title="Ranking Clo
 contratos_total = get_val(df_last, INDICATORS.CONTRATOS_ASSINADOS, "CLOSER")
 if contratos_total is None:
     contratos_total = sum(float(x.get("value") or 0.0) for x in contratos_vals) or 0.0
+tax_funil_1_raw = get_val(df_last, INDICATORS.TAX_CONV_FUNIL_1, "SDR")
+tax_funil_2_raw = get_val(df_last, INDICATORS.TAX_CONV_FUNIL_2, "CLOSER")
+
+tax_funil_1 = pct_to_float_percent(tax_funil_1_raw)
+tax_funil_2 = pct_to_float_percent(tax_funil_2_raw)
+
 
 card_funil_vendas = funil_vendas_card_html(
     title="Funil de Vendas",
     leads=leads_total,
     reunioes=reun_real,
     contratos=contratos_total,
+    pct_leads_para_reunioes=tax_funil_1,
+    pct_reunioes_para_contratos=tax_funil_2,
 )
 
 

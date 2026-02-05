@@ -18,7 +18,8 @@ def _pct_br(x: float | int | None, decimals: int) -> str:
         v = float(x or 0.0)
     except Exception:
         v = 0.0
-    v = max(0.0, min(999.99, v))
+    # mantém clamp (se você quiser remover, é só apagar estas 2 linhas)
+    v = max(-999.99, min(999.99, v))
     s = f"{v:.{decimals}f}".replace(".", ",")
     return f"{s}%"
 
@@ -35,36 +36,36 @@ def funil_vendas_card_html(
     """
     Card "Funil de Vendas" (3 estágios) no visual do protótipo.
 
-    - Topo: Leads
-    - Meio: Reuniões
-    - Fundo: Contratos
-    - Pills à direita: % de conversão em cada etapa
-
-    Se `pct_*` não for fornecido, calculamos:
-      - leads -> reuniões = reunioes/leads * 100
-      - reuniões -> contratos = contratos/reunioes * 100
+    IMPORTANTE:
+    - Não calcula mais as taxas automaticamente.
+    - Usa SOMENTE os valores recebidos em:
+        pct_leads_para_reunioes
+        pct_reunioes_para_contratos
     """
 
     title = (title or "").strip() or "Funil de Vendas"
 
+    # Valores dos estágios (mantém como antes)
     l = float(leads or 0.0)
     r = float(reunioes or 0.0)
     c = float(contratos or 0.0)
 
-    if pct_leads_para_reunioes is None:
-        p1 = (r / l * 100.0) if l > 0 else 0.0
-    else:
-        p1 = float(pct_leads_para_reunioes or 0.0)
+    # ✅ Agora NÃO calcula: apenas usa os pcts informados
+    try:
+        p1 = float(pct_leads_para_reunioes) if pct_leads_para_reunioes is not None else 0.0
+    except Exception:
+        p1 = 0.0
 
-    if pct_reunioes_para_contratos is None:
-        p2 = (c / r * 100.0) if r > 0 else 0.0
-    else:
-        p2 = float(pct_reunioes_para_contratos or 0.0)
+    try:
+        p2 = float(pct_reunioes_para_contratos) if pct_reunioes_para_contratos is not None else 0.0
+    except Exception:
+        p2 = 0.0
 
     leads_txt = _fmt_int_br(l)
     reunioes_txt = _fmt_int_br(r)
     contratos_txt = _fmt_int_br(c)
 
+    # Mantive sua decisão de casas: 1 no primeiro, 2 no segundo
     p1_txt = _pct_br(p1, 1)
     p2_txt = _pct_br(p2, 2)
 
@@ -97,7 +98,6 @@ def funil_vendas_card_html(
     PILL = "#252422"
     LINE1 = "rgba(0,0,0,0.10)"
     LINE2 = "rgba(0,0,0,0.10)"
-
 
     return f"""
 <div class="fv-card" role="group" aria-label="{html.escape(title)}">
@@ -141,6 +141,7 @@ def funil_vendas_card_html(
         <text class="fv-t fv-num3" x="1024" y="778" text-anchor="middle">{html.escape(contratos_txt)}</text>
         <text class="fv-t fv-lbl3" x="1024" y="846" text-anchor="middle">Contratos</text>
 
+        <!-- ✅ Agora vem direto dos indicadores -->
         <text class="fv-t fv-pct" x="1743" y="392" text-anchor="middle">{html.escape(p1_txt)}</text>
         <text class="fv-t fv-pct" x="1592" y="658" text-anchor="middle">{html.escape(p2_txt)}</text>
 

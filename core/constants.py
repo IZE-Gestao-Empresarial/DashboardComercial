@@ -3,8 +3,8 @@ from dataclasses import dataclass
 # =========================
 # Config central
 # =========================
-REFRESH_MS = 10_000 # Tempo de refresh do dashboard em ms
-CACHE_TTL_SECONDS = 5
+REFRESH_MS = 600_000 # Tempo de refresh do dashboard em ms
+CACHE_TTL_SECONDS = 55000
 
 
 @dataclass(frozen=True)
@@ -29,6 +29,7 @@ class _Indicators:
     CONTRATOS_ASSINADOS: str = "CONTRATOS ASSINADOS"
     FATURAMENTO_ASSINADO: str = "FATURAMENTO ASSINADO"
     FATURAMENTO_PAGO: str = "FATURAMENTO PAGO"
-
+    TAX_CONV_FUNIL_1: str = "TAXA DE CONVERSÃO FUNIL 1"
+    TAX_CONV_FUNIL_2: str = "TAXA DE CONVERSÃO FUNIL 2"
 
 INDICATORS = _Indicators()
