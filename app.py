@@ -7,7 +7,7 @@ import re
 from core.constants import CACHE_TTL_SECONDS, REFRESH_MS, INDICATORS
 from core.data import fetch_payload, payload_to_df, latest_values, get_val
 from core.metrics import total_for_indicator, people_values, to_percent_value
-from core.formatters import fmt_int, fmt_money, pct_to_float_percent
+from core.formatters import fmt_int, fmt_money, pct_to_float_percent, fmt_money_no_cents
 
 from ui.cards import kpi_card_html
 from ui.leads_conversion import leads_conversion_card_html
@@ -99,11 +99,11 @@ card_faturamento = kpi_card_html(
     percent_float=pct_to_float_percent(fat_perc),
     subtitle="Progresso",
     left_label="Faturamento Assinado",
-    left_value=fat_assinado,
-    left_badge=pct_to_float_percent(fat_cresc),         # teste grande
+    left_value=fmt_money_no_cents(fat_assinado),         # ✅ Mudou aqui
+    left_badge=pct_to_float_percent(fat_cresc),
     mid_label="Meta de Faturamento",
-    mid_value=fat_meta,
-    right_pill=fmt_int(fat_dif),
+    mid_value=fmt_money_no_cents(fat_meta),              # ✅ Mudou aqui
+    right_pill=fmt_int(fat_dif),              # ✅ Mudou aqui (era fmt_int)
 )
 
 
@@ -113,11 +113,10 @@ card_faturamento = kpi_card_html(
 leads_total = total_for_indicator(df_last, INDICATORS.LEADS_CRIADOS, prefer_responsavel="SDR")
 
 taxa_geral_raw = get_val(df_last, INDICATORS.TAXA_CONVERSAO, "SDR")
-taxa_geral = to_percent_value(taxa_geral_raw)
 
 card_leads_taxa = leads_conversion_card_html(
     leads_total=leads_total,
-    taxa_conversao=taxa_geral,
+    taxa_conversao=taxa_geral_raw,
     title="Leads | Taxa de Conversão (Geral)",
 )
 

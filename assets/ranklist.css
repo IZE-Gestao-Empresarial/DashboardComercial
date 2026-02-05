@@ -1,12 +1,6 @@
 /* ============================================================
    RANKLIST — CSS FIRE TV v9 FINAL
    Dashboard: 960x540 | Cards Ranking: 351.6x235.587
-   
-   AJUSTES v9:
-   ✓ SDR e Closer com MESMO tamanho (145px para métricas)
-   ✓ Nome Closer em 11px (Guilherme não corta)
-   ✓ Métricas SDR centralizadas (mesma posição do Closer)
-   ✓ Títulos alinhados com cards KPI (padding-left + margin-top)
    ============================================================ */
 
 .rk-scope{
@@ -20,7 +14,7 @@
   --rk-medal-img:calc(44px * var(--ui-scale));
 
   /* Pill */
-  --rk-pill-bg: rgba(17,24,39,.06);
+  --rk-pill-bg: #F6F6F6;
   --rk-pill-radius: 999px;
   --rk-pill-pad-y: calc(16px * var(--ui-scale));
   --rk-pill-pad-x: calc(20px * var(--ui-scale));
@@ -32,7 +26,7 @@
   /* Tipografia */
   --rk-name-fs:  calc(clamp(19px,1.7vw,32px) * var(--text-scale));
   --rk-label-fs: calc(clamp(12px,1.0vw,15px) * var(--text-scale));
-  --rk-value-fs: calc(clamp(16px,1.7vw,36px) * var(--text-scale));
+  --rk-value-fs: calc(clamp(12px,1.7vw,36px) * var(--text-scale));
   --rk-sub-fs:   calc(clamp(12px,1.0vw,15px) * var(--text-scale));
   --rk-pct-fs:   calc(clamp(12px,1.0vw,15px) * var(--text-scale));
 
@@ -46,6 +40,9 @@
 
   /* 2º lugar */
   --rk-r2-scale: .85;
+
+  /* ✅ quanto "volta" as métricas do 1º lugar (sem mexer no avatar) */
+  --rk-r1-metrics-back: calc(10px * var(--ui-scale));
 }
 
 .rk-scope .rk-card{
@@ -57,6 +54,8 @@
 .rk-scope .rk-title-soft{
   padding-left: calc(8px * var(--ui-scale));
   margin-top: calc(4px * var(--ui-scale));
+  color: #060606;
+  font-weight: 400;
 }
 
 .rk-scope .rk-body{
@@ -95,8 +94,8 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:900;
-  color:#111827;
+  font-weight:600;
+  color:#060606;
   background: rgba(17,24,39,.06);
 }
 
@@ -127,8 +126,8 @@
 
 .rk-scope .rk-name{
   min-width:0;
-  font-weight:900;
-  color:#111827;
+  font-weight:600;
+  color:#060606;
   font-size: var(--rk-name-fs);
   line-height: 1.05;
 
@@ -145,7 +144,8 @@
 }
 
 .rk-scope .rk-name-main{
-  font-weight:900;
+  font-weight:600;
+  color: #060606;
   line-height:1.05;
   white-space: nowrap;
   overflow: hidden;
@@ -154,18 +154,18 @@
 
 .rk-scope .rk-name-sub,
 .rk-scope .rk-name-pct{
-  font-weight:700;
-  color: rgba(17,24,39,.55);
+  font-weight:400;
+  color: #999999;
   line-height:1.05;
 }
 
-.rk-scope .rk-name-sub{ 
-  font-size: var(--rk-sub-fs); 
-  font-weight:600; 
+.rk-scope .rk-name-sub{
+  font-size: var(--rk-sub-fs);
+  font-weight:400;
 }
 
-.rk-scope .rk-name-pct{ 
-  font-size: var(--rk-pct-fs); 
+.rk-scope .rk-name-pct{
+  font-size: var(--rk-pct-fs);
 }
 
 .rk-scope .rk-metrics{
@@ -176,6 +176,11 @@
   min-width: 0;
 }
 
+/* empurra as métricas do 1º lugar um pouco para a esquerda (desktop) */
+.rk-scope .rk-row[data-rank="1"] .rk-metrics{
+  padding-right: var(--rk-r1-metrics-back);
+}
+
 .rk-scope .rk-metric{
   display:flex;
   flex-direction:column;
@@ -184,16 +189,16 @@
 }
 
 .rk-scope .rk-label{
-  font-weight:700;
-  color: rgba(17,24,39,.60);
+  font-weight:400;
+  color: #454545;
   font-size: var(--rk-label-fs);
   line-height:1.05;
   white-space:nowrap;
 }
 
 .rk-scope .rk-value{
-  font-weight:900;
-  color:#111827;
+  font-weight:600;
+  color:#060606;
   font-size: var(--rk-value-fs);
   line-height:1;
 
@@ -227,56 +232,74 @@
   padding-bottom: calc(var(--rk-pill-pad-y) * var(--rk-r2-scale));
 }
 
-.rk-scope .rk-row[data-rank="2"] .rk-name{
-  font-size: calc(var(--rk-name-fs) * var(--rk-r2-scale));
-}
-
-.rk-scope .rk-row[data-rank="2"] .rk-label{
-  font-size: calc(var(--rk-label-fs) * var(--rk-r2-scale));
-}
-
-.rk-scope .rk-row[data-rank="2"] .rk-value{
-  font-size: calc(var(--rk-value-fs) * var(--rk-r2-scale));
-}
 
 /* ============================================================
    FIRE TV — 960x540 | Cards: 351.6x235.587
-   v9: SDR E CLOSER COM MESMO TAMANHO
    ============================================================ */
 
 html[data-tv="fire"] .rk-scope{
-  /* Gaps reduzidos */
   --rk-body-gap: 16px;
   --rk-row-gap: 8px;
 
-  /* Medal menor */
   --rk-medal-w: 32px;
   --rk-medal-img: 28px;
 
-  /* Pill ajustada */
-  --rk-pill-bg: rgba(17,24,39,.06);
-  --rk-pill-pad-y: 10px;
-  --rk-pill-pad-x: 12px;
+  /* ✅ ALTURA DA PILL (aumentei p/ dar mais “corpo”) */
+  --rk-pill-pad-y: 4px;
+
+  /* ==========================================================
+     ✅ PADDING POR TIPO (CLOSER x SDR)
+     - CLOSER: ESQ 22px | DIR 7px
+     - SDR:    ESQ 33px | DIR 22px
+     ========================================================== */
+
+  /* Closer */
+  --rk-closer-pad-l: 20px;
+  --rk-closer-pad-r: 6px;
+
+  /* SDR */
+  --rk-sdr-pad-l: 10px;
+  --rk-sdr-pad-r: 6px;
+
+  /* Defaults do pill (por padrão = CLOSER) */
+  --rk-pill-pad-l: var(--rk-closer-pad-l);
+  --rk-pill-pad-r: var(--rk-closer-pad-r);
+
   --rk-pill-gap: 10px;
   --rk-pill-inset: 16px;
 
-  /* Tipografia reduzida */
   --rk-name-fs: 13px;
   --rk-label-fs: 8px;
   --rk-value-fs: 14px;
   --rk-sub-fs: 7px;
   --rk-pct-fs: 7px;
 
-  /* Avatar menor */
-  --rk-avatar-box: 38px;
-  --rk-avatar-scale: 1.0;
+  /* ✅ AVATAR com mais presença */
+  --rk-avatar-box: 38px;        /* tamanho do círculo */
+  --rk-avatar-ring: 3px;        /* “borda branca” (dentro do círculo) */
 
-  /* Métricas sem largura mínima (flexível) */
+  /* ✅ mover o CÍRCULO pra direita (sem mexer na imagem interna) */
+  --rk-avatar-shift-closer: 0.5px; /* aumente (ex: 2px, 4px) */
+  --rk-avatar-shift-sdr:    0.5px; /* aumente (ex: 2px, 4px) */
+
+  --rk-avatar-scale: 1.0;        /* não mexe na imagem interna */
+
   --rk-metrics-gap: 10px;
   --rk-metric-min: 0px;
+
+  --rk-r1-metrics-back: 17px;
+
+  /* empurra bloco (métricas + foto) pra direita */
+  --rk-right-shift: 10px;
+
+  /* desloca APENAS a 2ª métrica do 2º lugar (SDR) */
+  --rk-sdr-r2-m2-shift: -1px;
+
+  /* junta as métricas do SDR sem mexer no avatar */
+  --rk-sdr-metrics-gap: 23.5px;      /* ajuste fino */
+  --rk-sdr-metric-flex: 0 1 auto;    /* não estica */
 }
 
-/* FIRE TV: Card otimizado para 351.6x235.587 */
 html[data-tv="fire"] .rk-scope .rk-card{
   padding: 14px 12px;
   display: flex;
@@ -288,6 +311,8 @@ html[data-tv="fire"] .rk-scope .rk-title,
 html[data-tv="fire"] .rk-scope .rk-title-soft{
   padding-left: calc(8px * var(--ui-scale));
   margin-top: calc(4px * var(--ui-scale));
+  color: #060606;
+  font-weight: 400;
 }
 
 html[data-tv="fire"] .rk-scope .rk-body{
@@ -299,39 +324,36 @@ html[data-tv="fire"] .rk-scope .rk-body{
   gap: 16px;
 }
 
-/* ============================================================
-   FIRE TV v9: SDR E CLOSER COM MESMO GRID (145px)
-   ============================================================ */
-
 html[data-tv="fire"] .rk-scope .rk-pill{
   display: grid;
-  padding: 10px 12px;
+
+  /* padding por variáveis (top right bottom left) */
+  padding: var(--rk-pill-pad-y) var(--rk-pill-pad-r) var(--rk-pill-pad-y) var(--rk-pill-pad-l);
+
   align-items: center;
   column-gap: 10px;
 }
 
-/* SDR: MESMO TAMANHO DO CLOSER (145px) */
-html[data-tv="fire"] .rk-scope .rk-pill-sdr{
-  grid-template-columns: 1fr 145px 38px;
-  /*                      Nome  ↑     Avatar */
-  /*                      IGUAL AO CLOSER! */
-}
-
-/* Closer: Grid com colunas FIXAS */
+/* ✅ CLOSER mantém padding default (22 / 7) */
 html[data-tv="fire"] .rk-scope .rk-pill-closer{
-  grid-template-columns: 1fr 145px 38px;
-  /*                      Nome Métricas Avatar */
+  --rk-pill-pad-l: var(--rk-closer-pad-l);
+  --rk-pill-pad-r: var(--rk-closer-pad-r);
+
+  grid-template-columns: 1fr 145px 38px; /* avatar intacto */
 }
 
-/* ============================================================
-   FIRE TV v9: FONTES DIFERENCIADAS
-   ============================================================ */
+/* ✅ SDR usa padding exclusivo (33 / 22) */
+html[data-tv="fire"] .rk-scope .rk-pill-sdr{
+  --rk-pill-pad-l: var(--rk-sdr-pad-l);
+  --rk-pill-pad-r: var(--rk-sdr-pad-r);
 
-/* Nome SDR: mantém 13px */
+  grid-template-columns: 1fr 154px 38px; /* avatar intacto */
+}
+
 html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-name{
   font-size: 13px;
   line-height: 1.15;
-  font-weight: 900;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -339,7 +361,6 @@ html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-name{
   max-width: 100%;
 }
 
-/* Nome Closer: REDUZIDO para 11px (Guilherme não corta) */
 html[data-tv="fire"] .rk-scope .rk-pill-closer .rk-name{
   display: flex;
   flex-direction: column;
@@ -349,9 +370,9 @@ html[data-tv="fire"] .rk-scope .rk-pill-closer .rk-name{
 }
 
 html[data-tv="fire"] .rk-scope .rk-pill-closer .rk-name-main{
-  font-size: 11px; /* ← ERA 12px, AGORA 11px */
+  font-size: 11px;
   line-height: 1.2;
-  font-weight: 900;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -360,8 +381,8 @@ html[data-tv="fire"] .rk-scope .rk-pill-closer .rk-name-main{
 html[data-tv="fire"] .rk-scope .rk-name-sub{
   font-size: 7px;
   line-height: 1.15;
-  font-weight: 600;
-  color: rgba(17,24,39,.55);
+  font-weight: 400;
+  color: #999999;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -370,54 +391,62 @@ html[data-tv="fire"] .rk-scope .rk-name-sub{
 html[data-tv="fire"] .rk-scope .rk-name-pct{
   font-size: 7px;
   line-height: 1.15;
-  font-weight: 700;
-  color: rgba(17,24,39,.55);
+  font-weight: 600;
+  color: #999999;
   white-space: nowrap;
 }
 
-/* ============================================================
-   FIRE TV v9: MÉTRICAS CENTRALIZADAS (AMBOS)
-   ============================================================ */
-
+/* empurra métricas (avatar continua no mesmo lugar) */
 html[data-tv="fire"] .rk-scope .rk-metrics{
   display: flex;
   align-items: center;
-  justify-content: center; /* ← CENTRALIZA */
+  justify-content: flex-start;
   gap: 10px;
   width: 100%;
+  margin-left: var(--rk-right-shift);
+}
+
+/* junta as métricas APENAS no SDR (sem afetar Closer) */
+html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-metrics{
+  gap: var(--rk-sdr-metrics-gap);
+}
+
+html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-metrics .rk-metric{
+  flex: var(--rk-sdr-metric-flex);
+}
+
+/* 2º lugar: shift um pouco menor pra não “espremer” */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-metrics{
+  margin-left: calc(var(--rk-right-shift) * 0.7);
 }
 
 html[data-tv="fire"] .rk-scope .rk-metric{
   min-width: 0;
   flex: 1 1 0;
   gap: 2px;
-  text-align: center;
+  text-align: left;
 }
 
 html[data-tv="fire"] .rk-scope .rk-label{
   font-size: 8px;
   line-height: 1.1;
-  font-weight: 600;
-  color: rgba(17,24,39,.60);
-  text-align: center;
+  font-weight: 400;
+  color: #454545;
+  text-align: left;
   white-space: nowrap;
 }
 
 html[data-tv="fire"] .rk-scope .rk-value{
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
-  font-weight: 900;
-  color: #111827;
+  font-weight: 600;
+  color: #060606;
   letter-spacing: -0.2px;
-  text-align: center;
+  text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* ============================================================
-   FIRE TV v9: MEDALHA E AVATAR
-   ============================================================ */
 
 html[data-tv="fire"] .rk-scope .rk-medal{
   width: 32px;
@@ -435,55 +464,59 @@ html[data-tv="fire"] .rk-scope .rk-medal-fallback{
   font-size: 13px;
 }
 
-html[data-tv="fire"] .rk-scope .rk-avatar{
-  width: 40px;
-  height: 40px;
-  min-width: 38px;
-  transform: scale(1.15); 
+/* ✅ AVATAR (círculo) — mais presença + encostado na direita */
+html[data-tv="fire"] .rk-scope .rk-pill .rk-avatar{
+  width: var(--rk-avatar-box);
+  height: var(--rk-avatar-box);
+  min-width: var(--rk-avatar-box);
+  border-radius: 999px;
+
+  background: rgba(255,255,255,.96);
+  border: var(--rk-avatar-ring) solid rgba(255,255,255,.98);
+
+  justify-self: end; /* cola no canto direito da coluna do grid */
 }
 
-/* ============================================================
-   FIRE TV v9: 2º LUGAR - 92% COM GRID PROPORCIONAL
-   ============================================================ */
+/* ✅ Nudge por tipo: move o CÍRCULO inteiro (sem mexer na imagem interna) */
+html[data-tv="fire"] .rk-scope .rk-pill-closer .rk-avatar{
+  transform: translateX(var(--rk-avatar-shift-closer));
+}
+html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-avatar{
+  transform: translateX(var(--rk-avatar-shift-sdr));
+}
 
-/* AMBOS ALINHADOS À ESQUERDA */
+/* (mantém o child scale geral; no Fire TV ele está em 1.0) */
+/* .rk-scope .rk-avatar > * { transform: scale(var(--rk-avatar-scale)); } */
+
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-row-main,
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-row-main{
   justify-content: flex-start;
 }
 
-/* 1º lugar: 100% da largura disponível */
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-pill{
-  padding: 10px 12px;
+  padding: var(--rk-pill-pad-y) var(--rk-pill-pad-r) var(--rk-pill-pad-y) var(--rk-pill-pad-l);
   width: calc(100% - 16px);
   max-width: calc(100% - 16px);
 }
 
-/* 2º lugar: 92% */
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill{
-  padding: 10px 12px;
-  width: 92%;
-  max-width: 92%;
+  padding: var(--rk-pill-pad-y) var(--rk-pill-pad-r) var(--rk-pill-pad-y) var(--rk-pill-pad-l);
+  width: 88%;
+  max-width: 88%;
 }
 
-/* SDR 2º lugar: Grid proporcional (92% de 145px = 133px) */
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr{
-  grid-template-columns: 1fr 133px 38px;
-  /*                      Nome  -12px  Avatar */
+  grid-template-columns: 1fr 131px 38px;
 }
 
-/* Closer 2º lugar: Grid proporcional (92% de 145px = 133px) */
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer{
-  grid-template-columns: 1fr 133px 38px;
-  /*                      Nome  -12px  Avatar */
+  grid-template-columns: 1fr 118px 38px;
 }
 
-/* 2º lugar Closer: mantém fonte 11px */
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer .rk-name-main{
   font-size: 11px;
 }
 
-/* 2º lugar SDR: mantém fonte 13px */
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr .rk-name{
   font-size: 13px;
 }
@@ -498,14 +531,15 @@ html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-label{
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-value{
-  font-size: 14px;
+  font-size: 13px;
 }
 
-html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-avatar{
-  width: 40px;
-  height: 40px;
-  min-width: 38px;
-  transform: scale(1.15);
+/* ✅ Rank 2: garante que o nudge do círculo também aplique */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer .rk-avatar{
+  transform: translateX(var(--rk-avatar-shift-closer));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr .rk-avatar{
+  transform: translateX(var(--rk-avatar-shift-sdr));
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-medal{
@@ -522,4 +556,9 @@ html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-medal-fallback{
   width: 28px;
   height: 28px;
   font-size: 13px;
+}
+
+/* ✅ continua: só mexe na 2ª métrica do 2º colocado do SDR */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-sdr-r2-m2-shift));
 }

@@ -233,7 +233,7 @@ def ranking_sdr_card_html(
       <div class="rk-scope">
         <div class='rk-card bg-[#FFFFFF] rounded-xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden'
             style='padding: var(--rk-pad, var(--pad));'>
-          <div class="rk-title-soft text-zinc-900" style="font-size: var(--fs-title); line-height: 1.1;">
+          <div class="rk-title-soft" style="font-size: var(--fs-title); line-height: 1.1;">
             {html.escape(title)}
           </div>
 
@@ -341,7 +341,7 @@ def ranking_closer_card_html(
       <div class="rk-scope">
         <div class='rk-card bg-[#FFFFFF] rounded-xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden'
             style='padding: var(--rk-pad, var(--pad));'>
-          <div class="rk-title-soft text-zinc-900" style="font-size: var(--fs-title); line-height: 1.1;">
+          <div class="rk-title-soft" style="font-size: var(--fs-title); line-height: 1.1;">
             {html.escape(title)}
           </div>
           <div class='rk-body'>{''.join(rows_html)}</div>

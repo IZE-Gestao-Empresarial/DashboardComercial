@@ -23,10 +23,12 @@ html, body {
   --ui-scale: 0.93;
   /* PC: textos */
   --text-scale: 0.85;
-
+  --lc-ring-scale: 1
   --fs-title: 25px;
   --fs-subtitle: 25px;
-
+  --kpi-badge-nudge-right: 0px; /* default */
+  --kpi-box-pad-y-reduce: 0px;
+  --kpi-box-gap-reduce: 0px;
   --outer-pad: clamp(18px, 1.6vmin, 36px);
   --shell-pad: calc(clamp(18px, 2.2vmin, 44px) * var(--ui-scale));
 
@@ -79,14 +81,15 @@ html, body {
    ========================================= */
 html[data-tv="fire"]{
   --ui-scale: 0.88;
+  --lc-ring-scale: 0.86;
   --text-scale: 0.80;
-
+  --kpi-badge-nudge-right: calc(6px * var(--ui-scale));
   --fs-title: 19px;
   --fs-subtitle: 18px;
-
   --lr-top-flex: 6.9;
   --lr-bottom-flex: 3.1;
-
+  --kpi-box-pad-y-reduce: 4px;  /* reduz topo+baixo */
+  --kpi-box-gap-reduce: 2px; 
   /* evita auto-ajuste de texto do Silk */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -680,9 +683,10 @@ html[data-tv="4k"]{
 }
 
 .lc-ring-wrap {
+
   position: relative;
-  width: calc(clamp(160px, 14vw, 240px) * var(--ui-scale));
-  height: calc(clamp(160px, 14vw, 240px) * var(--ui-scale));
+  width:  calc(clamp(160px, 14vw, 240px) * var(--ui-scale) * var(--lc-ring-scale));
+  height: calc(clamp(160px, 14vw, 240px) * var(--ui-scale) * var(--lc-ring-scale));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -705,11 +709,12 @@ html[data-tv="4k"]{
   text-align: center;
   z-index: 2;
   padding-top: calc(4px * var(--ui-scale)); 
+  height: 117px;
 }
 
 .lc-pct {
   font-weight: 600;
-  color: #3F3E3B;
+  color: #403D38;
   line-height: 1;
   font-size: calc(clamp(24px, 2.6vw, 50px) * var(--text-scale));
   margin-bottom: calc(4px * var(--ui-scale));
@@ -717,11 +722,11 @@ html[data-tv="4k"]{
 }
 
 .lc-label {
-  font-weight: 600;
-  color: #3F3E3B;
+  font-weight: 500;
+  color: #403D38;
   opacity: 0.9;
   line-height: 1.1;
-  font-size: calc(clamp(11px, 0.95vw, 15px) * var(--text-scale));
+  font-size: calc(clamp(11px, 0.95vw, 15px) * var(--text-scale)*0.75);
   max-width: 80%;
 }
 
@@ -753,8 +758,8 @@ html[data-tv="4k"]{
 }
 
 .lc-data-label {
-  font-weight: 600;
-  color: #3F3E3B;
+  font-weight: 500;
+  color: #403D38;
   font-size: calc(clamp(12px, 0.9vw, 18px) * var(--text-scale));
   text-align: center;
   white-space: nowrap;
@@ -816,11 +821,11 @@ html[data-tv="fire"] .lc-data-side {
 }
 html[data-tv="fire"] .lc-pill{
   /* tipografia */
-  font-size: calc(clamp(20px, 2.2vw, 38px) * var(--text-scale) * 0.8);
+  font-size: calc(clamp(20px, 2.2vw, 38px) * var(--text-scale) * 0.65);
   line-height: 1;
 
   /* espaçamentos (sem sobrescrever padding depois) */
-  padding-top:    calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.48);
+  padding-top:    calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.7);
   padding-bottom: calc(clamp(6px, 0.8vw, 12px) * var(--ui-scale) * 0.48);
   padding-left:   calc(25px * var(--ui-scale));
   padding-right:  calc(25px * var(--ui-scale));
