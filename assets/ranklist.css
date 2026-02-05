@@ -471,8 +471,8 @@ html[data-tv="fire"] .rk-scope .rk-pill .rk-avatar{
   min-width: var(--rk-avatar-box);
   border-radius: 999px;
 
-  background: rgba(255,255,255,.96);
-  border: var(--rk-avatar-ring) solid rgba(255,255,255,.98);
+  background: var(--rk-pill-bg);
+  border: var(--rk-avatar-ring) solid var(--rk-pill-bg);
 
   justify-self: end; /* cola no canto direito da coluna do grid */
 }
