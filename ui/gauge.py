@@ -15,6 +15,13 @@ def gauge_svg(
     filled: str = "#EA591A",
     empty: str = "#F6F6F6",
 ) -> str:
+    """
+    Gauge em segmentos, com envelope fixo (viewBox 240x160).
+    Tamanho final no card é controlado pelo CSS:
+      - --gauge-scale       (já existia)  -> escala "base" (safe)
+      - --kpi-gauge-zoom    (NOVO)        -> zoom extra do gauge (somente ele)
+      - --gauge-w           (já existia)  -> largura preferida
+    """
     percent = max(0.0, min(100.0, float(percent or 0.0)))
     segments = max(1, int(segments))
     filled_count = int(round((percent / 100.0) * segments))
@@ -27,7 +34,7 @@ def gauge_svg(
     base_w, base_h = 78.0, 160.0
 
     # Tamanho final do segmento no gauge
-    seg_len = 42.0  # ajuste fino do "comprimento" radial
+    seg_len = 42.0  # comprimento radial
     scale = seg_len / base_h
     r_inner = 75.0  # raio interno onde começa o segmento
 
@@ -56,19 +63,22 @@ def gauge_svg(
         )
 
     return f"""
-    <svg
-      viewBox="0 0 {vb_w} {vb_h}"
-      style="
-        width: min(var(--gauge-w), 100%);
-        height: auto;
-        max-width: 100%;
-        display: block;
-        margin: 0 auto;
-        transform: scale(var(--gauge-scale, 1));
-        transform-origin: center;
-      "
-      aria-hidden="true"
-    >
-      {''.join(segs)}
-    </svg>
-    """
+<svg
+  viewBox="0 0 {vb_w} {vb_h}"
+  style="
+    width: min(var(--gauge-w, 240px), 100%);
+    height: auto;
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+
+    /* ✅ 1) scale base (já existia) */
+    /* ✅ 2) zoom extra só do gauge (NOVO) */
+    transform: scale(calc(var(--gauge-scale, 1) * var(--kpi-gauge-zoom, 1)));
+    transform-origin: center;
+  "
+  aria-hidden="true"
+>
+  {''.join(segs)}
+</svg>
+""".strip()

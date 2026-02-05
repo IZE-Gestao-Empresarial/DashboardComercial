@@ -95,8 +95,9 @@ def funil_vendas_card_html(
     MID = "#F1F1F1"
     ORA = "#EA591A"
     PILL = "#252422"
-    LINE1 = "#C6C6C6"
-    LINE2 = "#C0C0C0"
+    LINE1 = "rgba(0,0,0,0.10)"
+    LINE2 = "rgba(0,0,0,0.10)"
+
 
     return f"""
 <div class="fv-card" role="group" aria-label="{html.escape(title)}">
@@ -107,13 +108,13 @@ def funil_vendas_card_html(
           .fv-t {{
             font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
           }}
-          .fv-num1 {{ font-size: 92px; font-weight: 800; fill: #fff; letter-spacing: -0.5px; }}
-          .fv-lbl1 {{ font-size: 56px; font-weight: 500; fill: rgba(255,255,255,0.92); }}
-          .fv-num2 {{ font-size: 90px; font-weight: 800; fill: #000; letter-spacing: -0.5px; }}
-          .fv-lbl2 {{ font-size: 58px; font-weight: 500; fill: rgba(0,0,0,0.86); }}
-          .fv-num3 {{ font-size: 92px; font-weight: 800; fill: #fff; letter-spacing: -0.5px; }}
-          .fv-lbl3 {{ font-size: 58px; font-weight: 500; fill: rgba(255,255,255,0.95); }}
-          .fv-pct  {{ font-size: 60px; font-weight: 300; fill: #fff; }}
+          .fv-num1 {{ font-size: 92px; font-weight: 600; fill: #FFFFFF; letter-spacing: -0.5px; }}
+          .fv-lbl1 {{ font-size: 56px; font-weight: 500; fill: #FFFFFF; }}
+          .fv-num2 {{ font-size: 90px; font-weight: 600; fill: #000000; letter-spacing: -0.5px; }}
+          .fv-lbl2 {{ font-size: 58px; font-weight: 500; fill: #000000; }}
+          .fv-num3 {{ font-size: 92px; font-weight: 600; fill: #FFFFFF; letter-spacing: -0.5px; }}
+          .fv-lbl3 {{ font-size: 58px; font-weight: 500; fill: #FFFFFF; }}
+          .fv-pct  {{ font-size: 60px; font-weight: 300; fill: #FFFFFF; }}
           .fv-title{{ font-size: 58px; font-weight: 500; fill: {TOP}; }}
         </style>
 
