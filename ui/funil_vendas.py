@@ -67,7 +67,7 @@ def funil_vendas_card_html(
 
     # Mantive sua decisão de casas: 1 no primeiro, 2 no segundo
     p1_txt = _pct_br(p1, 1)
-    p2_txt = _pct_br(p2, 2)
+    p2_txt = _pct_br(p2, 1)
 
     PATH_TOP = (
         "M 1482.0 363.5 L 564.0 363.5 L 551.0 359.5 L 535.0 348.5 "
