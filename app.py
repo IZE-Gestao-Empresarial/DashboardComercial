@@ -18,9 +18,43 @@ from ui.render import inject_kiosk_css, render_dashboard
 
 
 # =========================
+# Hide Streamlit chrome (menu/header/footer/toolbar)
+# =========================
+def hide_streamlit_chrome():
+    st.markdown(
+        """
+        <style>
+          /* Remove barras/menus padrão */
+          #MainMenu { visibility: hidden; }
+          footer { visibility: hidden; }
+          header { visibility: hidden; }
+
+          /* Streamlit "chrome" (varia por versão) */
+          [data-testid="stHeader"] { display: none !important; }
+          [data-testid="stToolbar"] { display: none !important; }
+          [data-testid="stDecoration"] { display: none !important; }
+          [data-testid="stStatusWidget"] { display: none !important; }
+
+          /* Padding do app (deixa fullscreen de verdade) */
+          .block-container { padding-top: 0rem !important; padding-bottom: 0rem !important; }
+          [data-testid="stAppViewContainer"] { padding-top: 0rem !important; }
+
+          /* Tenta esconder o badge "Hosted with Streamlit" (no Cloud pode voltar) */
+          a[href*="streamlit.io"] { display: none !important; }
+          iframe[title="streamlit"] { display: none !important; } /* safety */
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# =========================
 # Config
 # =========================
 st.set_page_config(page_title="Comercial | Indicadores", layout="wide")
+
+# ✅ esconde UI do Streamlit (fora do iframe)
+hide_streamlit_chrome()
 
 # ✅ Kiosk mode: sem scroll + centralizado
 inject_kiosk_css()
@@ -67,31 +101,29 @@ reun_crescimento = get_val(df_last, INDICATORS.REUNIOES_CRESC, "SDR")
 reun_dif = (reun_real - reun_meta) if (reun_real is not None and reun_meta is not None) else None
 
 # ✅ No seu payload existem "FATURAMENTO ASSINADO" e "FATURAMENTO PAGO".
-# Antes você estava usando INDICATORS.FAT_REAL (= "FATURAMENTO PAGO") no campo "Assinado".
 fat_assinado = total_for_indicator(df_last, INDICATORS.FATURAMENTO_ASSINADO, prefer_responsavel="CLOSER")
 if fat_assinado is None:
-    # fallback: se não existir o total do time, soma os closers individuais
     fat_assinado = total_for_indicator(df_last, INDICATORS.FATURAMENTO_ASSINADO, exclude_responsaveis=["CLOSER"])
 
 fat_pago = total_for_indicator(df_last, INDICATORS.FATURAMENTO_PAGO, prefer_responsavel="CLOSER")
 if fat_pago is None:
-    # fallback: se não existir o total do time, soma os closers individuais
     fat_pago = total_for_indicator(df_last, INDICATORS.FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
 
 fat_meta = get_val(df_last, INDICATORS.FAT_META, "CLOSER")
 fat_perc = get_val(df_last, INDICATORS.FAT_PERC, "CLOSER")
 fat_cresc = get_val(df_last, INDICATORS.FAT_CRESC, "CLOSER")
 fat_dif = (fat_assinado - fat_meta) if (fat_assinado is not None and fat_meta is not None) else None
+
 card_reunioes = kpi_card_html(
     title="Reuniões Ocorridas",
     percent_float=pct_to_float_percent(reun_perc),
     subtitle="Progresso",
     left_label="Número de Reuniões",
     left_value=fmt_int(reun_real),
-    left_badge=pct_to_float_percent(reun_crescimento),          # teste badge alto
+    left_badge=pct_to_float_percent(reun_crescimento),
     mid_label="Meta de Reuniões",
     mid_value=fmt_int(reun_meta),
-    right_pill=fmt_int(reun_dif) if reun_dif is not None else "0",          # teste badge alto no direito
+    right_pill=fmt_int(reun_dif) if reun_dif is not None else "0",
 )
 
 card_faturamento = kpi_card_html(
@@ -99,11 +131,11 @@ card_faturamento = kpi_card_html(
     percent_float=pct_to_float_percent(fat_perc),
     subtitle="Progresso",
     left_label="Faturamento Assinado",
-    left_value=fmt_money_no_cents(fat_assinado),         # ✅ Mudou aqui
+    left_value=fmt_money_no_cents(fat_assinado),
     left_badge=pct_to_float_percent(fat_cresc),
     mid_label="Meta de Faturamento",
-    mid_value=fmt_money_no_cents(fat_meta),              # ✅ Mudou aqui
-    right_pill=fmt_int(fat_dif),              # ✅ Mudou aqui (era fmt_int)
+    mid_value=fmt_money_no_cents(fat_meta),
+    right_pill=fmt_int(fat_dif),
 )
 
 
@@ -111,7 +143,6 @@ card_faturamento = kpi_card_html(
 # 2) Leads + Taxa de Conversão (Geral)
 # =========================
 leads_total = total_for_indicator(df_last, INDICATORS.LEADS_CRIADOS, prefer_responsavel="SDR")
-
 taxa_geral_raw = get_val(df_last, INDICATORS.TAXA_CONVERSAO, "SDR")
 
 card_leads_taxa = leads_conversion_card_html(
@@ -155,10 +186,7 @@ reun_people_vals = people_values(
     exclude_responsaveis=["SDR", "CLOSER"],
 )
 
-# remove labels de equipe
 reun_people_vals = [x for x in reun_people_vals if not _is_team_label(x.get("name", ""))]
-
-# ordena por número de reuniões
 reun_people_vals.sort(key=lambda x: float(x.get("value") or 0.0), reverse=True)
 
 _total_reun = sum(float(x.get("value") or 0.0) for x in reun_people_vals) or 0.0
@@ -195,20 +223,17 @@ def _to_float_moneyish(v) -> float:
     if not s or s == "-":
         return 0.0
 
-    # pega o primeiro bloco numérico relevante
     m = re.search(r"-?[\d\.,]+", s.replace("R$", "").strip())
     if not m:
         return 0.0
 
     num = m.group(0)
 
-    # heurística BR: se tiver '.' e ',' => '.' milhar, ',' decimal
     if "." in num and "," in num:
         num = num.replace(".", "").replace(",", ".")
     elif "," in num and "." not in num:
         num = num.replace(",", ".")
     else:
-        # se tiver vários '.', tende a ser milhar
         if num.count(".") > 1:
             num = num.replace(".", "")
 
@@ -226,7 +251,6 @@ m_contr = {x["name"]: x["value"] for x in contratos_vals}
 m_fa = {x["name"]: x["value"] for x in fat_ass_vals}
 m_fp = {x["name"]: x["value"] for x in fat_pago_vals}
 
-# nomes que entram no ranking (tem Fat. Pago)
 names_in_rank = []
 for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
     if (name or "").strip().upper() == "CLOSER":
@@ -234,7 +258,6 @@ for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
     if name in m_fp:
         names_in_rank.append(name)
 
-# ✅ % baseada no faturamento assinado (participação do closer no total assinado do ranking)
 _total_fa = sum(_to_float_moneyish(m_fa.get(n)) for n in names_in_rank) or 0.0
 
 rows_closer = []
@@ -248,7 +271,7 @@ for name in names_in_rank:
             "contratos": m_contr.get(name),
             "fat_assinado": m_fa.get(name),
             "fat_pago": m_fp.get(name),
-            "pct": pct_fa_share,  # <- vai aparecer abaixo de "X contratos"
+            "pct": pct_fa_share,
         }
     )
 
@@ -261,19 +284,15 @@ card_ranking_closer = podium_contracts_card_html(rows_closer, title="Ranking Clo
 # =========================
 # 5) Funil de vendas (NOVO)
 # =========================
-# Totais:
-# - Leads: já calculado (leads_total)
-# - Reuniões: usa o total do KPI (reun_real)
-# - Contratos: tenta pegar o total do time (CLOSER); se não existir, soma valores individuais
 contratos_total = get_val(df_last, INDICATORS.CONTRATOS_ASSINADOS, "CLOSER")
 if contratos_total is None:
     contratos_total = sum(float(x.get("value") or 0.0) for x in contratos_vals) or 0.0
+
 tax_funil_1_raw = get_val(df_last, INDICATORS.TAX_CONV_FUNIL_1, "SDR")
 tax_funil_2_raw = get_val(df_last, INDICATORS.TAX_CONV_FUNIL_2, "CLOSER")
 
 tax_funil_1 = pct_to_float_percent(tax_funil_1_raw)
 tax_funil_2 = pct_to_float_percent(tax_funil_2_raw)
-
 
 card_funil_vendas = funil_vendas_card_html(
     title="Funil de Vendas",
@@ -299,5 +318,4 @@ slots = {
 
 html = render_dashboard(slots=slots)
 
-# ✅ height mínimo; o CSS do kiosk fixa o iframe em 100vh/100vw
 components.html(html, height=1, scrolling=False)
