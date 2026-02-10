@@ -180,30 +180,88 @@ def _is_team_label(name: str) -> bool:
     return False
 
 
+def _norm_name(name: str) -> str:
+    """Normaliza pra casar nomes entre indicadores (evita diferença de espaços/caixa)."""
+    n = (name or "").replace("\u00A0", " ")
+    n = " ".join(n.split()).strip().upper()
+    return n
+
+
+def _to_float_safe(v) -> float:
+    """Converte valor com segurança (aceita float, '0,123', '0.123', etc.)."""
+    if v is None:
+        return 0.0
+    try:
+        if isinstance(v, (int, float)):
+            return float(v)
+        s = str(v).strip().replace("\u00A0", " ").replace("%", "")
+        # se vier no padrão pt-BR com vírgula decimal
+        if "," in s and "." in s:
+            # heurística: se a última vírgula está depois do último ponto, vírgula é decimal
+            if s.rfind(",") > s.rfind("."):
+                s = s.replace(".", "").replace(",", ".")
+            else:
+                s = s.replace(",", "")
+        else:
+            s = s.replace(",", ".")
+        return float(s)
+    except Exception:
+        return 0.0
+
+
+# 1) Reuniões por pessoa (mantém ranking por reuniões)
 reun_people_vals = people_values(
     df_last,
     INDICATORS.REUNIOES_REAL,
     exclude_responsaveis=["SDR", "CLOSER"],
 )
-
 reun_people_vals = [x for x in reun_people_vals if not _is_team_label(x.get("name", ""))]
-reun_people_vals.sort(key=lambda x: float(x.get("value") or 0.0), reverse=True)
+reun_people_vals.sort(key=lambda x: _to_float_safe(x.get("value")), reverse=True)
 
-_total_reun = sum(float(x.get("value") or 0.0) for x in reun_people_vals) or 0.0
 _top_reun = reun_people_vals[:5]
 
+
+# 2) Taxa de conversão por pessoa (indicador "TAXA DE CONVERSÃO")
+conv_people_vals = people_values(
+    df_last,
+    INDICATORS.TAXA_CONVERSAO,  # <- defina isso como "TAXA DE CONVERSÃO" no seu indicators
+    exclude_responsaveis=["SDR", "CLOSER"],
+)
+conv_people_vals = [x for x in conv_people_vals if not _is_team_label(x.get("name", ""))]
+
+# mapa: NOME_NORMALIZADO -> valor_raw (ratio, ex: 0.1053)
+conv_by_name = {
+    _norm_name(x.get("name", "")): _to_float_safe(x.get("value"))
+    for x in conv_people_vals
+}
+
+
+# 3) Monta itens do ranking: conversão vem do indicador (não mais share)
 rank_sdr_items = []
 for it in _top_reun:
-    v = float(it.get("value") or 0.0)
-    share = (v / _total_reun * 100.0) if _total_reun > 0 else 0.0
-    rank_sdr_items.append({"name": it.get("name"), "value": v, "share": share})
+    name = it.get("name")
+    reun = _to_float_safe(it.get("value"))
+
+    conv_raw = conv_by_name.get(_norm_name(name), 0.0)  # ratio (dividido por 100)
+    conv_pct = pct_to_float_percent(conv_raw)           # vira percent (0..100)
+
+    rank_sdr_items.append({
+        "name": name,
+        "reunioes": reun,
+        "conversao": conv_pct,  # <- agora é taxa de conversão por responsável
+    })
+
 
 card_ranking_sdr = ranking_sdr_card_html(
     title="Ranking SDR",
-    items=[{"name": r.get("name"), "reunioes": r.get("value"), "conversao": r.get("share")} for r in rank_sdr_items],
+    items=[
+        {"name": r["name"], "reunioes": r["reunioes"], "conversao": r["conversao"]}
+        for r in rank_sdr_items
+    ],
     limit=2,
     avatar_size_px=56,
 )
+
 
 
 # =========================
