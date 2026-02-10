@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import re
+import math  # ✅ ADICIONADO
 from pathlib import Path
 from typing import Optional
 
@@ -199,6 +200,10 @@ def ranking_sdr_card_html(
         except Exception:
             conv_f = 0.0
 
+        # ✅ Antes: int(round(conv_f)) -> arredonda pra cima
+        # ✅ Agora: truncamento (não arredonda): 10.9 -> 10 | 4.9 -> 4
+        conv_int = int(math.trunc(conv_f))
+
         rows_html.append(
             f"""
             <div class='rk-row' data-rank='{idx}'>
@@ -215,7 +220,7 @@ def ranking_sdr_card_html(
                     </div>
                     <div class='rk-metric'>
                       <div class='rk-label'>Conversão (%)</div>
-                      <div class='rk-value'>{int(round(conv_f))}%</div>
+                      <div class='rk-value'>{conv_int}%</div>
                     </div>
                   </div>
 
