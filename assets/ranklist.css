@@ -391,7 +391,7 @@ html[data-tv="fire"] .rk-scope .rk-name-sub{
 html[data-tv="fire"] .rk-scope .rk-name-pct{
   font-size: 7px;
   line-height: 1.15;
-  font-weight: 600;
+  font-weight: 400;
   color: #999999;
   white-space: nowrap;
 }
