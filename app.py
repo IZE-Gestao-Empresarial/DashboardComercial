@@ -224,7 +224,7 @@ _top_reun = reun_people_vals[:5]
 # 2) Taxa de conversão por pessoa (indicador "TAXA DE CONVERSÃO")
 conv_people_vals = people_values(
     df_last,
-    INDICATORS.TAXA_CONVERSAO,  # <- defina isso como "TAXA DE CONVERSÃO" no seu indicators
+    INDICATORS.TAXA_CONVERSAO,
     exclude_responsaveis=["SDR", "CLOSER"],
 )
 conv_people_vals = [x for x in conv_people_vals if not _is_team_label(x.get("name", ""))]
@@ -248,7 +248,7 @@ for it in _top_reun:
     rank_sdr_items.append({
         "name": name,
         "reunioes": reun,
-        "conversao": conv_pct,  # <- agora é taxa de conversão por responsável
+        "conversao": conv_pct,
     })
 
 
@@ -261,7 +261,6 @@ card_ranking_sdr = ranking_sdr_card_html(
     limit=2,
     avatar_size_px=56,
 )
-
 
 
 # =========================
@@ -305,9 +304,13 @@ contratos_vals = people_values(df_last, INDICATORS.CONTRATOS_ASSINADOS, exclude_
 fat_ass_vals = people_values(df_last, INDICATORS.FATURAMENTO_ASSINADO, exclude_responsaveis=["CLOSER"])
 fat_pago_vals = people_values(df_last, INDICATORS.FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
 
+# ✅ NOVO: % vem do indicador PERC FATURAMENTO PAGO (sem cálculo no app.py)
+perc_fat_pago_vals = people_values(df_last, INDICATORS.PERC_FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
+
 m_contr = {x["name"]: x["value"] for x in contratos_vals}
 m_fa = {x["name"]: x["value"] for x in fat_ass_vals}
 m_fp = {x["name"]: x["value"] for x in fat_pago_vals}
+m_perc_fat_pago = {x["name"]: x["value"] for x in perc_fat_pago_vals}
 
 names_in_rank = []
 for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
@@ -316,12 +319,10 @@ for name in sorted(set(m_contr) | set(m_fa) | set(m_fp)):
     if name in m_fp:
         names_in_rank.append(name)
 
-_total_fa = sum(_to_float_moneyish(m_fa.get(n)) for n in names_in_rank) or 0.0
-
 rows_closer = []
 for name in names_in_rank:
-    fa_num = _to_float_moneyish(m_fa.get(name))
-    pct_fa_share = (fa_num / _total_fa * 100.0) if _total_fa > 0 else 0.0
+    perc_raw = m_perc_fat_pago.get(name)          # pode vir 0.15, "15%", "0,15", etc.
+    perc_float = pct_to_float_percent(perc_raw)   # normaliza para 0..100 (float)
 
     rows_closer.append(
         {
@@ -329,7 +330,12 @@ for name in names_in_rank:
             "contratos": m_contr.get(name),
             "fat_assinado": m_fa.get(name),
             "fat_pago": m_fp.get(name),
-            "pct": pct_fa_share,
+
+            # ✅ chave "oficial" que o ranklist procura por padrão (pct_field)
+            "PERC FATURAMENTO PAGO": perc_float,
+
+            # ✅ opcional: mantém fallback compatível (ranklist também busca "pct")
+            "pct": perc_float,
         }
     )
 

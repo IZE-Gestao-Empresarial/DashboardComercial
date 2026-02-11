@@ -3,8 +3,8 @@ from dataclasses import dataclass
 # =========================
 # Config central
 # =========================
-REFRESH_MS = 300_000        # 30s em ms
-CACHE_TTL_SECONDS = 270     # 25s
+REFRESH_MS = 300_000         # 5 min em ms
+CACHE_TTL_SECONDS = 250      # 250s (4 min e 10s)
 
 @dataclass(frozen=True)
 class _Indicators:
@@ -15,7 +15,7 @@ class _Indicators:
     REUNIOES_DIF:  str = "DIF META REUNIÕES OCORRIDAS"
     REUNIOES_CRESC: str = "PERC CRESCIMENTO REUNIOES"
 
-    FAT_REAL: str = "FATURAMENTO PAGO"         
+    FAT_REAL: str = "FATURAMENTO PAGO"
     FAT_FALLBACK_REAL: str = "FATURAMENTO"
     FAT_META: str = "FATURAMENTO - META"
     FAT_PERC: str = "PERC META FATURAMENTO"
@@ -30,5 +30,8 @@ class _Indicators:
     FATURAMENTO_PAGO: str = "FATURAMENTO PAGO"
     TAX_CONV_FUNIL_1: str = "TAXA DE CONVERSÃO FUNIL 1"
     TAX_CONV_FUNIL_2: str = "TAXA DE CONVERSÃO FUNIL 2"
+
+    # ✅ Ranking Closer: percentual deve vir do indicador (por responsável)
+    PERC_FATURAMENTO_PAGO: str = "PERC FATURAMENTO PAGO"
 
 INDICATORS = _Indicators()
