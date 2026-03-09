@@ -67,10 +67,10 @@ def photo_src(name_upper: str) -> str | None:
     return None
 
 
-def avatar_html(name_upper: str, size_px: int = 44, ring_px: int = 2) -> str:
+def avatar_html(name_upper: str, size_px: int = 44, ring_px: int = 2, display_name: str | None = None) -> str:
     key = (name_upper or "").strip().upper()
     src = photo_src(key)
-    safe_title = html.escape(pretty_name(key))
+    safe_title = html.escape((display_name or pretty_name(key)).strip() or pretty_name(key))
 
     ini = html.escape(initials(key))
     font_px = max(12, int(size_px * 0.35))

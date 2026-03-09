@@ -21,6 +21,12 @@ def fmt_percent_br(p: float) -> str:
 
 def _medal_data_uri(rank: int) -> str | None:
     """Tenta encontrar um PNG de colocação em assets/svg e retornar como data URI."""
+    # rank 4+ usa sempre rank_x.png (coroa de louros genérica)
+    if rank >= 4:
+        uri = file_to_data_uri("assets/svg/rank_x.png")
+        if uri:
+            return uri
+
     candidates = [
         f"assets/svg/rank_{rank}.png",
         f"assets/svg/rank-{rank}.png",
@@ -41,6 +47,14 @@ def _medal_data_uri(rank: int) -> str | None:
 
 def _medal_html(rank: int) -> str:
     uri = _medal_data_uri(rank)
+    if rank >= 4 and uri:
+        # Coroa de louros com número sobreposto centralizado
+        return (
+            f"<div class='rk-medal-rank-x'>"
+            f"<img class='rk-medal-img' src='{uri}' alt='{rank}º' />"
+            f"<span class='rk-medal-rank-x-num'>{rank}</span>"
+            f"</div>"
+        )
     if uri:
         return f"<img class='rk-medal-img' src='{uri}' alt='{rank}º' />"
     return f"<div class='rk-medal-fallback'>{rank}</div>"
@@ -180,13 +194,20 @@ def ranking_sdr_card_html(
           </div>
         </div>
         """
+    lim = max(1, int(limit) or 2)
+    rows = items[:lim]
 
-    rows = items[: max(0, int(limit) or 2)]
+    count = len(rows)
+    compact = count > 2
+    scope_class = "rk-scope rk-compact" if compact else "rk-scope"
+    scope_open = f"<div class=\"{scope_class}\" data-count=\"{count}\">"
+    avatar_size_eff = min(int(avatar_size_px or 56), 44) if compact else int(avatar_size_px or 56)
 
     rows_html: list[str] = []
     for idx, it in enumerate(rows, start=1):
         name_u = str(it.get("name") or "").strip().upper()
-        name_pretty = html.escape(pretty_name(name_u))
+        display_name = str(it.get("display_name") or "").strip()
+        name_pretty = html.escape(display_name or pretty_name(name_u))
 
         reun = it.get("reunioes")
         try:
@@ -225,7 +246,7 @@ def ranking_sdr_card_html(
                   </div>
 
                   <div class='rk-avatar'>
-                    {avatar_html(name_u, size_px=avatar_size_px, ring_px=0)}
+                    {avatar_html(name_u, size_px=avatar_size_eff, ring_px=0, display_name=display_name)}
                   </div>
                 </div>
               </div>
@@ -235,7 +256,7 @@ def ranking_sdr_card_html(
 
     return f"""
       {css_tag}
-      <div class="rk-scope">
+      {scope_open}
         <div class='rk-card bg-[#FFFFFF] rounded-xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden'
             style='padding: var(--rk-pad, var(--pad));'>
           <div class="rk-title-soft" style="font-size: var(--fs-title); line-height: 1.1;">
@@ -276,8 +297,14 @@ def ranking_closer_card_html(
             return float(r.get("fat_pago") or 0.0)
         except Exception:
             return 0.0
+    lim = max(1, int(limit) or 2)
+    ordered = sorted(rows, key=_k, reverse=True)[:lim]
 
-    ordered = sorted(rows, key=_k, reverse=True)[: max(0, int(limit) or 2)]
+    count = len(ordered)
+    compact = count > 2
+    scope_class = "rk-scope rk-compact" if compact else "rk-scope"
+    scope_open = f"<div class=\"{scope_class}\" data-count=\"{count}\">"
+    avatar_size_eff = min(int(avatar_size_px or 56), 44) if compact else int(avatar_size_px or 56)
 
     def _money(v) -> str:
         if v is None:
@@ -287,7 +314,8 @@ def ranking_closer_card_html(
     rows_html: list[str] = []
     for idx, it in enumerate(ordered, start=1):
         name_u = str(it.get("name") or "").strip().upper()
-        name_pretty = html.escape(pretty_name(name_u))
+        display_name = str(it.get("display_name") or "").strip()
+        name_pretty = html.escape(display_name or pretty_name(name_u))
 
         contratos = it.get("contratos")
         try:
@@ -333,7 +361,7 @@ def ranking_closer_card_html(
                   </div>
 
                   <div class='rk-avatar'>
-                    {avatar_html(name_u, size_px=avatar_size_px, ring_px=0)}
+                    {avatar_html(name_u, size_px=avatar_size_eff, ring_px=0, display_name=display_name)}
                   </div>
                 </div>
               </div>
@@ -343,7 +371,7 @@ def ranking_closer_card_html(
 
     return f"""
       {css_tag}
-      <div class="rk-scope">
+      {scope_open}
         <div class='rk-card bg-[#FFFFFF] rounded-xl shadow-sm border border-zinc-100 h-full w-full flex flex-col overflow-hidden'
             style='padding: var(--rk-pad, var(--pad));'>
           <div class="rk-title-soft" style="font-size: var(--fs-title); line-height: 1.1;">
