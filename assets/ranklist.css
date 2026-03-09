@@ -415,7 +415,6 @@ html[data-tv="fire"] .rk-scope.rk-compact{
 
   --rk-avatar-box: 32px;
 
-  --rk-body-justify: flex-start;
 }
 
 
@@ -442,8 +441,11 @@ html[data-tv="fire"] .rk-scope .rk-body{
   display: flex;
   flex-direction: column;
 
-  /* ✅ 2 pessoas continua centralizado; 3+ vai para topo via --rk-body-justify */
+  /* ✅ 1, 2 e 3 pessoas ficam centralizadas; 4+ sobem para o topo */
   justify-content: var(--rk-body-justify, center);
+
+  /* ✅ leve ajuste fino para subir o bloco mantendo a centralização */
+  transform: translateY(var(--rk-body-shift-y, 0px));
 
   /* ✅ gap pode ser reduzido no modo compacto */
   gap: var(--rk-body-gap, 16px);
@@ -451,6 +453,17 @@ html[data-tv="fire"] .rk-scope .rk-body{
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
+}
+
+html[data-tv="fire"] .rk-scope[data-count="1"],
+html[data-tv="fire"] .rk-scope[data-count="2"],
+html[data-tv="fire"] .rk-scope[data-count="3"]{
+  --rk-body-justify: center;
+  --rk-body-shift-y: -4px;
+}
+
+html[data-tv="fire"] .rk-scope.rk-compact:not([data-count="3"]){
+  --rk-body-justify: flex-start;
 }
 html[data-tv="fire"] .rk-scope .rk-body::-webkit-scrollbar{
   width: 0;
