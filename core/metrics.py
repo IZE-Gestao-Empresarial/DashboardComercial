@@ -5,6 +5,8 @@ import math
 import pandas as pd
 import re
 
+from core.people import dashboard_display_name
+
 def _is_nan(x) -> bool:
     return x is None or (isinstance(x, float) and math.isnan(x))
 
@@ -85,7 +87,19 @@ def people_values(
     d["VALOR"] = pd.to_numeric(d["VALOR"], errors="coerce")
     d = d[d["VALOR"].notna()]
 
-    return [{"name": str(r["RESPONSÁVEL"]), "value": float(r["VALOR"])} for _, r in d.iterrows()]
+    out: list[dict] = []
+    for _, r in d.iterrows():
+        name = str(r["RESPONSÁVEL"])
+        original_name = str(r.get("RESPONSÁVEL_ORIGINAL") or name)
+        out.append(
+            {
+                "name": name,
+                "original_name": original_name,
+                "display_name": dashboard_display_name(name, original_name),
+                "value": float(r["VALOR"]),
+            }
+        )
+    return out
 
 
 def shares_from_values(items: list[dict]) -> list[dict]:

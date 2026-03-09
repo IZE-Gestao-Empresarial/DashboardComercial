@@ -3,8 +3,8 @@ from dataclasses import dataclass
 # =========================
 # Config central
 # =========================
-REFRESH_MS = 300_000         # 5 min em ms
-CACHE_TTL_SECONDS = 250      # 250s (4 min e 10s)
+REFRESH_MS = 600_000         # 5 min em ms
+CACHE_TTL_SECONDS = 250     # 250s (4 min e 10s)
 
 @dataclass(frozen=True)
 class _Indicators:

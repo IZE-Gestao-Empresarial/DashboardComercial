@@ -32,7 +32,7 @@ def _fmt_money_br_no_symbol(v) -> str:
         return "0,00"
 
 
-def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") -> str:
+def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer", limit: int = 10, avatar_size_px: int = 56) -> str:
     """Ranking Closer (layout do mock).
 
     A colocação é definida SOMENTE por FATURAMENTO PAGO (desc).
@@ -59,6 +59,7 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
     formatted = []
     for r in ordered:
         name = r.get("name")
+        display_name = r.get("display_name")
 
         # ✅ prioriza a chave "oficial" que o ranklist procura por padrão
         pct_val = r.get("PERC FATURAMENTO PAGO")
@@ -68,6 +69,7 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
         formatted.append(
             {
                 "name": name,
+                "display_name": display_name,
                 "contratos": fmt_int(r.get("contratos")),
                 "fat_assinado": _fmt_money_br_no_symbol(r.get("fat_assinado")),
                 "fat_pago": _fmt_money_br_no_symbol(r.get("fat_pago")),
@@ -83,6 +85,6 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer") 
     return ranking_closer_card_html(
         title=title,
         rows=formatted,
-        limit=2,
-        avatar_size_px=56,
+        limit=limit,
+        avatar_size_px=avatar_size_px,
     )

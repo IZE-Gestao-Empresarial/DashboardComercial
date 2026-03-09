@@ -43,6 +43,31 @@
 
   /* ✅ quanto "volta" as métricas do 1º lugar (sem mexer no avatar) */
   --rk-r1-metrics-back: calc(10px * var(--ui-scale));
+
+/* ============================================================
+   COMPACT MODE — quando há 3+ pessoas no ranking (scroll + tipografia menor)
+   ============================================================ */
+.rk-scope.rk-compact{
+  --rk-body-gap: calc(10px * var(--ui-scale));
+  --rk-row-gap:  calc(10px * var(--ui-scale));
+
+  --rk-medal-w:  calc(42px * var(--ui-scale));
+  --rk-medal-img:calc(34px * var(--ui-scale));
+
+  /* --rk-pill-pad-y: NÃO sobrescreve — mantém altura igual para todos */
+  --rk-pill-pad-x: calc(14px * var(--ui-scale));
+  --rk-pill-gap:   calc(12px * var(--ui-scale));
+  --rk-pill-inset: clamp(18px, 2.2vw, 44px);
+
+  --rk-name-fs:  calc(clamp(16px,1.3vw,24px) * var(--text-scale));
+  --rk-label-fs: calc(clamp(10px,0.9vw,13px) * var(--text-scale));
+  --rk-value-fs: calc(clamp(12px,1.2vw,26px) * var(--text-scale));
+  --rk-sub-fs:   calc(clamp(10px,0.9vw,13px) * var(--text-scale));
+  --rk-pct-fs:   calc(clamp(10px,0.9vw,13px) * var(--text-scale));
+
+  --rk-avatar-box: calc(46px * var(--ui-scale));
+  --rk-avatar-scale: 1.0;
+}
 }
 
 .rk-scope .rk-card{
@@ -59,10 +84,23 @@
 }
 
 .rk-scope .rk-body{
-  margin-top: calc(12px * var(--ui-scale));
+  margin-top: calc(22px * var(--ui-scale));
   display:flex;
   flex-direction:column;
   gap: var(--rk-body-gap);
+
+  /* ✅ Permite acomodar mais pessoas sem estourar o card */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  /* esconde scrollbar (sem impactar scroll) */
+  scrollbar-width: none;          /* Firefox */
+}
+.rk-scope .rk-body::-webkit-scrollbar{
+  width: 0;
+  height: 0;
 }
 
 .rk-scope .rk-row{
@@ -226,10 +264,9 @@
   transform-origin:center;
 }
 
-/* DESKTOP: 2º lugar com altura reduzida */
+/* DESKTOP: 2º lugar — largura reduzida, altura igual ao rank 1 */
 .rk-scope .rk-row[data-rank="2"] .rk-pill{
-  padding-top:  calc(var(--rk-pill-pad-y) * var(--rk-r2-scale));
-  padding-bottom: calc(var(--rk-pill-pad-y) * var(--rk-r2-scale));
+  /* padding-top/bottom removido: altura igual para todos */
 }
 
 
@@ -268,7 +305,36 @@ html[data-tv="fire"] .rk-scope{
   --rk-pill-gap: 10px;
   --rk-pill-inset: 16px;
 
-  --rk-name-fs: 13px;
+  /* ==========================================================
+     ✅ Escalonamento proporcional de largura
+     Mantém a MESMA razão de redução do 1º -> 2º para os demais.
+
+     Base (rank 1):  width = 100% - --rk-pill-inset
+     razão (r):      0.921954708
+
+     rank 1  = 1
+     rank 2  = r
+     rank 3  = r²
+     rank 4  = r³
+     ...
+
+     Obs.: esses fatores são números (sem unidade) e funcionam
+     com calc() multiplicando um comprimento.
+     ========================================================== */
+  --rk-pill-w1: calc(100% - var(--rk-pill-inset));
+  --rk-pill-r: 0.921954708;
+  --rk-pill-wm-1: 1;
+  --rk-pill-wm-2: 0.921954708;
+  --rk-pill-wm-3: 0.850000484;
+  --rk-pill-wm-4: 0.783661948;
+  --rk-pill-wm-5: 0.722500822;
+  --rk-pill-wm-6: 0.666113034;
+  --rk-pill-wm-7: 0.614126048;
+  --rk-pill-wm-8: 0.566196401;
+  --rk-pill-wm-9: 0.522007438;
+  --rk-pill-wm-10: 0.481267215;
+
+  --rk-name-fs: 11px;
   --rk-label-fs: 8px;
   --rk-value-fs: 14px;
   --rk-sub-fs: 7px;
@@ -292,13 +358,66 @@ html[data-tv="fire"] .rk-scope{
   /* empurra bloco (métricas + foto) pra direita */
   --rk-right-shift: 10px;
 
-  /* desloca APENAS a 2ª métrica do 2º lugar (SDR) */
+  /* ajuste fino individual por bloco de métrica (SDR) */
+  --rk-sdr-r1-m1-shift: -2px;
+  --rk-sdr-r1-m2-shift: -2px;
+  --rk-sdr-r2-m1-shift: 0px;
   --rk-sdr-r2-m2-shift: -1px;
+  --rk-sdr-r3-m1-shift: -3.5px;
+  --rk-sdr-r3-m2-shift: 0px;
+  --rk-sdr-r4-m1-shift: -4.3px;
+  --rk-sdr-r4-m2-shift: 4px;
+
+  /* ajuste fino individual por bloco de métrica (Closer)
+     m1 = Fat. Assinado | m2 = Fat. Pago
+     negativo = esquerda | positivo = direita */
+  --rk-closer-r1-m1-shift: 0px;
+  --rk-closer-r1-m2-shift: 0px;
+  --rk-closer-r2-m1-shift: 0px;
+  --rk-closer-r2-m2-shift: 0px;
+  --rk-closer-r3-m1-shift: 0px;
+  --rk-closer-r3-m2-shift: 0px;
+  --rk-closer-r4-m1-shift: 0px;
+  --rk-closer-r4-m2-shift: 0px;
+  --rk-closer-r5-m1-shift: 0px;
+  --rk-closer-r5-m2-shift: 0px;
+  --rk-closer-r6-m1-shift: 0px;
+  --rk-closer-r6-m2-shift: 0px;
+  --rk-closer-r7-m1-shift: 0px;
+  --rk-closer-r7-m2-shift: 0px;
+  --rk-closer-r8-m1-shift: 0px;
+  --rk-closer-r8-m2-shift: 0px;
+  --rk-closer-r9-m1-shift: 0px;
+  --rk-closer-r9-m2-shift: 0px;
+  --rk-closer-r10-m1-shift: 0px;
+  --rk-closer-r10-m2-shift: 0px;
 
   /* junta as métricas do SDR sem mexer no avatar */
   --rk-sdr-metrics-gap: 23.5px;      /* ajuste fino */
   --rk-sdr-metric-flex: 0 1 auto;    /* não estica */
 }
+
+/* ✅ Fire TV: quando houver 3+ pessoas, reduz gaps mas mantém altura da pill igual */
+html[data-tv="fire"] .rk-scope.rk-compact{
+  --rk-body-gap: 8px;
+  --rk-row-gap: 6px;
+
+  --rk-medal-w: 28px;
+  --rk-medal-img: 24px;
+
+  /* --rk-pill-pad-y: NÃO sobrescreve — mantém 4px igual ao rank 1 */
+
+  --rk-name-fs: 11px;
+  --rk-label-fs: 7px;
+  --rk-value-fs: 12px;
+  --rk-sub-fs: 7px;
+  --rk-pct-fs: 7px;
+
+  --rk-avatar-box: 32px;
+
+  --rk-body-justify: flex-start;
+}
+
 
 html[data-tv="fire"] .rk-scope .rk-card{
   padding: 14px 12px;
@@ -316,12 +435,26 @@ html[data-tv="fire"] .rk-scope .rk-title-soft{
 }
 
 html[data-tv="fire"] .rk-scope .rk-body{
-  margin-top: 0;
-  flex: 1;
+  margin-top: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 16px;
+
+  /* ✅ 2 pessoas continua centralizado; 3+ vai para topo via --rk-body-justify */
+  justify-content: var(--rk-body-justify, center);
+
+  /* ✅ gap pode ser reduzido no modo compacto */
+  gap: var(--rk-body-gap, 16px);
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+html[data-tv="fire"] .rk-scope .rk-body::-webkit-scrollbar{
+  width: 0;
+  height: 0;
 }
 
 html[data-tv="fire"] .rk-scope .rk-pill{
@@ -351,7 +484,7 @@ html[data-tv="fire"] .rk-scope .rk-pill-sdr{
 }
 
 html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-name{
-  font-size: 13px;
+  font-size: 11px;
   line-height: 1.15;
   font-weight: 600;
   white-space: nowrap;
@@ -488,21 +621,41 @@ html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-avatar{
 /* (mantém o child scale geral; no Fire TV ele está em 1.0) */
 /* .rk-scope .rk-avatar > * { transform: scale(var(--rk-avatar-scale)); } */
 
-html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-row-main,
-html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-row-main{
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-row-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-row-main{
+  justify-content: flex-start;
+}
+
+/* Desktop: também alinha à esquerda para ranks 3+ */
+.rk-scope .rk-row[data-rank="3"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="4"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="5"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="6"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="7"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="8"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="9"]  .rk-row-main,
+.rk-scope .rk-row[data-rank="10"] .rk-row-main{
   justify-content: flex-start;
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-pill{
   padding: var(--rk-pill-pad-y) var(--rk-pill-pad-r) var(--rk-pill-pad-y) var(--rk-pill-pad-l);
-  width: calc(100% - 16px);
-  max-width: calc(100% - 16px);
+  width: var(--rk-pill-w1);
+  max-width: var(--rk-pill-w1);
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill{
   padding: var(--rk-pill-pad-y) var(--rk-pill-pad-r) var(--rk-pill-pad-y) var(--rk-pill-pad-l);
-  width: 88%;
-  max-width: 88%;
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-2));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-2));
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr{
@@ -514,11 +667,11 @@ html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer{
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer .rk-name-main{
-  font-size: 11px;
+  font-size: 11px; /* mantém 11px igual aos demais */
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr .rk-name{
-  font-size: 13px;
+  font-size: 11px; /* mantém 11px igual aos demais */
 }
 
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-name-sub,
@@ -558,7 +711,409 @@ html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-medal-fallback{
   font-size: 13px;
 }
 
-/* ✅ continua: só mexe na 2ª métrica do 2º colocado do SDR */
+/* ✅ ajuste fino por bloco, sem mexer na largura do ranking */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-sdr-r1-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-sdr-r1-m2-shift));
+}
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-sdr-r2-m1-shift));
+}
 html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(2){
   transform: translateX(var(--rk-sdr-r2-m2-shift));
+}
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-sdr-r3-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-sdr-r3-m2-shift));
+}
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-sdr-r4-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-sdr .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-sdr-r4-m2-shift));
+}
+
+/* ✅ ajuste fino por bloco no ranking Closer */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r1-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="1"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r1-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r2-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="2"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r2-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r3-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r3-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r4-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r4-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r5-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r5-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r6-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r6-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r7-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r7-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r8-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r8-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r9-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r9-m2-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(1){
+  transform: translateX(var(--rk-closer-r10-m1-shift));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-closer .rk-metrics .rk-metric:nth-child(2){
+  transform: translateX(var(--rk-closer-r10-m2-shift));
+}
+
+/* ============================================================
+   ESCALONAMENTO PROGRESSIVO — ranks 3, 4, 5+
+   Cada posição fica menor que a anterior:
+     rank 1 = 100% (base)
+     rank 2 = 88%  (já definido acima)
+     rank 3 = 77%
+     rank 4 = 68%
+     rank 5+ = 60%
+   ============================================================ */
+
+/* ---- DESKTOP: rank 3 ---- */
+.rk-scope .rk-row[data-rank="3"] .rk-pill{
+  /* padding-top/bottom removido: altura igual para todos */
+  width: calc(100% - var(--rk-pill-inset) * 1.5);
+  max-width: calc(100% - var(--rk-pill-inset) * 1.5);
+}
+.rk-scope .rk-row[data-rank="3"] .rk-name,
+.rk-scope .rk-row[data-rank="3"] .rk-name-main{
+  font-size: 11px;
+}
+.rk-scope .rk-row[data-rank="3"] .rk-label { font-size: calc(var(--rk-label-fs) * 0.82); }
+.rk-scope .rk-row[data-rank="3"] .rk-value { font-size: calc(var(--rk-value-fs) * 0.80); }
+.rk-scope .rk-row[data-rank="3"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="3"] .rk-name-pct{ font-size: calc(var(--rk-sub-fs) * 0.82); }
+.rk-scope .rk-row[data-rank="3"] .rk-avatar{
+  width:  calc(var(--rk-avatar-box) * 0.80);
+  height: calc(var(--rk-avatar-box) * 0.80);
+  min-width: calc(var(--rk-avatar-box) * 0.80);
+}
+/* medal rank 3 desktop: mesmo tamanho do rank 1 (sem override) */
+
+/* ---- DESKTOP: rank 4 ---- */
+.rk-scope .rk-row[data-rank="4"] .rk-pill{
+  /* padding-top/bottom removido: altura igual para todos */
+  width: calc(100% - var(--rk-pill-inset) * 2);
+  max-width: calc(100% - var(--rk-pill-inset) * 2);
+}
+.rk-scope .rk-row[data-rank="4"] .rk-name,
+.rk-scope .rk-row[data-rank="4"] .rk-name-main{
+  font-size: 11px;
+}
+.rk-scope .rk-row[data-rank="4"] .rk-label { font-size: calc(var(--rk-label-fs) * 0.70); }
+.rk-scope .rk-row[data-rank="4"] .rk-value { font-size: calc(var(--rk-value-fs) * 0.68); }
+.rk-scope .rk-row[data-rank="4"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="4"] .rk-name-pct{ font-size: calc(var(--rk-sub-fs) * 0.70); }
+.rk-scope .rk-row[data-rank="4"] .rk-avatar{
+  width:  calc(var(--rk-avatar-box) * 0.68);
+  height: calc(var(--rk-avatar-box) * 0.68);
+  min-width: calc(var(--rk-avatar-box) * 0.68);
+}
+/* medal rank 4 desktop: mesmo tamanho do rank 1 (sem override) */
+
+/* ---- DESKTOP: rank 5+ ---- */
+.rk-scope .rk-row[data-rank="5"] .rk-pill,
+.rk-scope .rk-row[data-rank="6"] .rk-pill,
+.rk-scope .rk-row[data-rank="7"] .rk-pill,
+.rk-scope .rk-row[data-rank="8"] .rk-pill,
+.rk-scope .rk-row[data-rank="9"] .rk-pill,
+.rk-scope .rk-row[data-rank="10"] .rk-pill{
+  /* padding-top/bottom removido: altura igual para todos */
+  width: calc(100% - var(--rk-pill-inset) * 2.5);
+  max-width: calc(100% - var(--rk-pill-inset) * 2.5);
+}
+.rk-scope .rk-row[data-rank="5"] .rk-name,
+.rk-scope .rk-row[data-rank="5"] .rk-name-main,
+.rk-scope .rk-row[data-rank="6"] .rk-name,
+.rk-scope .rk-row[data-rank="6"] .rk-name-main,
+.rk-scope .rk-row[data-rank="7"] .rk-name,
+.rk-scope .rk-row[data-rank="7"] .rk-name-main,
+.rk-scope .rk-row[data-rank="8"] .rk-name,
+.rk-scope .rk-row[data-rank="8"] .rk-name-main,
+.rk-scope .rk-row[data-rank="9"] .rk-name,
+.rk-scope .rk-row[data-rank="9"] .rk-name-main,
+.rk-scope .rk-row[data-rank="10"] .rk-name,
+.rk-scope .rk-row[data-rank="10"] .rk-name-main{ font-size: 11px; }
+
+.rk-scope .rk-row[data-rank="5"] .rk-label,
+.rk-scope .rk-row[data-rank="6"] .rk-label,
+.rk-scope .rk-row[data-rank="7"] .rk-label,
+.rk-scope .rk-row[data-rank="8"] .rk-label,
+.rk-scope .rk-row[data-rank="9"] .rk-label,
+.rk-scope .rk-row[data-rank="10"] .rk-label{ font-size: calc(var(--rk-label-fs) * 0.60); }
+
+.rk-scope .rk-row[data-rank="5"] .rk-value,
+.rk-scope .rk-row[data-rank="6"] .rk-value,
+.rk-scope .rk-row[data-rank="7"] .rk-value,
+.rk-scope .rk-row[data-rank="8"] .rk-value,
+.rk-scope .rk-row[data-rank="9"] .rk-value,
+.rk-scope .rk-row[data-rank="10"] .rk-value{ font-size: calc(var(--rk-value-fs) * 0.58); }
+
+.rk-scope .rk-row[data-rank="5"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="5"] .rk-name-pct,
+.rk-scope .rk-row[data-rank="6"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="6"] .rk-name-pct,
+.rk-scope .rk-row[data-rank="7"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="7"] .rk-name-pct,
+.rk-scope .rk-row[data-rank="8"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="8"] .rk-name-pct,
+.rk-scope .rk-row[data-rank="9"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="9"] .rk-name-pct,
+.rk-scope .rk-row[data-rank="10"] .rk-name-sub,
+.rk-scope .rk-row[data-rank="10"] .rk-name-pct{ font-size: calc(var(--rk-sub-fs) * 0.60); }
+
+.rk-scope .rk-row[data-rank="5"] .rk-avatar,
+.rk-scope .rk-row[data-rank="6"] .rk-avatar,
+.rk-scope .rk-row[data-rank="7"] .rk-avatar,
+.rk-scope .rk-row[data-rank="8"] .rk-avatar,
+.rk-scope .rk-row[data-rank="9"] .rk-avatar,
+.rk-scope .rk-row[data-rank="10"] .rk-avatar{
+  width:  calc(var(--rk-avatar-box) * 0.58);
+  height: calc(var(--rk-avatar-box) * 0.58);
+  min-width: calc(var(--rk-avatar-box) * 0.58);
+}
+/* medal ranks 5+ desktop: mesmo tamanho do rank 1 (sem override) */
+
+
+/* ============================================================
+   FIRE TV — ESCALONAMENTO PROGRESSIVO ranks 3, 4, 5+
+   Base Fire TV rank 1:
+     name 13px | label 8px | value 13px | sub 7px | avatar 38px | medal 28px
+   rank 2: width 88%  (já existia acima)
+   rank 3: width 76%  | ~82% do tamanho base
+   rank 4: width 66%  | ~70% do tamanho base
+   rank 5+: width 58% | ~60% do tamanho base
+   ============================================================ */
+
+/* ---- Fire TV: rank 3 ---- */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-3));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-3));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-closer{
+  grid-template-columns: 1fr 110px 30px;
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-sdr{
+  grid-template-columns: 1fr 118px 30px;
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-closer .rk-name-main{ font-size: 11px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-sdr .rk-name{ font-size: 11px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-name-pct{ font-size: 6px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-label{ font-size: 7px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-value{ font-size: 11px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-avatar{
+  width: 30px; height: 30px; min-width: 30px;
+}
+/* medal rank 3 Fire TV: mesmo tamanho do rank 1 (sem override) */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-closer .rk-avatar{ transform: translateX(var(--rk-avatar-shift-closer)); }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="3"] .rk-pill-sdr    .rk-avatar{ transform: translateX(var(--rk-avatar-shift-sdr)); }
+
+/* ---- Fire TV: rank 4 ---- */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-4));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-4));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-closer{
+  grid-template-columns: 1fr 94px 26px;
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-sdr{
+  grid-template-columns: 1fr 102px 26px;
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-closer .rk-name-main{ font-size: 11px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-sdr .rk-name{ font-size: 11px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-name-pct{ font-size: 5.5px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-label{ font-size: 6px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-value{ font-size: 9px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-avatar{
+  width: 26px; height: 26px; min-width: 26px;
+}
+/* medal rank 4 Fire TV: mesmo tamanho do rank 1 (sem override) */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-closer .rk-avatar{ transform: translateX(var(--rk-avatar-shift-closer)); }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="4"] .rk-pill-sdr    .rk-avatar{ transform: translateX(var(--rk-avatar-shift-sdr)); }
+
+/* ---- Fire TV: rank 5+ (continua proporcional) ---- */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-5));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-5));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-6));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-6));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-7));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-7));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-8));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-8));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-9));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-9));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill{
+  width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-10));
+  max-width: calc(var(--rk-pill-w1) * var(--rk-pill-wm-10));
+}
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-pill-closer,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-pill-closer,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-pill-closer,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-pill-closer,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-pill-closer,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-closer{ grid-template-columns: 1fr 80px 22px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-pill-sdr,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-pill-sdr,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-pill-sdr,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-pill-sdr,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-pill-sdr,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-sdr{ grid-template-columns: 1fr 88px 22px; }
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-pill-closer .rk-name-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-pill-closer .rk-name-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-pill-closer .rk-name-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-pill-closer .rk-name-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-pill-closer .rk-name-main,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-closer .rk-name-main{ font-size: 11px; }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-pill-sdr .rk-name,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-pill-sdr .rk-name,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-pill-sdr .rk-name,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-pill-sdr .rk-name,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-pill-sdr .rk-name,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-sdr .rk-name{ font-size: 11px; }
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-name-pct,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-name-pct,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-name-pct,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-name-pct,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-name-pct,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-name-sub,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-name-pct{ font-size: 5px; }
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-label,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-label,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-label,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-label,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-label,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-label{ font-size: 5.5px; }
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-value,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-value,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-value,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-value,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-value,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-value{ font-size: 8px; }
+
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-avatar{
+  width: 22px; height: 22px; min-width: 22px;
+}
+/* medal ranks 5+ Fire TV: mesmo tamanho do rank 1 (sem override) */
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-pill-closer .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-pill-closer .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-pill-closer .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-pill-closer .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-pill-closer .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-closer .rk-avatar{ transform: translateX(var(--rk-avatar-shift-closer)); }
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="5"]  .rk-pill-sdr .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="6"]  .rk-pill-sdr .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="7"]  .rk-pill-sdr .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="8"]  .rk-pill-sdr .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="9"]  .rk-pill-sdr .rk-avatar,
+html[data-tv="fire"] .rk-scope .rk-row[data-rank="10"] .rk-pill-sdr .rk-avatar{ transform: translateX(var(--rk-avatar-shift-sdr)); }
+
+
+/* ============================================================
+   RANK_X — Coroa de louros com número sobreposto (rank 4+)
+   ============================================================ */
+
+/* Container relativo para empilhar imagem + número */
+.rk-scope .rk-medal-rank-x {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rk-medal-img);
+  height: var(--rk-medal-img);
+}
+
+/* Número centralizado sobre a coroa — fonte definida em 88px,
+   depois escalada para caber dentro da imagem (tamanho ~44px base) */
+.rk-scope .rk-medal-rank-x-num {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 40px;
+  font-weight: 700;
+  color: #000000;
+  line-height: 1;
+  pointer-events: none;
+  transform: translate(-50%, -58%) scale(0.45);
+  transform-origin: center center;
+  white-space: nowrap;
+}
+
+/* Fire TV: a imagem da medalha é 28px, então escalamos proporcionalmente */
+html[data-tv="fire"] .rk-scope .rk-medal-rank-x {
+  width: 28px;
+  height: 28px;
+}
+
+html[data-tv="fire"] .rk-scope .rk-medal-rank-x-num {
+  /* 28px / 44px * 0.45 ≈ 0.286 */
+  transform: translate(-50%, -58%) scale(0.286);
 }
