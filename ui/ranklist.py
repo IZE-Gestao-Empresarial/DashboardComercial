@@ -292,13 +292,12 @@ def ranking_closer_card_html(
         </div>
         """
 
-    def _k(r: dict) -> float:
-        try:
-            return float(r.get("fat_pago") or 0.0)
-        except Exception:
-            return 0.0
+    # ⚠️ Importante: esta função é de *renderização*.
+    # A ordenação deve ser feita no app (onde ainda temos os valores numéricos
+    # corretos). Aqui os valores podem estar formatados (ex.: "98.874"), e
+    # reordenar usando float() causaria bugs.
     lim = max(1, int(limit) or 2)
-    ordered = sorted(rows, key=_k, reverse=True)[:lim]
+    ordered = rows[:lim]
 
     count = len(ordered)
     compact = count > 2

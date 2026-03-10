@@ -35,7 +35,11 @@ def _fmt_money_br_no_symbol(v) -> str:
 def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer", limit: int = 10, avatar_size_px: int = 56) -> str:
     """Ranking Closer (layout do mock).
 
-    A colocação é definida SOMENTE por FATURAMENTO PAGO (desc).
+    A colocação é definida por:
+      1) FATURAMENTO ASSINADO (desc)
+      2) Em empate, FATURAMENTO PAGO (desc)
+      3) Em novo empate, CONTRATOS (desc)
+      4) Por fim, NOME (asc) para estabilidade
     Espera `rows` com chaves:
       - name, contratos, fat_assinado, fat_pago
       - (opcional) PERC FATURAMENTO PAGO -> percentual a exibir abaixo de "contratos"
@@ -48,13 +52,21 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer", 
         </div>
         '''
 
-    def _k(r: dict) -> float:
+    def _f(v) -> float:
         try:
-            return float(r.get("fat_pago") or 0.0)
+            return float(v or 0.0)
         except Exception:
             return 0.0
 
-    ordered = sorted(rows, key=_k, reverse=True)
+    ordered = sorted(
+        rows,
+        key=lambda r: (
+            -_f(r.get("fat_assinado")),
+            -_f(r.get("fat_pago")),
+            -_f(r.get("contratos")),
+            str(r.get("name") or "").strip().upper(),
+        ),
+    )
 
     formatted = []
     for r in ordered:
