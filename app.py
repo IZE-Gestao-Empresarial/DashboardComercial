@@ -359,7 +359,10 @@ m_perc_fat_pago = _map_norm(perc_fat_pago_vals)
 
 # ✅ Dinâmico: só entra no Ranking Closer quem tiver TODOS os 4 indicadores:
 #    CONTRATOS ASSINADOS, FATURAMENTO ASSINADO, FATURAMENTO PAGO e PERC FATURAMENTO PAGO
-eligible_keys = list(set(m_contr) & set(m_fa) & set(m_fp) & set(m_perc_fat_pago))
+#
+# ⚠️ Importante: NÃO use set() puro aqui para não introduzir ordem não-determinística
+# (o que bagunça a colocação quando há empates). Mantemos uma ordem estável.
+eligible_keys = sorted(set(m_contr) & set(m_fa) & set(m_fp) & set(m_perc_fat_pago))
 
 rows_closer: list[dict] = []
 for k in eligible_keys:
@@ -393,7 +396,19 @@ for k in eligible_keys:
         }
     )
 
-rows_closer.sort(key=lambda r: float(_to_float_moneyish(r.get("fat_pago")) or 0.0), reverse=True)
+# Ordenação do Ranking Closer:
+#  1) Faturamento ASSINADO (desc)
+#  2) Em empate, Faturamento PAGO (desc)
+#  3) Em novo empate, Contratos (desc)
+#  4) Por fim, Nome (asc) para estabilidade total
+rows_closer.sort(
+    key=lambda r: (
+        -float(_to_float_moneyish(r.get("fat_assinado")) or 0.0),
+        -float(_to_float_moneyish(r.get("fat_pago")) or 0.0),
+        -float(r.get("contratos") or 0.0),
+        str(r.get("name") or "").strip().upper(),
+    )
+)
 rows_closer = rows_closer[:RANKING_MAX_ROWS]
 
 
