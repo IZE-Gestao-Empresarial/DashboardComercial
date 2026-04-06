@@ -44,6 +44,9 @@
   /* ✅ quanto "volta" as métricas do 1º lugar (sem mexer no avatar) */
   --rk-r1-metrics-back: calc(10px * var(--ui-scale));
 
+  /* deslocamento horizontal exclusivo das métricas do 5º lugar no SDR */
+  --rk-sdr-rank5-metrics-shift-x: -6px;
+
 /* ============================================================
    COMPACT MODE — quando há 3+ pessoas no ranking (scroll + tipografia menor)
    ============================================================ */
@@ -219,6 +222,11 @@
   padding-right: var(--rk-r1-metrics-back);
 }
 
+/* desloca apenas o bloco de métricas do 5º lugar no ranking SDR */
+.rk-scope .rk-row[data-rank="5"] .rk-pill-sdr .rk-metrics{
+  transform: translateX(var(--rk-sdr-rank5-metrics-shift-x));
+}
+
 .rk-scope .rk-metric{
   display:flex;
   flex-direction:column;
@@ -282,7 +290,7 @@ html[data-tv="fire"] .rk-scope{
   --rk-medal-img: 28px;
 
   /* ✅ ALTURA DA PILL (aumentei p/ dar mais “corpo”) */
-  --rk-pill-pad-y: 4px;
+  --rk-pill-pad-y: 2px;
 
   /* ==========================================================
      ✅ PADDING POR TIPO (CLOSER x SDR)
@@ -395,17 +403,21 @@ html[data-tv="fire"] .rk-scope{
   /* junta as métricas do SDR sem mexer no avatar */
   --rk-sdr-metrics-gap: 23.5px;      /* ajuste fino */
   --rk-sdr-metric-flex: 0 1 auto;    /* não estica */
+
+  /* desloca o bloco inteiro Reuniões + Conversão (%)
+     negativo = esquerda | positivo = direita */
+  --rk-sdr-metrics-shift-x: 0px;
 }
 
 /* ✅ Fire TV: quando houver 3+ pessoas, reduz gaps mas mantém altura da pill igual */
 html[data-tv="fire"] .rk-scope.rk-compact{
-  --rk-body-gap: 8px;
-  --rk-row-gap: 6px;
+  --rk-body-gap: 6px;
+  --rk-row-gap: 4px;
 
   --rk-medal-w: 28px;
   --rk-medal-img: 24px;
 
-  /* --rk-pill-pad-y: NÃO sobrescreve — mantém 4px igual ao rank 1 */
+  /* --rk-pill-pad-y: NÃO sobrescreve — mantém 2px igual ao rank 1 */
 
   --rk-name-fs: 11px;
   --rk-label-fs: 7px;
@@ -555,6 +567,7 @@ html[data-tv="fire"] .rk-scope .rk-metrics{
 /* junta as métricas APENAS no SDR (sem afetar Closer) */
 html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-metrics{
   gap: var(--rk-sdr-metrics-gap);
+  transform: translateX(var(--rk-sdr-metrics-shift-x));
 }
 
 html[data-tv="fire"] .rk-scope .rk-pill-sdr .rk-metrics .rk-metric{
