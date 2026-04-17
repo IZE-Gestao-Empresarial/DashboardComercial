@@ -103,7 +103,7 @@ def fetch_payload(url: str, token: str, ttl_seconds: int = 4) -> Dict[str, Any]:
 
     @st.cache_data(ttl=ttl_seconds, show_spinner=False)
     def _fetch(_url: str, _token: str) -> Dict[str, Any]:
-        r = requests.get(_url, params={"token": _token}, timeout=25)
+        r = requests.get(_url, params={"token": _token}, timeout=60)
         r.raise_for_status()
         return _safe_json(r)
 
