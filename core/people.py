@@ -44,5 +44,6 @@ PHOTO_URLS: dict[str, str] = {
     "CODRI": "https://i.imgur.com/fakgDcL.png",
     "MATHEUS": "https://i.imgur.com/uKjvrb1.png",
     "RAISSA": "https://i.imgur.com/7z9lI91.jpeg",
-    "ARTHUR": "https://i.imgur.com/I46ZNA2.jpeg"
+    "ARTHUR": "https://i.imgur.com/I46ZNA2.jpeg",
+    "MARCOS": "http://i.imgur.com/mc2H4t5.png"
 }

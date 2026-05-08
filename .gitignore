@@ -7,6 +7,7 @@ core/__pycache__/
 __pycache__/
 *.pyc
 
-venv/
+venv
+.venv
 .streamlit/secrets.toml
 .streamlit/secrets.toml
