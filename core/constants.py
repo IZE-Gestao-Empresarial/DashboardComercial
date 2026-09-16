@@ -5,6 +5,8 @@ from dataclasses import dataclass
 # =========================
 REFRESH_MS = 600_000         # 5 min em ms
 CACHE_TTL_SECONDS = 250     # 250s (4 min e 10s)
+SHEET_ID = "1AFGtJnXdqb6KfmXOmSfFbSR_cmGho5d8d1yd9HX6RUo"
+SHEET_GID = "0"
 
 @dataclass(frozen=True)
 class _Indicators:
@@ -28,10 +30,10 @@ class _Indicators:
     CONTRATOS_ASSINADOS: str = "CONTRATOS ASSINADOS"
     FATURAMENTO_ASSINADO: str = "FATURAMENTO ASSINADO"
     FATURAMENTO_PAGO: str = "FATURAMENTO PAGO"
-    TAX_CONV_FUNIL_1: str = "TAXA DE CONVERSÃO FUNIL 1"
-    TAX_CONV_FUNIL_2: str = "TAXA DE CONVERSÃO FUNIL 2"
+    TAX_CONV_FUNIL_1: str = "PRODUTIVIDADE POR EVENTOS DO PERÍODO 1"
+    TAX_CONV_FUNIL_2: str = "PRODUTIVIDADE POR EVENTOS DO PERÍODO 2"
 
     # ✅ Ranking Closer: percentual deve vir do indicador (por responsável)
-    PERC_FATURAMENTO_PAGO: str = "PERC FATURAMENTO PAGO"
+    TAXA_CONVERSAO_CLOSER: str = "TAXA DE CONVERS\u00c3O DO CLOSER"
 
 INDICATORS = _Indicators()

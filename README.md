@@ -1,6 +1,6 @@
 # Streamlit - Indicadores Comerciais (Google Sheets)
 
-Este app lê um endpoint (Apps Script Web App) que retorna JSON no formato:
+Este app lê diretamente uma aba pública do Google Sheets usando a exportação CSV nativa.
 
 {
   "updatedAt": "...",
@@ -13,19 +13,8 @@ Este app lê um endpoint (Apps Script Web App) que retorna JSON no formato:
 1) Instalar deps:
 pip install -r requirements.txt
 
-2) Criar secrets:
-- Windows: %USERPROFILE%\.streamlit\secrets.toml
-- Linux/mac: ~/.streamlit/secrets.toml
-
-Conteúdo do secrets.toml:
-
-SHEETS_WEBAPP_URL = "https://script.google.com/macros/s/...../exec"
-SHEETS_WEBAPP_TOKEN = "seu_token"
-
-3) Rodar:
+2) Rodar:
 streamlit run app.py
 
 ## Streamlit Cloud
-No Streamlit Cloud -> Settings -> Secrets, use as mesmas chaves.
-
-O app faz refresh automático a cada 1 minuto.
+O app faz refresh automático e atualiza os dados a partir do Sheets.

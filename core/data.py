@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from io import StringIO
 from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
@@ -95,19 +96,27 @@ def _safe_json(resp: requests.Response) -> Dict[str, Any]:
         }
 
 
-def fetch_payload(url: str, token: str, ttl_seconds: int = 4) -> Dict[str, Any]:
-    """
-    Busca o JSON do Apps Script WebApp.
-    Cache (TTL) é aplicado aqui pra reduzir a carga e evitar rate-limit.
-    """
+def fetch_payload(sheet_id: str, gid: str = "0", ttl_seconds: int = 250) -> Dict[str, Any]:
+    """Busca diretamente uma aba pública do Google Sheets em formato CSV."""
 
     @st.cache_data(ttl=ttl_seconds, show_spinner=False)
-    def _fetch(_url: str, _token: str) -> Dict[str, Any]:
-        r = requests.get(_url, params={"token": _token}, timeout=60)
+    def _fetch(_sheet_id: str, _gid: str) -> Dict[str, Any]:
+        url = f"https://docs.google.com/spreadsheets/d/{_sheet_id}/export"
+        r = requests.get(url, params={"format": "csv", "gid": _gid}, timeout=60)
         r.raise_for_status()
-        return _safe_json(r)
 
-    return _fetch(url, token)
+        if not r.text.lstrip().startswith(("INDICADORES", '"INDICADORES')):
+            raise RuntimeError("O Google Sheets não retornou um CSV válido. Verifique se a planilha está pública.")
+
+        sheet_df = pd.read_csv(StringIO(r.text), dtype=object)
+        sheet_df = sheet_df.where(pd.notna(sheet_df), None)
+        return {
+            "updatedAt": None,
+            "sheet": "INDICADORES_COMERCIAL",
+            "rows": sheet_df.to_dict(orient="records"),
+        }
+
+    return _fetch(sheet_id, gid)
 
 
 def payload_to_df(payload: Dict[str, Any]) -> Tuple[pd.DataFrame, Optional[str], Optional[str]]:

@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 from streamlit_autorefresh import st_autorefresh
 import re
 
-from core.constants import CACHE_TTL_SECONDS, REFRESH_MS, INDICATORS
+from core.constants import CACHE_TTL_SECONDS, REFRESH_MS, INDICATORS, SHEET_ID, SHEET_GID
 from core.data import fetch_payload, payload_to_df, latest_values, get_val
 from core.metrics import total_for_indicator, people_values, to_percent_value
 from core.formatters import fmt_int, fmt_money, pct_to_float_percent, fmt_money_no_cents
@@ -65,20 +65,11 @@ inject_kiosk_css()
 # Auto refresh (TV)
 st_autorefresh(interval=REFRESH_MS, key="auto_refresh_main")
 
-# Secrets
-URL = st.secrets.get("SHEETS_WEBAPP_URL", "")
-TOKEN = st.secrets.get("SHEETS_WEBAPP_TOKEN", "")
-
-if not (URL and TOKEN):
-    st.error("Defina SHEETS_WEBAPP_URL e SHEETS_WEBAPP_TOKEN em .streamlit/secrets.toml")
-    st.stop()
-
-
 # =========================
 # Data
 # =========================
 try:
-    payload = fetch_payload(URL, TOKEN, ttl_seconds=CACHE_TTL_SECONDS)
+    payload = fetch_payload(SHEET_ID, SHEET_GID, ttl_seconds=CACHE_TTL_SECONDS)
 except requests.HTTPError as e:
     st.error(f"Erro HTTP ao buscar dados: {e}")
     st.stop()
@@ -116,6 +107,15 @@ fat_meta = get_val(df_last, INDICATORS.FAT_META, "CLOSER")
 fat_perc = get_val(df_last, INDICATORS.FAT_PERC, "CLOSER")
 fat_cresc = get_val(df_last, INDICATORS.FAT_CRESC, "CLOSER")
 fat_dif = (fat_assinado - fat_meta) if (fat_assinado is not None and fat_meta is not None) else None
+
+# Se o percentual da planilha vier vazio ou zerado, calcula pelo faturamento assinado/meta.
+try:
+    fat_perc_num = float(fat_perc) if fat_perc is not None else 0.0
+except (TypeError, ValueError):
+    fat_perc_num = 0.0
+
+if fat_perc_num == 0.0 and fat_assinado is not None and fat_meta:
+    fat_perc = float(fat_assinado) / float(fat_meta)
 
 card_reunioes = kpi_card_html(
     title="Reuniões Ocorridas",
@@ -329,8 +329,8 @@ contratos_vals = people_values(df_last, INDICATORS.CONTRATOS_ASSINADOS, exclude_
 fat_ass_vals = people_values(df_last, INDICATORS.FATURAMENTO_ASSINADO, exclude_responsaveis=["CLOSER"])
 fat_pago_vals = people_values(df_last, INDICATORS.FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
 
-# ✅ % vem do indicador PERC FATURAMENTO PAGO (sem cálculo no app.py)
-perc_fat_pago_vals = people_values(df_last, INDICATORS.PERC_FATURAMENTO_PAGO, exclude_responsaveis=["CLOSER"])
+# A taxa vem do indicador TAXA DE CONVERSÃO DO CLOSER (sem cálculo no app.py)
+taxa_conversao_closer_vals = people_values(df_last, INDICATORS.TAXA_CONVERSAO_CLOSER, exclude_responsaveis=["CLOSER"])
 
 def _map_norm(vals: list[dict]) -> dict[str, dict]:
     """Mapeia: NOME_NORMALIZADO -> {name, value}."""
@@ -355,29 +355,29 @@ def _map_norm(vals: list[dict]) -> dict[str, dict]:
 m_contr = _map_norm(contratos_vals)
 m_fa = _map_norm(fat_ass_vals)
 m_fp = _map_norm(fat_pago_vals)
-m_perc_fat_pago = _map_norm(perc_fat_pago_vals)
+m_taxa_closer = _map_norm(taxa_conversao_closer_vals)
 
 # ✅ Dinâmico: só entra no Ranking Closer quem tiver TODOS os 4 indicadores:
-#    CONTRATOS ASSINADOS, FATURAMENTO ASSINADO, FATURAMENTO PAGO e PERC FATURAMENTO PAGO
+#    CONTRATOS ASSINADOS, FATURAMENTO ASSINADO, FATURAMENTO PAGO e TAXA DE CONVERSÃO DO CLOSER
 #
 # ⚠️ Importante: NÃO use set() puro aqui para não introduzir ordem não-determinística
 # (o que bagunça a colocação quando há empates). Mantemos uma ordem estável.
-eligible_keys = sorted(set(m_contr) & set(m_fa) & set(m_fp) & set(m_perc_fat_pago))
+eligible_keys = sorted(set(m_contr) & set(m_fa) & set(m_fp) & set(m_taxa_closer))
 
 rows_closer: list[dict] = []
 for k in eligible_keys:
-    src_row = (m_fp.get(k) or m_fa.get(k) or m_contr.get(k) or m_perc_fat_pago.get(k) or {})
+    src_row = (m_fp.get(k) or m_fa.get(k) or m_contr.get(k) or m_taxa_closer.get(k) or {})
     name = (
         src_row.get("name")
         or (m_fp.get(k) or {}).get("name")
         or (m_fa.get(k) or {}).get("name")
         or (m_contr.get(k) or {}).get("name")
-        or (m_perc_fat_pago.get(k) or {}).get("name")
+        or (m_taxa_closer.get(k) or {}).get("name")
         or k
     )
     display_name = src_row.get("display_name")
 
-    perc_raw = (m_perc_fat_pago.get(k) or {}).get("value")  # pode vir 0.15, "15%", "0,15", etc.
+    perc_raw = (m_taxa_closer.get(k) or {}).get("value")  # pode vir 0.15, "15%", "0,15", etc.
     perc_float = pct_to_float_percent(perc_raw)               # normaliza para 0..100 (float)
 
     rows_closer.append(
@@ -389,9 +389,7 @@ for k in eligible_keys:
             "fat_pago": (m_fp.get(k) or {}).get("value"),
 
             # ✅ chave "oficial" que o ranklist procura por padrão (pct_field)
-            "PERC FATURAMENTO PAGO": perc_float,
-
-            # ✅ opcional: mantém fallback compatível (ranklist também busca "pct")
+            # O card usa este percentual via fallback "pct".
             "pct": perc_float,
         }
     )
@@ -425,8 +423,21 @@ if contratos_total is None:
 tax_funil_1_raw = get_val(df_last, INDICATORS.TAX_CONV_FUNIL_1, "SDR")
 tax_funil_2_raw = get_val(df_last, INDICATORS.TAX_CONV_FUNIL_2, "CLOSER")
 
-tax_funil_1 = pct_to_float_percent(tax_funil_1_raw)
-tax_funil_2 = pct_to_float_percent(tax_funil_2_raw)
+# A planilha atual não possui linhas para esses dois indicadores.
+# Calcula o percentual a partir dos totais e usa o valor da planilha quando existir.
+if tax_funil_1_raw is None:
+    leads_base = _to_float_safe(leads_total)
+    reunioes_base = _to_float_safe(reun_real)
+    tax_funil_1 = (reunioes_base / leads_base * 100.0) if leads_base > 0 else 0.0
+else:
+    tax_funil_1 = pct_to_float_percent(tax_funil_1_raw)
+
+if tax_funil_2_raw is None:
+    reunioes_base = _to_float_safe(reun_real)
+    contratos_base = _to_float_safe(contratos_total)
+    tax_funil_2 = (contratos_base / reunioes_base * 100.0) if reunioes_base > 0 else 0.0
+else:
+    tax_funil_2 = pct_to_float_percent(tax_funil_2_raw)
 
 card_funil_vendas = funil_vendas_card_html(
     title="Funil de Vendas",

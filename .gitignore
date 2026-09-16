@@ -6,7 +6,7 @@ ui/__pycache__/
 core/__pycache__/
 __pycache__/
 *.pyc
-
+*__pycache__
 venv
 .venv
 .streamlit/secrets.toml

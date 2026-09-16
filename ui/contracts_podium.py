@@ -42,7 +42,7 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer", 
       4) Por fim, NOME (asc) para estabilidade
     Espera `rows` com chaves:
       - name, contratos, fat_assinado, fat_pago
-      - (opcional) PERC FATURAMENTO PAGO -> percentual a exibir abaixo de "contratos"
+      - (opcional) TAXA DE CONVERSÃO DO CLOSER -> percentual a exibir abaixo de "contratos"
       - (opcional) pct -> fallback/compatibilidade
     """
     if not rows:
@@ -73,10 +73,7 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer", 
         name = r.get("name")
         display_name = r.get("display_name")
 
-        # ✅ prioriza a chave "oficial" que o ranklist procura por padrão
-        pct_val = r.get("PERC FATURAMENTO PAGO")
-        if pct_val is None:
-            pct_val = r.get("pct")
+        pct_val = r.get("pct")
 
         formatted.append(
             {
@@ -86,10 +83,6 @@ def podium_contracts_card_html(rows: list[dict], title: str = "Ranking Closer", 
                 "fat_assinado": _fmt_money_br_no_symbol(r.get("fat_assinado")),
                 "fat_pago": _fmt_money_br_no_symbol(r.get("fat_pago")),
 
-                # ✅ garante que o ranklist pegue pelo pct_field="PERC FATURAMENTO PAGO"
-                "PERC FATURAMENTO PAGO": pct_val,
-
-                # ✅ mantém fallback compatível (ranklist também busca "pct")
                 "pct": pct_val,
             }
         )

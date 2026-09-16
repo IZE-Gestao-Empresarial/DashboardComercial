@@ -276,7 +276,7 @@ def ranking_closer_card_html(
     limit: int = 2,
     avatar_size_px: int = 56,
     money_prefix: str = "R$ ",
-    pct_field: str = "PERC FATURAMENTO PAGO",
+    pct_field: str = "TAXA DE CONVERS\u00c3O DO CLOSER",
 ) -> str:
     """Ranking Closer no layout do mock (pills com 2 colunas: Fat. Assinado + Fat. Pago)."""
 
